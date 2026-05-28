@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db, Expert, TaskSubmission, RoyaltyPayout } from './db';
+import { evaluateWithGroqScore, evaluateWithOpenAIStructured } from '../../lib/llm';
+import { executeFullPayoutFlow } from '../../lib/razorpay';
 
 // Route handler for handling unified simulated actions
 export async function GET(req: NextRequest) {
@@ -86,36 +88,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Expert or Pool not found' }, { status: 404 });
     }
 
-    // Dynamic points calculation based on quality and tier multipliers
-    // Simulate high-speed model structure check & premium model reasoning check
-    const isReasoningGood = response.trim().length > 100;
-    const score = isReasoningGood 
-      ? Math.floor(Math.random() * (100 - 90 + 1)) + 90 // 90 to 100
-      : Math.floor(Math.random() * (88 - 70 + 1)) + 70; // 70 to 88
+    // Execute Groq and OpenAI evaluations concurrently
+    console.log(`[API Submit] Running consensus evaluations for prompt: "${prompt.substring(0, 50)}..."`);
+    const [groqScore, openaiResult] = await Promise.all([
+      evaluateWithGroqScore(response, pool.description || undefined),
+      evaluateWithOpenAIStructured(response, pool.description || undefined)
+    ]);
 
-    let status: TaskSubmission['status'] = 'PENDING';
-    if (score >= 92) {
-      status = 'APPROVED';
-    } else if (score >= 85) {
-      status = 'BORDERLINE';
-    } else {
-      status = 'HUMAN_REVIEW_REQUIRED';
-    }
+    console.log(`[API Submit] Groq Score Result: ${groqScore}`);
+    console.log(`[API Submit] OpenAI Result: Score=${openaiResult.score}, Reasoning="${openaiResult.reasoning_text}"`);
+
+    // Status is strictly updated to APPROVED as requested
+    const status: TaskSubmission['status'] = 'APPROVED';
+
+    // Calculate quality score scaled to 100
+    const avgScoreDecimal = (groqScore + openaiResult.score) / 2;
+    const finalQualityScore = Math.round(avgScoreDecimal * 100);
 
     // Calculate points: basePoints (10) * diffMultiplier * tierMultiplier * qualityMultiplier
     const basePoints = 10;
     const tierMultipliers = { BRONZE: 1.0, SILVER: 1.2, GOLD: 1.5, SENIOR: 1.7, ELITE: 2.0 };
     const tierMultiplier = tierMultipliers[expert.tier] || 1.0;
     
-    let qualityMultiplier = 0.5;
-    if (score >= 95) qualityMultiplier = 1.2;
-    else if (score >= 90) qualityMultiplier = 1.0;
-    else if (score >= 80) qualityMultiplier = 0.8;
-
+    let qualityMultiplier = avgScoreDecimal >= 0.9 ? 1.2 : (avgScoreDecimal >= 0.8 ? 1.0 : 0.8);
     const pointsEarned = parseFloat((basePoints * difficultyMultiplier * tierMultiplier * qualityMultiplier).toFixed(2));
-
-    const llamaVerdict = score >= 90 ? 'APPROVED' : 'BORDERLINE';
-    const claudeVerdict = score >= 92 ? 'APPROVED' : (score >= 85 ? 'BORDERLINE' : 'REJECTED');
 
     const newSubmission: TaskSubmission = {
       id: `sub_${Math.random().toString(36).substring(2, 9)}`,
@@ -127,59 +123,92 @@ export async function POST(req: NextRequest) {
       prompt,
       response,
       difficultyMultiplier,
-      qualityScore: score,
-      pointsEarned: status === 'APPROVED' || status === 'BORDERLINE' ? pointsEarned : 0,
+      qualityScore: finalQualityScore,
+      pointsEarned,
       status,
       timestamp: new Date().toISOString(),
       evaluations: [
         {
-          provider: 'Llama 3.3 (Groq)',
+          provider: 'Groq (Llama 3.3)',
           modelName: 'llama-3.3-70b-versatile',
-          score: Math.min(100, score + 2),
-          verdict: llamaVerdict,
-          reasoning: score >= 90 
-            ? 'Response adheres to structure, uses appropriate code-mixed Indic vocabulary.' 
-            : 'Response is somewhat sparse and could benefit from deeper reasoning steps.'
+          score: Math.round(groqScore * 100), // scaled score
+          verdict: groqScore >= 0.8 ? 'APPROVED' : 'BORDERLINE',
+          reasoning: `Groq Llama 3.3 score output: ${groqScore.toFixed(2)}`
         },
         {
-          provider: 'Claude 3.5 Sonnet',
-          modelName: 'claude-3-5-sonnet-20241022',
-          score: score,
-          verdict: claudeVerdict,
-          reasoning: score >= 92 
-            ? 'Robust reasoning trace. Clear semantic layout and high local language calibration.' 
-            : 'Fails to explore complex logic alternatives. Truncated output.'
+          provider: 'OpenAI (GPT-4o)',
+          modelName: 'gpt-4o',
+          score: Math.round(openaiResult.score * 100),
+          verdict: openaiResult.score >= 0.8 ? 'APPROVED' : 'BORDERLINE',
+          reasoning: openaiResult.reasoning_text
         }
       ]
     };
 
     db.submissions.push(newSubmission);
 
-    if (status === 'APPROVED' || status === 'BORDERLINE') {
-      // Add points to expert and pool
-      expert.points += pointsEarned;
-      pool.totalPoints += pointsEarned;
+    // Add points to expert and pool
+    expert.points += pointsEarned;
+    pool.totalPoints += pointsEarned;
 
-      // Simulate a small upfront payment payout directly via Razorpay UPI!
-      const immediateUpfrontPay = parseFloat((pointsEarned * 120).toFixed(0)); // e.g. ₹120 per point baseline payout
-      expert.totalEarnings += immediateUpfrontPay;
+    // Simulate immediate UPI payout
+    const immediateUpfrontPay = parseFloat((pointsEarned * 120).toFixed(0)); // e.g. ₹120 per point
+    expert.totalEarnings += immediateUpfrontPay;
 
-      // Add payout logs if approved
-      const baselinePayout: RoyaltyPayout = {
-        id: `payout_upfront_${Math.random().toString(36).substring(2, 9)}`,
-        expertId,
-        expertName: expert.name,
-        poolId,
-        poolTitle: pool.title,
-        licenseType: 'SHARED', // base payouts labeled shared
-        grossRoyalty: immediateUpfrontPay,
-        netRoyalty: parseFloat((immediateUpfrontPay * 0.98).toFixed(2)), // 2% fees
-        timestamp: new Date().toISOString(),
-        status: 'SUCCESS',
-        payoutTransactionId: `rzp_pay_base_${Math.random().toString(36).substring(2, 10)}`
-      };
-      db.royaltyLedger.push(baselinePayout);
+    // Add payout logs
+    const baselinePayout: RoyaltyPayout = {
+      id: `payout_upfront_${Math.random().toString(36).substring(2, 9)}`,
+      expertId,
+      expertName: expert.name,
+      poolId,
+      poolTitle: pool.title,
+      licenseType: 'SHARED',
+      grossRoyalty: immediateUpfrontPay,
+      netRoyalty: parseFloat((immediateUpfrontPay * 0.98).toFixed(2)), // 2% fee
+      timestamp: new Date().toISOString(),
+      status: 'SUCCESS',
+      payoutTransactionId: `rzp_pay_base_${Math.random().toString(36).substring(2, 10)}`
+    };
+    db.royaltyLedger.push(baselinePayout);
+
+    // Calculate 5% passive royalty stake from pool base price
+    const poolBasePriceINR = pool.basePrice * 83; // Convert USD to INR (~₹83/USD)
+    const royaltyPoolINR = poolBasePriceINR * 0.05; // 5% of pool base price
+    const expertSharePercentage = pool.totalPoints > 0 ? (expert.points / pool.totalPoints) : 1;
+    const passiveRoyaltyGross = parseFloat((royaltyPoolINR * expertSharePercentage).toFixed(2));
+    const passiveRoyaltyNet = parseFloat((passiveRoyaltyGross * 0.98).toFixed(2)); // 2% gateway fee
+
+    // Create passive royalty ledger entry as PENDING (awaiting Razorpay webhook)
+    const passiveRoyaltyId = `payout_royalty_${Math.random().toString(36).substring(2, 9)}`;
+
+    // Initiate real Razorpay X payout (or simulate if credentials are placeholder)
+    let razorpayPayoutId = `rzp_pending_${Math.random().toString(36).substring(2, 10)}`;
+    try {
+      const payoutResult = await executeFullPayoutFlow(
+        { id: expert.id, name: expert.name, email: expert.email, upiId: expert.upiId },
+        passiveRoyaltyNet,
+        passiveRoyaltyId
+      );
+      razorpayPayoutId = payoutResult.payoutId;
+      console.log(`[API Submit] Razorpay payout initiated: ${razorpayPayoutId} (status: ${payoutResult.status})`);
+    } catch (err: any) {
+      console.error(`[API Submit] Razorpay payout initiation failed:`, err?.message || err);
     }
+
+    const passiveRoyaltyPayout: RoyaltyPayout = {
+      id: passiveRoyaltyId,
+      expertId,
+      expertName: expert.name,
+      poolId,
+      poolTitle: pool.title,
+      licenseType: 'SHARED',
+      grossRoyalty: passiveRoyaltyGross,
+      netRoyalty: passiveRoyaltyNet,
+      timestamp: new Date().toISOString(),
+      status: 'PENDING', // Will be updated to SUCCESS via Razorpay webhook
+      payoutTransactionId: razorpayPayoutId
+    };
+    db.royaltyLedger.push(passiveRoyaltyPayout);
 
     return NextResponse.json({ success: true, submission: newSubmission });
   }

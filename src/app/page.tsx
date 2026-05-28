@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Layers,
   Cpu,
@@ -95,6 +95,62 @@ interface FineTuningJob {
   status: string;
 }
 
+// ==========================================
+// Animated Counter Hook
+// ==========================================
+function useAnimatedCounter(targetValue: number, duration: number = 800): number {
+  const [displayValue, setDisplayValue] = useState(targetValue);
+  const previousValue = useRef(targetValue);
+  const animationRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const startValue = previousValue.current;
+    const diff = targetValue - startValue;
+
+    if (Math.abs(diff) < 0.01) {
+      setDisplayValue(targetValue);
+      previousValue.current = targetValue;
+      return;
+    }
+
+    const startTime = performance.now();
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic for smooth deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = startValue + diff * eased;
+
+      setDisplayValue(parseFloat(current.toFixed(1)));
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        setDisplayValue(targetValue);
+        previousValue.current = targetValue;
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [targetValue, duration]);
+
+  return displayValue;
+}
+
+// ==========================================
+// Pre-seeded expert emails for switcher
+// ==========================================
+const SEEDED_EXPERTS = [
+  { email: 'ananya.iyer@axiom.ai', name: 'Dr. Ananya Iyer' },
+  { email: 'rahul.banerjee@axiom.ai', name: 'Adv. Rahul Banerjee' },
+  { email: 'priya.sharma@axiom.ai', name: 'Dr. Priya Sharma' },
+];
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'expert' | 'client'>('expert');
   const [loading, setLoading] = useState(true);
@@ -129,6 +185,7 @@ export default function Home() {
   const [buyerEmail, setBuyerEmail] = useState('');
   const [purchaseSuccess, setPurchaseSuccess] = useState<PurchaseSuccess | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
+  const [purchasedPools, setPurchasedPools] = useState<Record<string, string>>({});
 
   // OpenAI Fine Tuning Integration State
   const [fineTuningJob, setFineTuningJob] = useState<FineTuningJob | null>(null);
@@ -136,6 +193,31 @@ export default function Home() {
 
   // Error/Success Notifications
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Animated counter for points
+  const animatedPoints = useAnimatedCounter(expertProfile?.points ?? 0);
+
+  // Switch expert handler
+  const handleSwitchExpert = useCallback((email: string) => {
+    setExpertEmail(email);
+    fetchExpertData(email);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Status polling for pending payouts
+  useEffect(() => {
+    const hasPendingPayouts = payouts.some(p => p.status === 'PENDING');
+    if (!hasPendingPayouts || loading) return;
+
+    const pollInterval = setInterval(() => {
+      if (expertProfile?.email) {
+        fetchExpertData(expertProfile.email);
+      }
+    }, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(pollInterval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [payouts, loading, expertProfile?.email]);
 
   // Fetch expert profile and lists
   const fetchExpertData = async (email: string) => {
@@ -287,10 +369,10 @@ export default function Home() {
 
     try {
       setCheckingOut(true);
-      // Simulate Stripe API checkout
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate Stripe API checkout auth delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      const res = await fetch('/api?action=buy', {
+      const res = await fetch('/api/client/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -303,9 +385,10 @@ export default function Home() {
       if (data.success) {
         setPurchaseSuccess({
           message: data.message,
-          token: `cf-r2-download-token-${Math.random().toString(36).substring(2, 15)}-${licensingPool.id}`,
-          poolTitle: licensingPool.title
+          token: data.token,
+          poolTitle: data.poolTitle
         });
+        setPurchasedPools(prev => ({ ...prev, [licensingPool.id]: data.token }));
         setAlert({ type: 'success', message: 'Dataset licensed successfully! Check download credentials.' });
         fetchPools(); // refresh pools (check archived status)
       } else {
@@ -323,18 +406,34 @@ export default function Home() {
     try {
       setFineTuningStatus('submitting');
       
-      const res = await fetch('/api?action=finetune', {
+      const res = await fetch('/api/client/fine-tune', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ poolId })
       });
       const data = await res.json();
       if (data.success) {
-        setFineTuningJob(data);
+        setFineTuningJob({
+          success: true,
+          message: data.message,
+          jobId: data.jobId,
+          status: data.status
+        });
         
-        // Simulate fine-tuning steps
-        setTimeout(() => setFineTuningStatus('running'), 2000);
-        setTimeout(() => setFineTuningStatus('completed'), 6000);
+        if (data.mock) {
+          // Simulate visual training steps locally
+          setTimeout(() => setFineTuningStatus('running'), 2000);
+          setTimeout(() => setFineTuningStatus('completed'), 6000);
+        } else {
+          // Track SFT job state directly from OpenAI response
+          if (data.status === 'succeeded' || data.status === 'completed') {
+            setFineTuningStatus('completed');
+          } else if (data.status === 'validating_files') {
+            setFineTuningStatus('submitting');
+          } else {
+            setFineTuningStatus('running');
+          }
+        }
       } else {
         setAlert({ type: 'error', message: data.error || 'Failed to trigger fine-tune' });
         setFineTuningStatus('idle');
@@ -415,10 +514,24 @@ export default function Home() {
               {/* Expert Profile Panel */}
               <div className="p-6 rounded-2xl glass-card relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-emerald-400" />
-                  Expert Identity
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <UserCheck className="w-5 h-5 text-emerald-400" />
+                    Expert Identity
+                  </h3>
+                  {/* Expert Switcher Dropdown */}
+                  <select
+                    value={expertEmail}
+                    onChange={(e) => handleSwitchExpert(e.target.value)}
+                    className="text-[10px] font-mono bg-black/60 border border-white/10 text-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500/40 transition cursor-pointer"
+                  >
+                    {SEEDED_EXPERTS.map((exp) => (
+                      <option key={exp.email} value={exp.email}>
+                        {exp.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 {loading ? (
                   /* Loading Skeleton */
@@ -519,8 +632,8 @@ export default function Home() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-3.5 bg-white/5 rounded-xl border border-white/5 text-center">
                         <span className="text-xs text-[#acaab4] block">Accumulated Points</span>
-                        <span className="text-2xl font-bold text-white block mt-1 glow-text-emerald font-mono">
-                          {expertProfile ? expertProfile.points.toFixed(1) : "0.0"}
+                        <span className="text-2xl font-bold text-white block mt-1 glow-text-emerald font-mono transition-all duration-300">
+                          {expertProfile ? animatedPoints.toFixed(1) : "0.0"}
                         </span>
                       </div>
                       <div className="p-3.5 bg-white/5 rounded-xl border border-white/5 text-center">
@@ -663,22 +776,21 @@ export default function Home() {
                   </div>
                 </form>
               </div>
-
               {/* Consensus QA Network Report Overlay / Results Panel */}
               {consensusReport && (
-                <div className="p-6 rounded-2xl border border-indigo-500/30 bg-indigo-950/20 backdrop-blur-md glow-violet relative overflow-hidden animate-fade-in">
+                <div className="p-6 rounded-2xl border border-indigo-500/30 bg-indigo-950/20 backdrop-blur-md glow-violet relative overflow-hidden animate-fade-in mb-8">
                   <div className="absolute top-0 right-0 p-2 bg-indigo-500/10 rounded-bl-xl border-l border-b border-indigo-500/20">
                     <Cpu className="w-4 h-4 text-indigo-400" />
                   </div>
                   
                   <div className="flex items-center gap-2.5 mb-4">
                     <span className={`w-3 h-3 rounded-full ${
-                      consensusReport.status === 'APPROVED' ? 'bg-emerald-400' :
+                      consensusReport.status === 'APPROVED' ? 'bg-emerald-400 animate-pulse' :
                       consensusReport.status === 'BORDERLINE' ? 'bg-amber-400' : 'bg-rose-400'
                     }`} />
                     <h3 className="text-base font-bold text-white">Consensus AI QA Calibration Report</h3>
                     <span className="text-xs px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-mono">
-                      Task: {consensusReport.id}
+                      Task: {consensusReport?.id || "Pending"}
                     </span>
                   </div>
 
@@ -688,48 +800,84 @@ export default function Home() {
 
                   {/* Side by side Model Evaluations */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                    {consensusReport.evaluations?.map((evaluation, idx) => (
-                      <div key={idx} className="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-bold text-white block">{evaluation.provider}</span>
-                            <span className="text-[10px] text-indigo-400 font-mono">{evaluation.modelName}</span>
-                          </div>
-                          <p className="text-xs text-[#acaab4] leading-relaxed italic">
-                            &ldquo;{evaluation.reasoning}&rdquo;
-                          </p>
+                    {/* Left Column: Groq (Llama 3.3) */}
+                    <div className="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-white block">Groq Evaluation</span>
+                          <span className="text-[10px] text-indigo-400 font-mono">llama-3.3-70b-versatile</span>
                         </div>
-                        <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-2">
-                          <span className="text-[10px] text-[#acaab4]">Score Metric</span>
-                          <span className="text-xs font-bold font-mono text-emerald-400">{evaluation.score}/100</span>
-                        </div>
+                        <p className="text-xs text-[#acaab4] leading-relaxed italic">
+                          {consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'))?.reasoning || "Evaluation scoring completed successfully by Llama 3.3 model parser."}
+                        </p>
                       </div>
-                    ))}
+                      <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-2">
+                        <span className="text-[10px] text-[#acaab4]">Score Metric (0-1)</span>
+                        <span className="text-xs font-bold font-mono text-emerald-400">
+                          {(() => {
+                            const evalObj = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'));
+                            if (!evalObj || evalObj.score === undefined) return "Loading...";
+                            const rawScore = evalObj.score;
+                            return rawScore > 1 ? (rawScore / 100).toFixed(2) : rawScore.toFixed(2);
+                          })()}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right Column: OpenAI (GPT-4o) */}
+                    <div className="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-white block">OpenAI Evaluation</span>
+                          <span className="text-[10px] text-indigo-400 font-mono">gpt-4o</span>
+                        </div>
+                        <p className="text-xs text-[#acaab4] leading-relaxed italic">
+                          &ldquo;{consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'))?.reasoning || "Pending reasoning trace output..."}&rdquo;
+                        </p>
+                      </div>
+                      <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-2">
+                        <span className="text-[10px] text-[#acaab4]">Score Metric (0-1)</span>
+                        <span className="text-xs font-bold font-mono text-emerald-400">
+                          {(() => {
+                            const evalObj = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'));
+                            if (!evalObj || evalObj.score === undefined) return "Loading...";
+                            const rawScore = evalObj.score;
+                            return rawScore > 1 ? (rawScore / 100).toFixed(2) : rawScore.toFixed(2);
+                          })()}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Adjudication Outcome */}
                   <div className="p-4 rounded-xl bg-black/60 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                       <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block">Consensus Verdict</span>
-                      <span className={`text-base font-bold tracking-wide ${
+                      <span className={`text-base font-bold tracking-wide flex items-center gap-1.5 ${
                         consensusReport.status === 'APPROVED' ? 'text-emerald-400 glow-text-emerald' :
                         consensusReport.status === 'BORDERLINE' ? 'text-amber-400' : 'text-rose-400'
                       }`}>
-                        {consensusReport.status}
+                        {consensusReport.status === 'APPROVED' && (
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                          </span>
+                        )}
+                        {consensusReport.status || "PENDING"}
                       </span>
                     </div>
 
                     <div className="text-left sm:text-right">
                       <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block">Points Credited</span>
-                      <span className="text-base font-bold text-white font-mono">+{consensusReport.pointsEarned?.toFixed(2)} Points</span>
+                      <span className="text-base font-bold text-white font-mono">+{consensusReport.pointsEarned?.toFixed(2) || "0.00"} Points</span>
                     </div>
 
-                    {consensusReport.pointsEarned && consensusReport.pointsEarned > 0 && (
+                    {consensusReport.pointsEarned && consensusReport.pointsEarned > 0 ? (
                       <div className="px-3 py-1.5 rounded-lg bg-emerald-950 border border-emerald-500/20 text-center">
                         <span className="text-[9px] text-[#acaab4] uppercase tracking-wider block">UPI Baseline Cash</span>
                         <span className="text-xs font-bold text-emerald-400">₹{(consensusReport.pointsEarned * 120).toLocaleString('en-IN')} paid</span>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               )}
@@ -790,10 +938,18 @@ export default function Home() {
 
               {/* UPI Transaction Ledger */}
               <div className="p-6 rounded-2xl glass-card relative overflow-hidden">
-                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-emerald-400" />
-                  Razorpay UPI Payout Ledger
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-emerald-400" />
+                    Razorpay UPI Payout Ledger
+                  </h3>
+                  {payouts.some(p => p.status === 'PENDING') && (
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Polling for updates...
+                    </span>
+                  )}
+                </div>
 
                 {loading ? (
                   <div className="space-y-4 animate-pulse">
@@ -804,6 +960,7 @@ export default function Home() {
                   <div className="text-center py-8 bg-black/20 rounded-xl border border-white/5">
                     <Wallet className="w-8 h-8 text-gray-600 mx-auto mb-2" />
                     <p className="text-xs text-[#acaab4]">No recent payouts recorded.</p>
+                    <p className="text-[10px] text-gray-600 mt-1">Submit a task to earn points and trigger payouts.</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -812,26 +969,66 @@ export default function Home() {
                         <tr className="border-b border-white/5 text-[10px] font-bold text-[#acaab4] uppercase tracking-wider">
                           <th className="pb-3 pr-2">Transaction ID</th>
                           <th className="pb-3 px-2">Pool Source</th>
-                          <th className="pb-3 px-2">Gross Payout</th>
-                          <th className="pb-3 px-2">Net (2% fees)</th>
+                          <th className="pb-3 px-2">5% Royalty Stake</th>
+                          <th className="pb-3 px-2">Gross (₹)</th>
+                          <th className="pb-3 px-2">Net (₹)</th>
+                          <th className="pb-3 px-2 text-center">Type</th>
                           <th className="pb-3 pl-2 text-right">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5 text-xs">
-                        {payouts.map((pay) => (
-                          <tr key={pay.id} className="hover:bg-white/5 transition duration-300">
-                            <td className="py-3 pr-2 font-mono text-[10px] text-gray-300">{pay.payoutTransactionId}</td>
-                            <td className="py-3 px-2 text-[#acaab4] max-w-[150px] truncate">{pay.poolTitle}</td>
-                            <td className="py-3 px-2 text-white font-semibold">₹{pay.grossRoyalty.toLocaleString('en-IN')}</td>
-                            <td className="py-3 px-2 text-emerald-400 font-bold">₹{pay.netRoyalty.toLocaleString('en-IN')}</td>
-                            <td className="py-3 pl-2 text-right">
-                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
-                                <Check className="w-3.5 h-3.5" />
-                                Success
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
+                        {payouts.map((pay) => {
+                          // Determine if this is a passive royalty or upfront payout
+                          const isPassiveRoyalty = pay.id.includes('royalty');
+                          const poolObj = pools.find(p => p.id === pay.poolId);
+                          const poolBaseINR = poolObj ? poolObj.basePrice * 83 : 0;
+                          const fivePercentStake = poolBaseINR * 0.05;
+
+                          return (
+                            <tr key={pay.id} className="hover:bg-white/5 transition duration-300">
+                              <td className="py-3 pr-2 font-mono text-[10px] text-gray-300 max-w-[120px] truncate">{pay.payoutTransactionId}</td>
+                              <td className="py-3 px-2 text-[#acaab4] max-w-[120px] truncate">{pay.poolTitle}</td>
+                              <td className="py-3 px-2">
+                                {isPassiveRoyalty ? (
+                                  <span className="text-[10px] text-indigo-300 font-mono">
+                                    5% × ₹{poolBaseINR.toLocaleString('en-IN')} = <strong className="text-white">₹{fivePercentStake.toLocaleString('en-IN')}</strong>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-gray-500">Upfront base</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-2 text-white font-semibold">₹{pay.grossRoyalty.toLocaleString('en-IN')}</td>
+                              <td className="py-3 px-2 text-emerald-400 font-bold">₹{pay.netRoyalty.toLocaleString('en-IN')}</td>
+                              <td className="py-3 px-2 text-center">
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide ${
+                                  pay.licenseType === 'EXCLUSIVE'
+                                    ? 'bg-violet-950/60 border border-violet-500/20 text-violet-400'
+                                    : 'bg-sky-950/60 border border-sky-500/20 text-sky-400'
+                                }`}>
+                                  {pay.licenseType}
+                                </span>
+                              </td>
+                              <td className="py-3 pl-2 text-right">
+                                {pay.status === 'SUCCESS' ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+                                    <Check className="w-3.5 h-3.5" />
+                                    Paid
+                                  </span>
+                                ) : pay.status === 'PENDING' ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400">
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                    Processing
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400">
+                                    <AlertCircle className="w-3.5 h-3.5" />
+                                    Failed
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -929,17 +1126,24 @@ export default function Home() {
                         <span className="text-indigo-400 font-bold font-mono">${pool.exclusivePrice.toLocaleString()} USD</span>
                       </div>
 
-                      <button
-                        onClick={() => {
-                          setLicensingPool(pool);
-                          setLicenseType('SHARED');
-                          setPurchaseSuccess(null);
-                        }}
-                        className="w-full py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl transition duration-300 flex items-center justify-center gap-1.5"
-                      >
-                        <LockIcon className="w-3.5 h-3.5" />
-                        License Dataset Pool
-                      </button>
+                      {purchasedPools[pool.id] ? (
+                        <div className="w-full p-2.5 bg-emerald-950/80 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono rounded-xl text-center select-all truncate break-all relative">
+                          <span className="text-[8px] text-gray-400 block mb-0.5 font-sans uppercase">Licensed Download Token</span>
+                          {purchasedPools[pool.id]}
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setLicensingPool(pool);
+                            setLicenseType('SHARED');
+                            setPurchaseSuccess(null);
+                          }}
+                          className="w-full py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl transition duration-300 flex items-center justify-center gap-1.5"
+                        >
+                          <LockIcon className="w-3.5 h-3.5" />
+                          License Dataset Pool
+                        </button>
+                      )}
                     </div>
 
                   </div>
@@ -1033,9 +1237,10 @@ export default function Home() {
                         <p>[INFO] Uploading formatted JSONL dataset file to OpenAI files API...</p>
                         {fineTuningStatus !== 'submitting' && (
                           <>
-                            <p className="text-indigo-300">[INFO] File upload success! File ID: file-AxIoM982a7d6d</p>
-                            <p>[INFO] Creating fine-tuning job model targeted: gpt-4o...</p>
+                            <p className="text-indigo-300">[INFO] File upload success! File ID: file-{fineTuningJob?.jobId ? fineTuningJob.jobId.slice(6, 15) : 'AxIoM982a'}</p>
+                            <p>[INFO] Creating fine-tuning job model targeted: gpt-4o-mini...</p>
                             <p className="text-indigo-300">[INFO] Job initiated! Job ID: {fineTuningJob?.jobId}</p>
+                            <p className="text-indigo-400">[STATUS] Current status from OpenAI API: {fineTuningJob?.status || 'validating_files'}</p>
                           </>
                         )}
                         {fineTuningStatus === 'running' && (
@@ -1047,7 +1252,7 @@ export default function Home() {
                         {fineTuningStatus === 'completed' && (
                           <>
                             <p className="text-amber-400">[TRAIN] Loss reduction trend: 0.941 -&gt; 0.224...</p>
-                            <p className="text-emerald-400">[SUCCESS] OpenAI Model gpt-4o successfully fine-tuned! Custom Model Name: ft:gpt-4o:axiom:medical-hinglish-v1</p>
+                            <p className="text-emerald-400">[SUCCESS] OpenAI Model gpt-4o-mini successfully fine-tuned! Custom Model ID: ft:gpt-4o-mini:axiom:{licensingPool?.id || 'clinical-hinglish'}</p>
                             <p className="text-emerald-400">[SUCCESS] Model deployed for inference endpoints.</p>
                           </>
                         )}

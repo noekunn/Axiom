@@ -1,7 +1,7 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../../lib/prisma';
-import { ConsensusStatus, ExpertTier, TaskStatus } from '@prisma/client';
+import { ConsensusStatus, ExpertTier, TaskStatus, EvaluationVerdict, ModelProvider } from '@prisma/client';
 
 const submitSchema = z.object({
   submissionId: z.string().uuid('Invalid Submission ID format'),
@@ -9,10 +9,10 @@ const submitSchema = z.object({
 });
 
 interface EvaluationItem {
-  provider: string;
+  provider: ModelProvider;
   modelName: string;
   score: number;
-  verdict: string;
+  verdict: EvaluationVerdict;
   reasoning: string;
 }
 
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     const variation = Math.random() * 6 - 3; // -3% to +3%
     llamaScore = Math.min(100, Math.max(0, parseFloat((llamaScore + variation).toFixed(2))));
     
-    let finalStatus: ConsensusStatus = ConsensusStatus.PENDING;
+    let finalStatus: ConsensusStatus = ConsensusStatus.PENDING_QA;
     let finalScore = llamaScore;
     let qualityMultiplierApplied = 1.0;
     
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         provider: 'GROQ',
         modelName: 'llama-3.3-70b-versatile',
         score: llamaScore,
-        verdict: 'APPROVE',
+        verdict: EvaluationVerdict.APPROVE,
         reasoning: `First-pass structural, semantic and syntactic verification passed with a score of ${llamaScore}%. The response satisfies high-fidelity reasoning guidelines.`,
       });
     } else if (llamaScore >= 70.0) {
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
         provider: 'GROQ',
         modelName: 'llama-3.3-70b-versatile',
         score: llamaScore,
-        verdict: 'ESCALATE',
+        verdict: EvaluationVerdict.BORDERLINE,
         reasoning: `Llama-3.3 detected borderline structural complexity with a score of ${llamaScore}%. Escalating to frontier model for consensus adjudication.`,
       });
       
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
           provider: 'OPENAI',
           modelName: 'gpt-4o',
           score: gptScore,
-          verdict: 'APPROVE',
+          verdict: EvaluationVerdict.APPROVE,
           reasoning: `Adjudication complete. GPT-4o verified domain relevance and logical step coherence. Score: ${gptScore}%. Overruling initial borderline assessment.`,
         });
       } else if (gptScore >= 73.0) {
@@ -134,7 +134,7 @@ export async function POST(request: Request) {
           provider: 'OPENAI',
           modelName: 'gpt-4o',
           score: gptScore,
-          verdict: 'ESCALATE',
+          verdict: EvaluationVerdict.BORDERLINE,
           reasoning: `Borderline score of ${gptScore}% on frontier model. Models disagree on formatting guidelines. Flagged for domain lead human review to prevent Goodhart's Law over-optimization.`,
         });
       } else {
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
           provider: 'OPENAI',
           modelName: 'gpt-4o',
           score: gptScore,
-          verdict: 'REJECT',
+          verdict: EvaluationVerdict.REJECT,
           reasoning: `Adjudication complete. Frontier model confirmed logical fallacies or hallucinated arguments. Score: ${gptScore}%. Submission rejected.`,
         });
       }
@@ -154,7 +154,7 @@ export async function POST(request: Request) {
         provider: 'GROQ',
         modelName: 'llama-3.3-70b-versatile',
         score: llamaScore,
-        verdict: 'REJECT',
+        verdict: EvaluationVerdict.REJECT,
         reasoning: `Response length or structure is deficient (score ${llamaScore}%). Failed basic instruction coherence checks. Direct rejection applied.`,
       });
     }
@@ -167,7 +167,7 @@ export async function POST(request: Request) {
       for (const evalData of evaluations) {
         await tx.consensusEvaluation.create({
           data: {
-            submissionId,
+            taskSubmissionId: submissionId,
             provider: evalData.provider,
             modelName: evalData.modelName,
             score: evalData.score,

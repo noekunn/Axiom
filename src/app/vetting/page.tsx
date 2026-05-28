@@ -1340,7 +1340,7 @@ export default function VettingArena() {
                 {/* Final Score CTAs */}
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => handleStartVetting(selectedDomain)}
+                    onClick={() => selectedDomain && handleStartVetting(selectedDomain)}
                     className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-xs tracking-wider uppercase text-white shadow-lg shadow-indigo-600/20 active:translate-y-px transition-all select-none"
                   >
                     RE-RUN SIMULATION

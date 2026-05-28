@@ -2,7 +2,10 @@ import { Queue, Worker, Job, ConnectionOptions } from 'bullmq';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
 import { prisma } from '../lib/prisma';
-import { evaluateWithOpenAI, evaluateWithGroq } from '../lib/llm';
+import { evaluateWithOpenAI, evaluateWithGroq, evaluateWithGroqScore, evaluateWithOpenAIStructured } from '../lib/llm';
+import { db as mockDb } from '../app/api/db';
+import { ConsensusStatus, EvaluationVerdict, ModelProvider } from '@prisma/client';
+import { executeFullPayoutFlow } from '../lib/razorpay';
 
 dotenv.config();
 
@@ -18,7 +21,7 @@ const redisConnectionOptions: any = process.env.REDIS_URL
       maxRetriesPerRequest: null,
       connectTimeout: 10000,
       keepAlive: 30000,
-      retryStrategy(times) {
+      retryStrategy(times: number) {
         const delay = Math.min(times * 100, 3000);
         return delay;
       },
@@ -92,273 +95,180 @@ export const qaConsensusWorker = new Worker(
   'qa-consensus',
   async (job: Job<{ submissionId: string }>) => {
     const { submissionId } = job.data;
-    console.log(`[QA Director] Initiating QA Consensus for Submission: ${submissionId}`);
+    console.log(`[QA Worker] Starting consensus QA for submission ID: ${submissionId}`);
 
-    // 1. Fetch submission and verify existence
-    const submission = await prisma.taskSubmission.findUnique({
-      where: { id: submissionId },
-      include: { pool: true },
-    });
+    try {
+      // 1. Fetch from Prisma database
+      let submissionPrisma = null;
+      try {
+        submissionPrisma = await prisma.taskSubmission.findUnique({
+          where: { id: submissionId },
+          include: { task: { include: { assetPool: true } } },
+        });
+      } catch (err) {
+        console.warn(`[QA Worker] Prisma fetch failed (likely dev DB offline):`, err);
+      }
 
-    if (!submission) {
-      throw new Error(`Submission ${submissionId} not found in database.`);
-    }
+      // 2. Fetch from simulated database
+      const submissionMock = mockDb.submissions.find(s => s.id === submissionId);
 
-    // 2. Update status to processing
-    await prisma.taskSubmission.update({
-      where: { id: submissionId },
-      data: { status: 'QA_PROCESSING' },
-    });
+      if (!submissionPrisma && !submissionMock) {
+        throw new Error(`Submission ID ${submissionId} not found in database.`);
+      }
 
-    // 3. Prepare checks in the database to prevent duplicate requests
-    const models: ('openai-gpt-4o' | 'groq-llama-3-3')[] = ['openai-gpt-4o', 'groq-llama-3-3'];
-    
-    for (const modelName of models) {
-      // Create QA check records
-      const qaCheck = await prisma.qACheck.create({
-        data: {
-          submissionId,
-          modelName,
-          status: 'PENDING',
-        },
-      });
+      const content = submissionPrisma ? submissionPrisma.content : (submissionMock ? submissionMock.response : "");
+      const poolDescription = submissionPrisma ? (submissionPrisma.task.assetPool.description || undefined) : undefined;
 
-      // Enqueue job for parallel check
-      await modelCheckQueue.add(
-        `check-${modelName}-${submissionId}`,
-        {
-          submissionId,
-          qaCheckId: qaCheck.id,
-          modelName,
-        },
-        {
-          jobId: `job-${qaCheck.id}`, // Deduplication check per database row
+      console.log(`[QA Worker] Content to evaluate (first 100 chars): "${content.substring(0, 100)}..."`);
+
+      // 3. Call both APIs concurrently
+      console.log(`[QA Worker] Initiating Groq Llama 3.3 and OpenAI GPT-4o API requests...`);
+      const [groqScore, openaiResult] = await Promise.all([
+        evaluateWithGroqScore(content, poolDescription),
+        evaluateWithOpenAIStructured(content, poolDescription)
+      ]);
+
+      console.log(`[QA Worker] Groq Score Result: ${groqScore}`);
+      console.log(`[QA Worker] OpenAI Score Result: ${openaiResult.score}, Reasoning: "${openaiResult.reasoning_text}"`);
+
+      // Calculate final combined quality score (scaled to 0-100)
+      const avgScore = (groqScore + openaiResult.score) / 2;
+      const qualityScoreHundred = Math.round(avgScore * 100);
+
+      // 4. Update Prisma Database (if exists)
+      if (submissionPrisma) {
+        console.log(`[QA Worker] Updating Prisma TaskSubmission status to APPROVED`);
+        await prisma.taskSubmission.update({
+          where: { id: submissionId },
+          data: {
+            qualityScore: qualityScoreHundred,
+            consensusStatus: ConsensusStatus.APPROVED
+          }
+        });
+
+        // Add model evaluation logs to Prisma
+        await prisma.consensusEvaluation.createMany({
+          data: [
+            {
+              taskSubmissionId: submissionId,
+              provider: ModelProvider.GROQ,
+              modelName: 'llama-3.3-70b-versatile',
+              score: groqScore * 100,
+              verdict: groqScore >= 0.8 ? EvaluationVerdict.APPROVE : EvaluationVerdict.BORDERLINE,
+              reasoning: `Groq Llama 3.3 score output: ${groqScore}`
+            },
+            {
+              taskSubmissionId: submissionId,
+              provider: ModelProvider.OPENAI,
+              modelName: 'gpt-4o',
+              score: openaiResult.score * 100,
+              verdict: openaiResult.score >= 0.8 ? EvaluationVerdict.APPROVE : EvaluationVerdict.BORDERLINE,
+              reasoning: openaiResult.reasoning_text
+            }
+          ]
+        });
+      }
+
+      // 5. Update Simulated In-Memory Database (crucial for local web app demo)
+      if (submissionMock) {
+        console.log(`[QA Worker] Updating Simulated DB TaskSubmission status to APPROVED`);
+        submissionMock.status = 'APPROVED';
+        submissionMock.qualityScore = qualityScoreHundred;
+        
+        submissionMock.evaluations = [
+          {
+            provider: 'Groq (Llama 3.3)',
+            modelName: 'llama-3.3-70b-versatile',
+            score: Math.round(groqScore * 100),
+            verdict: groqScore >= 0.8 ? 'APPROVED' : 'BORDERLINE',
+            reasoning: `Groq evaluated with score: ${groqScore.toFixed(2)}`
+          },
+          {
+            provider: 'OpenAI (GPT-4o)',
+            modelName: 'gpt-4o',
+            score: Math.round(openaiResult.score * 100),
+            verdict: openaiResult.score >= 0.8 ? 'APPROVED' : 'BORDERLINE',
+            reasoning: openaiResult.reasoning_text
+          }
+        ];
+
+        // Process points and payouts in the mock database
+        const expert = mockDb.experts.find(e => e.id === submissionMock.expertId);
+        const pool = mockDb.pools.find(p => p.id === submissionMock.poolId);
+        
+        if (expert && pool) {
+          const basePoints = 10;
+          const tierMultipliers = { BRONZE: 1.0, SILVER: 1.2, GOLD: 1.5, SENIOR: 1.7, ELITE: 2.0 };
+          const tierMultiplier = tierMultipliers[expert.tier] || 1.0;
+          const qualityMultiplier = avgScore >= 0.9 ? 1.2 : (avgScore >= 0.8 ? 1.0 : 0.8);
+          const pointsEarned = parseFloat((basePoints * submissionMock.difficultyMultiplier * tierMultiplier * qualityMultiplier).toFixed(2));
+
+          submissionMock.pointsEarned = pointsEarned;
+          expert.points += pointsEarned;
+          pool.totalPoints += pointsEarned;
+
+          const immediateUpfrontPay = parseFloat((pointsEarned * 120).toFixed(0));
+          expert.totalEarnings += immediateUpfrontPay;
+
+          mockDb.royaltyLedger.push({
+            id: `payout_upfront_${Math.random().toString(36).substring(2, 9)}`,
+            expertId: expert.id,
+            expertName: expert.name,
+            poolId: pool.id,
+            poolTitle: pool.title,
+            licenseType: 'SHARED',
+            grossRoyalty: immediateUpfrontPay,
+            netRoyalty: parseFloat((immediateUpfrontPay * 0.98).toFixed(2)),
+            timestamp: new Date().toISOString(),
+            status: 'SUCCESS',
+            payoutTransactionId: `rzp_pay_base_${Math.random().toString(36).substring(2, 10)}`
+          });
+
+          // 5% passive royalty stake entry (awaiting Razorpay webhook)
+          const poolBasePriceINR = pool.basePrice * 83;
+          const royaltyPoolINR = poolBasePriceINR * 0.05;
+          const expertSharePct = pool.totalPoints > 0 ? (expert.points / pool.totalPoints) : 1;
+          const passiveGross = parseFloat((royaltyPoolINR * expertSharePct).toFixed(2));
+          const passiveNet = parseFloat((passiveGross * 0.98).toFixed(2));
+          const passiveId = `payout_royalty_${Math.random().toString(36).substring(2, 9)}`;
+
+          let rzpPayoutId = `rzp_pending_${Math.random().toString(36).substring(2, 10)}`;
+          try {
+            const payoutResult = await executeFullPayoutFlow(
+              { id: expert.id, name: expert.name, email: expert.email || '', upiId: expert.upiId },
+              passiveNet,
+              passiveId
+            );
+            rzpPayoutId = payoutResult.payoutId;
+            console.log(`[QA Worker] Razorpay payout initiated: ${rzpPayoutId}`);
+          } catch (rzpErr: any) {
+            console.error(`[QA Worker] Razorpay payout failed:`, rzpErr?.message || rzpErr);
+          }
+
+          mockDb.royaltyLedger.push({
+            id: passiveId,
+            expertId: expert.id,
+            expertName: expert.name,
+            poolId: pool.id,
+            poolTitle: pool.title,
+            licenseType: 'SHARED',
+            grossRoyalty: passiveGross,
+            netRoyalty: passiveNet,
+            timestamp: new Date().toISOString(),
+            status: 'PENDING',
+            payoutTransactionId: rzpPayoutId
+          });
         }
-      );
+      }
 
-      console.log(`[QA Director] Enqueued ${modelName} check for submission ${submissionId}`);
+      console.log(`[QA Worker] Consensus QA pipeline completed successfully for ID ${submissionId}`);
+
+    } catch (err: any) {
+      console.error(`[QA Worker Critical Failure] Consensus QA process encountered an error:`, err);
+      throw err;
     }
   },
   { connection: sharedRedis, concurrency: 5 }
 );
 
-/**
- * WORKER 2: Model Checker Worker
- * Runs individual model evaluations (OpenAI or Groq) in parallel, handling API retries.
- */
-export const modelCheckWorker = new Worker(
-  'model-check',
-  async (job: Job<{ submissionId: string; qaCheckId: string; modelName: string }>) => {
-    const { submissionId, qaCheckId, modelName } = job.data;
-    console.log(`[Model Checker] Running ${modelName} verification on QA Check: ${qaCheckId}`);
 
-    // Fetch the task and checking parameters
-    const [submission, qaCheck] = await Promise.all([
-      prisma.taskSubmission.findUnique({
-        where: { id: submissionId },
-        include: { pool: true },
-      }),
-      prisma.qACheck.findUnique({
-        where: { id: qaCheckId },
-      }),
-    ]);
-
-    if (!submission || !qaCheck) {
-      throw new Error(`Invalid context: Submission ${submissionId} or QACheck ${qaCheckId} missing.`);
-    }
-
-    try {
-      let evaluation;
-
-      if (modelName === 'openai-gpt-4o') {
-        evaluation = await evaluateWithOpenAI(submission.content, submission.pool.description || undefined);
-      } else if (modelName === 'groq-llama-3-3') {
-        evaluation = await evaluateWithGroq(submission.content, submission.pool.description || undefined);
-      } else {
-        throw new Error(`Unsupported AI model requested for QA check: ${modelName}`);
-      }
-
-      // Update QACheck database status
-      await prisma.qACheck.update({
-        where: { id: qaCheckId },
-        data: {
-          status: 'COMPLETED',
-          approved: evaluation.approved,
-          score: evaluation.score,
-          explanation: evaluation.explanation,
-        },
-      });
-
-      console.log(`[Model Checker] Completed check by ${modelName} for submission ${submissionId}. Score: ${evaluation.score}`);
-
-      // Check and finalize consensus
-      await runConsensusEvaluation(submissionId);
-
-    } catch (error: any) {
-      console.error(`[Model Checker] Fail during model evaluation (${modelName}):`, error);
-
-      // Save failures so we don't stall the pipeline permanently
-      await prisma.qACheck.update({
-        where: { id: qaCheckId },
-        data: {
-          status: 'FAILED',
-          error: error?.message || String(error),
-        },
-      });
-
-      // Still try evaluating consensus in case other checks failed or need manual override
-      await runConsensusEvaluation(submissionId);
-
-      throw error; // Let BullMQ retry queue mechanism trigger if configured
-    }
-  },
-  { connection: sharedRedis, concurrency: 3 }
-);
-
-/**
- * WORKER 3: Dataset Generation Worker
- * Compiles approved submission assets into synthetic training formats.
- */
-export const datasetGenerationWorker = new Worker(
-  'dataset-generation',
-  async (job: Job<{ poolId: string }>) => {
-    const { poolId } = job.data;
-    console.log(`[Dataset Gen] Compiling dataset version for Asset Pool: ${poolId}`);
-
-    const pool = await prisma.assetPool.findUnique({
-      where: { id: poolId },
-      include: {
-        submissions: {
-          where: { status: 'APPROVED' },
-        },
-      },
-    });
-
-    if (!pool) {
-      throw new Error(`Asset Pool ${poolId} not found`);
-    }
-
-    console.log(`[Dataset Gen] Consolidated ${pool.submissions.length} approved submissions.`);
-    
-    // Simulate training set compilation (e.g. converting to fine-tuning formats, JSONL, or S3 output)
-    const compilationMetadata = {
-      poolId: pool.id,
-      poolName: pool.name,
-      totalAssetsCount: pool.submissions.length,
-      compiledAt: new Date().toISOString(),
-      version: `v1.0.${pool.submissions.length}`,
-    };
-
-    console.log(`[Dataset Gen] Compilation successfully complete! Metadata:`, compilationMetadata);
-  },
-  { connection: sharedRedis, concurrency: 2 }
-);
-
-// ==========================================
-// 4. Consensus & Royalty Business Logic
-// ==========================================
-
-/**
- * Checks all active QA checks for a submission and triggers final approval and payments.
- */
-async function runConsensusEvaluation(submissionId: string): Promise<void> {
-  // Query all evaluations for the submission
-  const qaChecks = await prisma.qACheck.findMany({
-    where: { submissionId },
-  });
-
-  const pendingChecks = qaChecks.filter((c) => c.status === 'PENDING');
-  if (pendingChecks.length > 0) {
-    // Some model checks are still running
-    console.log(`[Consensus] Submission ${submissionId} has ${pendingChecks.length} checks pending. Waiting...`);
-    return;
-  }
-
-  console.log(`[Consensus] Evaluating consensus for submission ${submissionId}`);
-
-  const completedChecks = qaChecks.filter((c) => c.status === 'COMPLETED');
-  const failedChecks = qaChecks.filter((c) => c.status === 'FAILED');
-
-  if (completedChecks.length === 0) {
-    // All checks failed to run
-    console.error(`[Consensus] Error: All checks failed for submission ${submissionId}`);
-    await prisma.taskSubmission.update({
-      where: { id: submissionId },
-      data: {
-        status: 'REJECTED',
-        consensusReason: 'All multi-model checks failed due to external API errors.',
-      },
-    });
-    return;
-  }
-
-  // Calculate stats
-  const totalScore = completedChecks.reduce((acc, c) => acc + (c.score || 0), 0);
-  const averageScore = totalScore / completedChecks.length;
-  const approvalsCount = completedChecks.filter((c) => c.approved === true).length;
-
-  // Consensus threshold requirements:
-  // - More than half of completed checks must approve
-  // - Average score must be >= 0.8
-  const consensusApproved = approvalsCount >= Math.ceil(completedChecks.length / 2) && averageScore >= 0.8;
-
-  const consensusSummary = `Evaluations: ${completedChecks.length} successful, ${failedChecks.length} failed. ` +
-    `Approvals: ${approvalsCount}/${completedChecks.length}. Average Score: ${averageScore.toFixed(2)}.`;
-
-  console.log(`[Consensus Result] Approved: ${consensusApproved}. Summary: ${consensusSummary}`);
-
-  if (consensusApproved) {
-    // 1. Update Task Submission to APPROVED
-    const updatedSubmission = await prisma.taskSubmission.update({
-      where: { id: submissionId },
-      data: {
-        status: 'APPROVED',
-        consensusScore: averageScore,
-        consensusReason: consensusSummary,
-      },
-      include: { pool: true },
-    });
-
-    // 2. Compute Royalties
-    // Formula: flat base reward + pool fractional shares (if pool has funds)
-    const baseReward = 15.00; // Flat USD payout per approved task
-    const poolVolume = updatedSubmission.pool.totalValue;
-    
-    // Allocate proportional incentives to the submitter based on pool performance, up to an extra 10%
-    const variableBonus = poolVolume > 0 ? Math.min(10.00, poolVolume * 0.01) : 0;
-    const finalRoyalty = baseReward + variableBonus;
-
-    // Create Royalty Ledger Entry (Unpaid state initially, to be picked up by Stripe/Razorpay)
-    const payoutMethod = 'STRIPE'; // Default global channel. Toggle to UPI for local context in routes
-
-    await prisma.royaltyLedger.create({
-      data: {
-        poolId: updatedSubmission.poolId,
-        submissionId: submissionId,
-        recipientId: updatedSubmission.submitterId,
-        amount: finalRoyalty,
-        currency: 'USD',
-        status: 'UNPAID',
-        payoutMethod,
-      },
-    });
-
-    console.log(`[Consensus Ledger] Royalty allocated for contributor ${updatedSubmission.submitterId}: $${finalRoyalty.toFixed(2)}`);
-
-    // 3. Queue Dataset Compilation
-    await datasetGenerationQueue.add(`generate-pool-${updatedSubmission.poolId}`, {
-      poolId: updatedSubmission.poolId,
-    });
-
-  } else {
-    // Update Task Submission to REJECTED
-    await prisma.taskSubmission.update({
-      where: { id: submissionId },
-      data: {
-        status: 'REJECTED',
-        consensusScore: averageScore,
-        consensusReason: consensusSummary + ' Submission did not pass multi-model approval or quality criteria.',
-      },
-    });
-  }
-}

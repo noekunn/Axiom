@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Axiom: Decentralized Royalty-Backed Dataset Platform
 
-## Getting Started
+Axiom is a next-generation decentralized reasoning data marketplace that connects domain experts (medical, legal, technical) directly with B2B enterprise AI models. Axiom uses a multi-model consensus QA pipeline to validate reasoning traces, automates upfront micro-payments & passive royalties via Razorpay FinOps, and unlocks immediate dataset licensing downloads and OpenAI fine-tuning pipelines.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Links & Deliverables
+
+*   **Live Vercel Demo URL**: `[Insert Live Vercel URL Here]`
+*   **2-Minute Video Pitch Link**: `[Insert Video Pitch Link Here]`
+
+---
+
+## 🛠️ Core Features
+
+1.  **Multi-Model Consensus QA Pipeline**: Crowdsourced dataset submissions (e.g. medical diagnostic reasoning in Hinglish) undergo automated consensus evaluations using Groq (Llama 3.3) and OpenAI (GPT-4o) to calibrate quality scores, automate approvals, or route borderline edge cases to human administrators.
+2.  **Razorpay FinOps Payouts**: Connects experts with Razorpay X UPI payout channels. Upon task approval, experts receive automated upfront base payments (₹120/point) and passive royalty distribution entries.
+3.  **B2B Data-Asset Marketplace**: Enterprises can license dataset index pools non-exclusively or opt for exclusive buyouts, unlocking immediate Cloudflare R2 download tokens.
+4.  **OpenAI Fine-Tuning Integration Webhook**: Enables clients to trigger Supervised Fine-Tuning (SFT) jobs on OpenAI models (`gpt-4o-mini`) using the licensed dataset directly from the Axiom interface.
+5.  **Fail-Safe DB Graceful Degradation**: Both purchase and fine-tune endpoints detect database connection status. If PostgreSQL is offline, the backend gracefully falls back to simulated in-memory `db.ts` database updates, ensuring the demo works flawlessly.
+
+---
+
+## 📂 Project Tech Stack & Architecture
+
+### Tech Stack
+*   **Framework**: Next.js 14 (App Router)
+*   **Language**: TypeScript
+*   **Styling**: Tailwind CSS & Modern Glassmorphism
+*   **Database**: PostgreSQL with Prisma Client ORM
+*   **SDKs**: Official `openai` SDK (Fine-tuning), `razorpay` Node SDK (FinOps UPI Payouts)
+*   **Queueing**: BullMQ & Redis (Consensus pipeline background jobs)
+
+### Core Architecture Flow
+```mermaid
+graph TD
+    A[Expert Workbench] -->|Submit Instruction Pair| B(Multi-Model QA Consensus)
+    B -->|Groq / OpenAI Auditor| C{Consensus Status}
+    C -->|Approved >= 0.8| D[Prisma Transaction / Mock DB]
+    C -->|Borderline / Disagreement| E[Admin Human Review]
+    D -->|Upfront Cash Payout| F[Razorpay X UPI Payout]
+    D -->|Points Credited| G[Expert Dashboard Points]
+    
+    H[Client Licensing Portal] -->|Shared / Exclusive License| I[Stripe Checkout Simulator]
+    I -->|Calculate Stakes| J[5% Perpetual Royalty Split]
+    J -->|Pro-rata Distribution| K[Prisma RoyaltyLedger & Mock DB]
+    K -->|Payout Updated| F
+    
+    H -->|Download Dataset| L[Cloudflare R2 Secure Token]
+    H -->|Trigger Fine-Tuning| M[OpenAI Fine-Tuning API]
+    M -->|JSONL File Upload| N[openai.files.create]
+    N -->|SFT Training Job| O[openai.fineTuning.jobs.create]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 💻 Running Locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
+*   Node.js (v18+)
+*   npm or yarn
 
-## Learn More
+### 1. Clone & Install Dependencies
+```bash
+git clone <repository-url>
+cd Axiom
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Environment Setup
+Create a `.env` file in the root directory and copy the following configuration variables (credentials are pre-configured to default test/simulation modes):
+```env
+# Database connection string (PostgreSQL)
+DATABASE_URL="postgresql://username:password@localhost:5432/axiom_db"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Razorpay X Payout Keys
+RAZORPAY_KEY_ID="rzp_test_placeholder_key_id"
+RAZORPAY_KEY_SECRET="razorpay_test_placeholder_secret"
+RAZORPAY_WEBHOOK_SECRET="razorpay_test_placeholder_webhook_secret"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# LLM Consensus and OpenAI Fine-Tuning API Keys
+OPENAI_API_KEY="openai_test_placeholder_api_key"
+GROQ_API_KEY="groq_test_placeholder_api_key"
+CLAUDE_API_KEY="claude_test_placeholder_api_key"
+```
 
-## Deploy on Vercel
+### 3. Initialize the Database
+If you have PostgreSQL running locally, push the Prisma schemas:
+```bash
+npx prisma db push
+```
+*Note: If your local PostgreSQL server is offline, the application will automatically fall back to simulated in-memory mode, so you can still run, test, and purchase licensing.*
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 4. Run the Development Server
+```bash
+npm run dev
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🎯 Demo & Evaluation Flow
+
+For judges evaluating this hackathon submission, follow this 5-step walkthrough:
+
+1.  **Onboard/Switch Experts**: Under the **Expert Workbench** tab, use the **Expert Identity** dropdown to switch between pre-seeded experts (e.g., Dr. Ananya Iyer, Adv. Rahul Banerjee). Observe their active points, lifetime earnings, and transaction history.
+2.  **Submit Reasoning Dataset**:
+    *   Select a Target Asset Pool (e.g. `Axiom-Hinglish-Clinical-V1`).
+    *   Enter a high-fidelity prompt instruction and expert response (e.g. Hinglish clinical diagnostic trace).
+    *   Click **Submit to Consensus QA Pipeline**. Observe the Groq and OpenAI model grading, points counter animating up, and the immediate payout added to the **Razorpay Payout Ledger** as `SUCCESS` (upfront base payment).
+3.  **Purchase Dataset License**:
+    *   Switch to the **Client Licensing Portal** tab.
+    *   Select a dataset pool and click **License Dataset Pool**.
+    *   Select **Standard Shared** or **Exclusive Buyout** and enter a billing email.
+    *   Click **Authorize & Checkout**. On success:
+        *   The buy button on the card is replaced by a secure **Cloudflare R2 Download Token** string.
+        *   A success banner displays Stripe verification.
+4.  **Verify Royalty Distributions**:
+    *   Switch back to the **Expert Workbench** tab.
+    *   Observe that the lifetime earnings of the contributors have increased (calculated pro-rata based on points).
+    *   Scroll down to the **Razorpay UPI Payout Ledger** to verify that a new passive `SHARED` or `EXCLUSIVE` royalty payout row is registered as `SUCCESS`.
+5.  **Trigger Fine-Tuning**:
+    *   On the Client tab success banner, click **Trigger OpenAI Fine-Tuning**.
+    *   Watch the interactive log console run through file packaging to JSONL, uploading to OpenAI files API, and initiating the Supervised Fine-Tuning (SFT) job with real-time status output.

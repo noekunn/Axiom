@@ -221,7 +221,7 @@ export default function LeaderboardPage() {
           }
 
           if (selectedLanguage !== 'all') {
-            const langAdj = profile.adjustments.languages[selectedLanguage as keyof typeof profile.adjustments.languages];
+            const langAdj = profile.adjustments.languages[selectedLanguage as keyof typeof profile.adjustments.languages] as { linguistic?: number; domain?: number; reasoning?: number } | undefined;
             if (langAdj) {
               if (langAdj.linguistic) linguistic += langAdj.linguistic;
               if (langAdj.domain) domainScore += langAdj.domain;

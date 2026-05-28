@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '../../../../lib/prisma';
 import { TaskStatus, ConsensusStatus } from '@prisma/client';
@@ -47,9 +47,9 @@ export async function POST(request: Request) {
       );
     }
     
-    if (task.status !== TaskStatus.ACTIVE) {
+    if (task.status !== TaskStatus.OPEN) {
       return NextResponse.json(
-        { error: 'Bad Request', message: `Task is not active. Status: ${task.status}` },
+        { error: 'Bad Request', message: `Task is not open for claims. Status: ${task.status}` },
         { status: 400 }
       );
     }
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     
     // 3. Check if someone else currently claims it (i.e. has a PENDING submission)
     const activeClaim = existingSubmissions.find(
-      (sub) => sub.consensusStatus === ConsensusStatus.PENDING
+      (sub) => sub.consensusStatus === ConsensusStatus.PENDING_QA
     );
     if (activeClaim) {
       return NextResponse.json(
@@ -97,12 +97,12 @@ export async function POST(request: Request) {
         taskId,
         expertId,
         content: 'CLAIMED_IN_PROGRESS',
-        consensusStatus: ConsensusStatus.PENDING,
+        consensusStatus: ConsensusStatus.PENDING_QA,
         qualityMultiplierApplied: 1.0,
         pointsEarned: 0.0,
       },
     });
-    
+
     return NextResponse.json(
       {
         message: 'Task successfully claimed. The claim lock is now active.',
