@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,7 +10,6 @@ import {
   Trophy,
   Settings,
   HelpCircle,
-  TrendingUp,
   Search,
   Bell,
   Wallet,
@@ -58,11 +57,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       name: "Operator Control",
       href: "/admin",
       icon: Settings
-    },
-    {
-      name: "Compounding Growth",
-      href: "/marketing",
-      icon: TrendingUp
     }
   ];
 

@@ -10,16 +10,7 @@ import {
   Check, 
   X, 
   Info, 
-  ChevronRight, 
-  Search, 
-  ArrowRight, 
-  Users, 
-  TrendingUp, 
-  Sparkles,
-  Layers,
-  HelpCircle,
-  FileText,
-  Code
+  Search
 } from "lucide-react";
 
 // Inline Custom SVGs for Branding and visual depth
@@ -62,7 +53,6 @@ export default function HomePage() {
   // Enterprise/Client Calculator States
   const [clientDataPoints, setClientDataPoints] = useState(75000); // 1,000 to 250,000
   const [complexityFactor, setComplexityFactor] = useState(1.4); // 1.0, 1.4, 2.2, 3.0
-  const [complexityName, setComplexityName] = useState("Finance & E-commerce");
 
   // Form State for Modals
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -124,9 +114,8 @@ export default function HomePage() {
   }, []);
 
   // Complexity Handler
-  const handleComplexityChange = (factor: number, name: string) => {
+  const handleComplexityChange = (factor: number) => {
     setComplexityFactor(factor);
-    setComplexityName(name);
   };
 
   // FAQ Database
@@ -751,28 +740,28 @@ export default function HomePage() {
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <button 
-                          onClick={() => handleComplexityChange(1.0, "General NLP & Web")}
+                          onClick={() => handleComplexityChange(1.0)}
                           className={`p-3 rounded-xl border text-center transition-all duration-300 ${complexityFactor === 1.0 ? "border-[#BF5AF2] bg-[#BF5AF2]/10 text-white shadow-sm" : "border-white/5 hover:border-white/10 text-gray-400 bg-[#13131a]/40"}`}
                         >
                           <span className="text-[9px] font-mono block mb-1">LEVEL 1</span>
                           <span className="text-xs font-bold block">General NLP</span>
                         </button>
                         <button 
-                          onClick={() => handleComplexityChange(1.4, "Finance & E-commerce")}
+                          onClick={() => handleComplexityChange(1.4)}
                           className={`p-3 rounded-xl border text-center transition-all duration-300 ${complexityFactor === 1.4 ? "border-[#BF5AF2] bg-[#BF5AF2]/10 text-white shadow-sm" : "border-white/5 hover:border-white/10 text-gray-400 bg-[#13131a]/40"}`}
                         >
                           <span className="text-[9px] font-mono block mb-1">LEVEL 2</span>
                           <span className="text-xs font-bold block">Finance</span>
                         </button>
                         <button 
-                          onClick={() => handleComplexityChange(2.2, "BioMed & Regulatory")}
+                          onClick={() => handleComplexityChange(2.2)}
                           className={`p-3 rounded-xl border text-center transition-all duration-300 ${complexityFactor === 2.2 ? "border-[#BF5AF2] bg-[#BF5AF2]/10 text-white shadow-sm" : "border-white/5 hover:border-white/10 text-gray-400 bg-[#13131a]/40"}`}
                         >
                           <span className="text-[9px] font-mono block mb-1">LEVEL 3</span>
                           <span className="text-xs font-bold block">BioMedical</span>
                         </button>
                         <button 
-                          onClick={() => handleComplexityChange(3.0, "Deep Tech & Quantum")}
+                          onClick={() => handleComplexityChange(3.0)}
                           className={`p-3 rounded-xl border text-center transition-all duration-300 ${complexityFactor === 3.0 ? "border-[#BF5AF2] bg-[#BF5AF2]/10 text-white shadow-sm" : "border-white/5 hover:border-white/10 text-gray-400 bg-[#13131a]/40"}`}
                         >
                           <span className="text-[9px] font-mono block mb-1">LEVEL 4</span>
