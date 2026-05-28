@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import ExpertLayout from "@/components/ExpertLayout";
 
 
 // Types
@@ -655,7 +655,7 @@ export default function VettingArena() {
   };
 
   return (
-    <DashboardLayout>
+    <ExpertLayout>
       {/* Spark Particle Explosion Overlay Canvas */}
       {showLevelUp && (
         <canvas 
@@ -1429,7 +1429,7 @@ export default function VettingArena() {
         </div>
       )}
 
-    </DashboardLayout>
+    </ExpertLayout>
 
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import DashboardLayout from '@/components/DashboardLayout';
+import AdminLayout from '@/components/AdminLayout';
 
 
 // Interfaces for structured types
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
   });
 
   return (
-    <DashboardLayout>
+    <AdminLayout>
       {/* Toast Notification Container */}
       {toast && (
         <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl border shadow-2xl transition-all duration-300 transform translate-y-0 animate-bounce ${
@@ -1162,7 +1162,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-    </DashboardLayout>
+    </AdminLayout>
   );
 }
 

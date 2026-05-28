@@ -75,6 +75,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, message: 'Signup successful', expert: newExpert });
   }
 
+  if (action === 'client-signup') {
+    const { companyName, email, llmSize, stripeBilling, datasetNeeds } = body;
+    if (!companyName || !email || !llmSize || !stripeBilling || !datasetNeeds) {
+      return NextResponse.json({ success: false, error: 'All fields are required' }, { status: 400 });
+    }
+
+    // Check if client already exists
+    const client = db.clients.find(c => c.email.toLowerCase() === email.toLowerCase());
+    if (client) {
+      return NextResponse.json({ success: true, message: 'LoggedIn successfully', client });
+    }
+
+    // Create new client
+    const newClient = {
+      id: `cli_${Math.random().toString(36).substring(2, 9)}`,
+      companyName,
+      email,
+      llmSize,
+      stripeBilling,
+      datasetNeeds
+    };
+
+    db.clients.push(newClient);
+
+    return NextResponse.json({ success: true, message: 'Signup successful', client: newClient });
+  }
+
   if (action === 'submit') {
     const { expertId, poolId, prompt, response, difficultyMultiplier } = body;
     if (!expertId || !poolId || !prompt || !response || !difficultyMultiplier) {

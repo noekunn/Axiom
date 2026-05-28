@@ -1,4 +1,4 @@
-﻿// Simulated in-memory database to preserve state during development dev-server lifecycle
+// Simulated in-memory database to preserve state during development dev-server lifecycle
 // Prevents hot-reloading from clearing state by binding to globalThis
 
 export interface Expert {
@@ -63,11 +63,21 @@ export interface RoyaltyPayout {
   payoutTransactionId: string;
 }
 
+export interface Client {
+  id: string;
+  companyName: string;
+  email: string;
+  llmSize: string;
+  stripeBilling: string;
+  datasetNeeds: string;
+}
+
 class SimulatedDatabase {
   public experts: Expert[] = [];
   public pools: AssetPool[] = [];
   public submissions: TaskSubmission[] = [];
   public royaltyLedger: RoyaltyPayout[] = [];
+  public clients: Client[] = [];
 
   constructor() {
     this.seed();

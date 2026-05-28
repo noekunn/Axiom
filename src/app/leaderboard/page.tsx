@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { ModelScore } from '../api/leaderboard/route';
-import DashboardLayout from '@/components/DashboardLayout';
+import ClientLayout from '@/components/ClientLayout';
 
 
 // Static client-side simulation fallback data to ensure smooth rendering and instant load times
@@ -313,7 +313,7 @@ export default function LeaderboardPage() {
   }, [data.leaderboard, activeModelId]);
 
   return (
-    <DashboardLayout>
+    <ClientLayout>
       <div className="max-w-7xl mx-auto relative z-10 select-none">
         
         {/* Dashboard Header */}
@@ -1023,7 +1023,7 @@ export default function LeaderboardPage() {
         </section>
 
       </div>
-    </DashboardLayout>
+    </ClientLayout>
   );
 }
 
