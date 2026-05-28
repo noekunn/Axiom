@@ -354,7 +354,7 @@ export default function HomePage() {
                     Active Expert Nodes
                   </span>
                   <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono">
-                    {networkStats.activeNodes.toLocaleString()}
+                    {networkStats.activeNodes.toLocaleString('en-US')}
                   </div>
                   <span className="text-[9px] text-[#5E5CE6] font-mono flex items-center gap-1 mt-1">
                     <span className="font-bold">↑</span> +12% this week
@@ -366,7 +366,7 @@ export default function HomePage() {
                     Validated Tokens
                   </span>
                   <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono">
-                    {networkStats.validatedData.toLocaleString()}
+                    {networkStats.validatedData.toLocaleString('en-US')}
                   </div>
                   <span className="text-[9px] text-[#BF5AF2] font-mono flex items-center gap-1 mt-1">
                     <span className="font-bold">↑</span> live streaming
@@ -378,7 +378,7 @@ export default function HomePage() {
                     Royalties Distributed
                   </span>
                   <div className="text-2xl sm:text-3xl font-extrabold text-[#5E5CE6] tracking-tight font-mono">
-                    ${(networkStats.royaltiesPaid / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${(networkStats.royaltiesPaid / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <span className="text-[9px] text-gray-400 font-mono flex items-center gap-1 mt-1">
                     USD settlement layer
@@ -564,7 +564,7 @@ export default function HomePage() {
                           Tasks Completed & Approved
                         </label>
                         <span className="text-xl font-bold font-mono text-white">
-                          {expertTasks.toLocaleString()} <span className="text-xs text-gray-500 font-normal">tasks</span>
+                          {expertTasks.toLocaleString('en-US')} <span className="text-xs text-gray-500 font-normal">tasks</span>
                         </span>
                       </div>
                       <input 
@@ -642,7 +642,7 @@ export default function HomePage() {
                       {/* Large Number */}
                       <div>
                         <div className="text-4xl sm:text-5xl font-black text-[#5E5CE6] tracking-tight font-mono drop-shadow-[0_0_10px_rgba(94,92,230,0.3)]">
-                          ${expertTotalEarnings.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                          ${expertTotalEarnings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                         </div>
                         <span className="text-[11px] text-gray-400 mt-1 block">
                           Compounding lifetime earnings yield
@@ -652,15 +652,15 @@ export default function HomePage() {
                       <div className="space-y-3 pt-4 border-t border-white/[0.03] text-xs">
                         <div className="flex justify-between text-gray-400 font-mono">
                           <span>Base Task Pay (Upfront):</span>
-                          <span className="text-white font-semibold">${expertActiveEarnings.toLocaleString()}</span>
+                          <span className="text-white font-semibold">${expertActiveEarnings.toLocaleString('en-US')}</span>
                         </div>
                         <div className="flex justify-between text-gray-400 font-mono">
                           <span>Axiom Secondary Royalties:</span>
-                          <span className="text-[#a5a5ff] font-semibold">${expertRoyaltyEarnings.toLocaleString()}</span>
+                          <span className="text-[#a5a5ff] font-semibold">${expertRoyaltyEarnings.toLocaleString('en-US')}</span>
                         </div>
                         <div className="flex justify-between text-gray-500 pt-2 border-t border-white/[0.03] font-mono">
                           <span>Traditional mechanical payout:</span>
-                          <span className="line-through">${mturkBaselineEarnings.toLocaleString()}</span>
+                          <span className="line-through">${mturkBaselineEarnings.toLocaleString('en-US')}</span>
                         </div>
                       </div>
 
@@ -711,7 +711,7 @@ export default function HomePage() {
                           Target Dataset Size
                         </label>
                         <span className="text-xl font-bold font-mono text-white">
-                          {clientDataPoints.toLocaleString()} <span className="text-xs text-gray-500 font-normal">records</span>
+                          {clientDataPoints.toLocaleString('en-US')} <span className="text-xs text-gray-500 font-normal">records</span>
                         </span>
                       </div>
                       <input 
@@ -797,7 +797,7 @@ export default function HomePage() {
                       {/* Large Savings Number */}
                       <div>
                         <div className="text-4xl sm:text-5xl font-black text-[#BF5AF2] tracking-tight font-mono drop-shadow-[0_0_10px_rgba(191,90,242,0.3)]">
-                          ${clientNetSavings.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                          ${clientNetSavings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                         </div>
                         <span className="text-[11px] text-gray-400 mt-1 block">
                           Savings vs Legacy Consulting Firms ({clientSavingsPercent}% Saved)
@@ -807,11 +807,11 @@ export default function HomePage() {
                       <div className="space-y-3 pt-4 border-t border-white/[0.03] text-xs">
                         <div className="flex justify-between text-gray-400 font-mono">
                           <span>Legacy Consulting Cost (Vetto):</span>
-                          <span className="text-white font-semibold">${vettoCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                          <span className="text-white font-semibold">${vettoCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                         </div>
                         <div className="flex justify-between text-gray-400 font-mono">
                           <span>Axiom Ecosystem Cost:</span>
-                          <span className="text-[#c974fa] font-semibold">${axiomCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                          <span className="text-[#c974fa] font-semibold">${axiomCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                         </div>
                         <div className="flex justify-between text-gray-500 pt-2 border-t border-white/[0.03] font-mono">
                           <span>Setup / Onboarding Overhead:</span>

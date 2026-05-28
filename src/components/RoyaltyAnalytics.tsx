@@ -62,7 +62,7 @@ export default function RoyaltyAnalytics({ points, earnings, poolCount }: Royalt
       <div className="glass-panel rounded-2xl p-5 border border-white/[0.01] flex items-center justify-between">
         <div>
           <p className="text-xs text-[#acaab4] font-label mb-1">Contribution Points</p>
-          <p className="font-display font-black text-2xl text-[#e7e4ee] tracking-tight">{points.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
+          <p className="font-display font-black text-2xl text-[#e7e4ee] tracking-tight">{points.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
         </div>
         <div className="w-11 h-11 rounded-full bg-[#bf5af2]/10 flex items-center justify-center text-[#bf5af2] border border-[#bf5af2]/10">
           <Star className="w-5 h-5 fill-[#bf5af2]/20" />
