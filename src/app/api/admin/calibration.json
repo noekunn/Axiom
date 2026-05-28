@@ -1,0 +1,14 @@
+{
+  "agreementMargin": 57,
+  "autoApprovalThreshold": 90,
+  "humanEscalationMargin": 70,
+  "retryLimit": 3,
+  "strategy": "strict",
+  "strictAlignment": true,
+  "logDiscrepancies": false,
+  "queues": {
+    "consensus-qa": "active",
+    "royalty-payouts": "active",
+    "webhook-ingestion": "active"
+  }
+}

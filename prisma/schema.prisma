@@ -1,0 +1,342 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+/// Defines the user's primary system role.
+enum UserRole {
+  ADMINISTRATOR
+  EXPERT
+  CLIENT
+}
+
+/// Defines the expertise tier of a domain specialist.
+/// Tiers grant specific multipliers that augment royalty points earned during task submissions.
+enum ExpertTier {
+  BRONZE   // Multiplier: 1.0x
+  SILVER   // Multiplier: 1.1x
+  GOLD     // Multiplier: 1.25x
+  SENIOR   // Multiplier: 1.5x
+  ELITE    // Multiplier: 2.0x
+}
+
+/// Tracks the operational state of a thematic dataset Asset Pool.
+enum PoolStatus {
+  DRAFT       // Pool is being constructed and tasks are open
+  ACTIVE      // Pool is active, accepting contributions, or processing QA
+  COMPLETED   // Pool is finalized, dataset built, ready/active for licensing
+  ARCHIVED    // Pool has been exclusively purchased and taken off market
+}
+
+/// Tracks the lifecycle of a particular dataset instruction pair task.
+enum TaskStatus {
+  OPEN
+  ASSIGNED
+  SUBMITTED
+  COMPLETED
+}
+
+/// Status of the multi-model AI consensus QA pipeline.
+enum ConsensusStatus {
+  PENDING_QA              // Awaiting AI models consensus check
+  AI_APPROVED             // Automated consensus passed without borderline issues
+  HUMAN_REVIEW_REQUIRED   // Disagreement between LLMs or borderline QA score; routed to human
+  APPROVED                // Approved either by AI consensus or human arbitrator
+  REJECTED                // Rejected due to poor quality/incorrect response
+}
+
+/// Verdict of an individual LLM agent in the consensus network.
+enum EvaluationVerdict {
+  APPROVE
+  REJECT
+  BORDERLINE
+}
+
+/// Licensing commercial model chosen by purchasing enterprise client.
+enum LicenseType {
+  SHARED      // Default: lower price, non-exclusive rights, dataset remains on marketplace
+  EXCLUSIVE   // Premium: high price (e.g. 3.5x), exclusive rights, archives pool
+}
+
+/// Status of the global licensing purchase checkout.
+enum LicenseStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+}
+
+/// Payout status for local UPI distribution (Razorpay).
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+}
+
+/// Supported payment gateways for operations.
+enum PaymentProvider {
+  RAZORPAY    // Default for domestic India UPI payouts
+  STRIPE      // Default for global client licensing purchases
+}
+
+/// AI Provider used for multi-model consensus QA.
+enum ModelProvider {
+  OPENAI
+  GROQ
+  CLAUDE
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+/// Unified User table holding core system authentication and basic profile data.
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String?
+  role          UserRole       @default(EXPERT)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // 1-to-1 profile mappings for separation of concerns
+  expertProfile ExpertProfile?
+  clientProfile ClientProfile?
+
+  // Client licensing purchases
+  licenses      PoolLicense[]
+}
+
+/// Extended profile detailing a domain expert's ranking, payments, and metrics.
+model ExpertProfile {
+  id                    String             @id @default(uuid())
+  userId                String             @unique
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tier                  ExpertTier         @default(BRONZE)
+  
+  // Local India payment details (Razorpay UPI integration)
+  upiId                 String?            // UPI VPA (e.g. expert@okaxis)
+  razorpayContactId     String?            // Razorpay Contact ID
+  razorpayFundAccountId String?            // Razorpay Fund Account ID for direct UPI Payouts
+  
+  // Aggregated analytics
+  totalPoints           Float              @default(0.0) // Cumulative points across all pools
+  lifetimeEarnings      Decimal            @default(0.0) @db.Decimal(12, 2) // In INR or USD
+  
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  // Relationships
+  contributions         PoolContribution[]
+  submissions           TaskSubmission[]
+  royaltyLedgers        RoyaltyLedger[]
+}
+
+/// Extended profile for enterprise customers licensing datasets from the marketplace.
+model ClientProfile {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  companyName      String?
+  stripeCustomerId String?  // Stripe customer integration for international licensing
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+/// Represents a domain-specific thematic dataset (e.g. "Indic Cardiology V1", "Hinglish Corporate Law V2").
+/// Serves as a unified royalty index fund where contributors earn shares of the pool's resale revenue.
+model AssetPool {
+  id             String             @id @default(uuid())
+  name           String             // e.g. "Indic Cardiology V1"
+  description    String?
+  domain         String             // e.g. "Cardiology", "Corporate Law", "E-Commerce"
+  language       String             // e.g. "Hindi", "Bengali", "Hinglish", "Tamil"
+  version        String             @default("V1")
+  status         PoolStatus         @default(DRAFT)
+  
+  // Total royalty points distributed to all contributors in this index fund
+  totalPoints    Float              @default(0.0)
+  
+  // Licensing pricing strategies (Recommendation B: Dual-Licensing)
+  basePrice      Decimal            @db.Decimal(10, 2) // Fee for Shared License (non-exclusive)
+  exclusivePrice Decimal            @db.Decimal(10, 2) // Fee for Exclusive License (3.5x premium)
+  
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  // Relationships
+  contributions  PoolContribution[]
+  tasks          Task[]
+  licenses       PoolLicense[]
+  royaltyLedgers RoyaltyLedger[]
+}
+
+/// Tracks an individual expert's total cumulative contribution and fractional points inside a specific Asset Pool.
+/// This prevents micro-payout dilution by acting as an index fund share ledger.
+model PoolContribution {
+  id              String        @id @default(uuid())
+  expertId        String
+  expert          ExpertProfile @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  
+  assetPoolId     String
+  assetPool       AssetPool     @relation(fields: [assetPoolId], references: [id], onDelete: Cascade)
+  
+  // Cumulative points earned inside this specific asset pool
+  points          Float         @default(0.0)
+  
+  // Dynamic share percentage at any given instant (points / assetPool.totalPoints)
+  sharePercentage Float         @default(0.0)
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // An expert can only have one consolidated contribution record per Asset Pool
+  @@unique([expertId, assetPoolId])
+}
+
+/// Individual prompt/response generation task defined within an Asset Pool.
+model Task {
+  id                   String           @id @default(uuid())
+  assetPoolId          String
+  assetPool            AssetPool        @relation(fields: [assetPoolId], references: [id], onDelete: Cascade)
+  
+  title                String
+  instruction          String           // Detailed prompt instructions
+  difficultyMultiplier Float            @default(1.0) // Task weight based on complexity (e.g. 1.0 - 2.5x)
+  status               TaskStatus       @default(OPEN)
+  
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  submissions          TaskSubmission[]
+}
+
+/// An expert's dataset submission for a given Task, processed by the multi-model AI QA pipeline.
+model TaskSubmission {
+  id                         String                @id @default(uuid())
+  taskId                     String
+  task                       Task                  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  expertId                   String
+  expert                     ExpertProfile         @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  
+  // The dataset entry contents submitted by the expert (prompt response / instruction pair)
+  content                    String                @db.Text
+  
+  // QA Metadata & Calibration
+  qualityScore               Float?                // Calibrated score out of 100.0 from multi-model QA
+  consensusStatus            ConsensusStatus       @default(PENDING_QA)
+  reviewedByHumanId          String?               // User ID of administrator if routed to human review
+  
+  // Points calculation factors (points-based royalty architecture)
+  basePoints                 Float                 @default(100.0) // Base points per successful task
+  tierMultiplierApplied      Float                 @default(1.0)   // ExpertTier multiplier at submission
+  qualityMultiplierApplied   Float                 @default(1.0)   // QA quality modifier based on score
+  difficultyMultiplierApplied Float                @default(1.0)   // Task complexity modifier
+  pointsEarned               Float                 @default(0.0)   // basePoints * tier * quality * difficulty
+  
+  createdAt                  DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
+
+  consensusEvaluations       ConsensusEvaluation[]
+}
+
+/// Individual LLM evaluation report for a submission, establishing multi-model consensus.
+model ConsensusEvaluation {
+  id               String            @id @default(uuid())
+  taskSubmissionId String
+  taskSubmission   TaskSubmission    @relation(fields: [taskSubmissionId], references: [id], onDelete: Cascade)
+  
+  provider         ModelProvider     // OPENAI, GROQ, CLAUDE
+  modelName        String            // e.g. "gpt-4o", "llama-3.3-70b-specdec", "claude-3-5-sonnet-v2"
+  score            Float             // QA Quality score generated by this model (0 to 100)
+  verdict          EvaluationVerdict // Evaluator verdict
+  reasoning        String            @db.Text // AI explanation for the quality score and verdict
+  
+  createdAt        DateTime          @default(now())
+}
+
+/// Tracks B2B marketplace licensing transactions of an Asset Pool.
+model PoolLicense {
+  id                    String          @id @default(uuid())
+  assetPoolId           String
+  assetPool             AssetPool       @relation(fields: [assetPoolId], references: [id], onDelete: Cascade)
+  
+  clientId              String
+  client                User            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  licenseType           LicenseType     @default(SHARED)
+  licenseFee            Decimal         @db.Decimal(10, 2) // Purchase fee (USD/INR)
+  status                LicenseStatus   @default(PENDING)
+  
+  // Stripe integration details
+  stripeSessionId       String?         @unique
+  stripePaymentIntentId String?         @unique
+  
+  licensedAt            DateTime?
+  expiresAt             DateTime?       // NULL if perpetual license
+  
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  royaltyLedgers        RoyaltyLedger[]
+}
+
+/// Ledger tracking individual expert royalty distributions triggered by an Asset Pool license sale.
+model RoyaltyLedger {
+  id                    String        @id @default(uuid())
+  poolLicenseId         String
+  poolLicense           PoolLicense   @relation(fields: [poolLicenseId], references: [id], onDelete: Cascade)
+  
+  assetPoolId           String
+  assetPool             AssetPool     @relation(fields: [assetPoolId], references: [id], onDelete: Cascade)
+  
+  expertId              String
+  expert                ExpertProfile @relation(fields: [expertId], references: [id], onDelete: Cascade)
+  
+  // Historical snapshots of points used to compute the exact royalty split (prevents dispute & retroactive issues)
+  pointsAtTime          Float
+  totalPointsAtTime     Float
+  sharePercentageAtTime Float         // pointsAtTime / totalPointsAtTime
+  
+  // Payout financial tracking (Calculated as expert's pool share of the designated 5% perpetual royalty pool)
+  grossRoyalty          Decimal       @db.Decimal(12, 4) // Raw calculated amount
+  platformFee           Decimal       @db.Decimal(12, 4) // Optional Axiom platform operational fee
+  netRoyalty            Decimal       @db.Decimal(12, 4) // Final payout amount sent to expert
+  
+  payoutStatus          PayoutStatus  @default(PENDING)
+  payoutProvider        PaymentProvider @default(RAZORPAY) // Domestic UPI (Razorpay) or Global (Stripe)
+  payoutTransactionId   String?       @unique            // Razorpay Payout ID or Stripe Transfer ID
+  failureReason         String?
+  
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+/// Tracks webhooks received from payment providers (Stripe/Razorpay) to guarantee idempotency and audit logs.
+model WebhookLog {
+  id           String          @id @default(uuid())
+  provider     PaymentProvider
+  eventId      String          @unique // stripe event ID or razorpay event ID
+  eventType    String          // e.g. "payout.processed", "checkout.session.completed"
+  payload      String          @db.Text
+  processed    Boolean         @default(false)
+  errorMessage String?
+  
+  createdAt    DateTime        @default(now())
+  processedAt  DateTime?
+}
