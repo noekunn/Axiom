@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { ModelScore } from '../api/leaderboard/route';
+import DashboardLayout from '@/components/DashboardLayout';
+
 
 // Static client-side simulation fallback data to ensure smooth rendering and instant load times
 const LOCAL_MODEL_PROFILES = [
@@ -311,17 +313,12 @@ export default function LeaderboardPage() {
   }, [data.leaderboard, activeModelId]);
 
   return (
-    <div className="min-h-screen bg-[#030712] text-zinc-100 font-sans selection:bg-violet-500/30 pb-20">
-      {/* Dynamic Background Gradients */}
-      <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-violet-950/15 via-indigo-950/5 to-transparent pointer-events-none" />
-      <div className="absolute top-[200px] left-[10%] w-[350px] h-[350px] rounded-full bg-violet-600/5 blur-[120px] pointer-events-none" />
-      <div className="absolute top-[350px] right-[10%] w-[450px] h-[450px] rounded-full bg-cyan-600/5 blur-[150px] pointer-events-none" />
-
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 relative z-10">
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto relative z-10 select-none">
         
         {/* Dashboard Header */}
-        <header className="border-b border-zinc-800/80 pb-8 mb-8">
+        <header className="border-b border-zinc-800/80 pb-6 mb-8">
+
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -1026,6 +1023,7 @@ export default function LeaderboardPage() {
         </section>
 
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
+

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
+
 
 // Types
 interface Question {
@@ -653,74 +655,64 @@ export default function VettingArena() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030303] text-zinc-100 font-sans relative overflow-x-hidden selection:bg-purple-500/30 selection:text-purple-300">
+    <DashboardLayout>
+      {/* Spark Particle Explosion Overlay Canvas */}
+      {showLevelUp && (
+        <canvas 
+          ref={canvasRef} 
+          className="fixed inset-0 w-full h-full pointer-events-none z-45"
+          style={{ mixBlendMode: 'screen' }}
+        />
+      )}
       
-      {/* Dynamic Tactical Background Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0c0c0e_1px,transparent_1px),linear-gradient(to_bottom,#0c0c0e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none z-0" />
-      
-      {/* Fine Ambient Neon Spotlights */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[140px] pointer-events-none z-0" />
+      {/* Header Widget */}
+      <div className="flex flex-col md:flex-row items-center justify-between border-b border-zinc-800 pb-6 mb-8 gap-4 select-none">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 via-zinc-300 to-zinc-400 font-headline">
+            AXIOM <span className="text-[#a5a5ff] font-extrabold text-xs px-2 py-0.5 rounded border border-[#a5a5ff]/20 bg-[#a5a5ff]/5 font-mono">VETTING CORE</span>
+          </h1>
+          <p className="text-[10px] text-zinc-500 tracking-wider font-mono">PREMIUM ALGORITHMIC PLAYGROUND</p>
+        </div>
 
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        
-        {/* Navigation Header bar */}
-        <header className="flex flex-col sm:flex-row items-center justify-between border-b border-zinc-800 pb-6 mb-8 gap-4">
-          <div className="flex items-center gap-3">
-            {/* Logo */}
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 via-zinc-300 to-zinc-400">
-                AXIOM <span className="text-indigo-400 font-extrabold text-xs px-2 py-0.5 rounded border border-indigo-500/20 bg-indigo-500/5">VETTING CORE</span>
-              </h1>
-              <p className="text-xs text-zinc-500 tracking-wider">PREMIUM ALGORITHMIC PLAYGROUND</p>
-            </div>
+        {/* Micro XP Profile Summary Widget */}
+        <div className="flex items-center gap-4 bg-zinc-900/50 backdrop-blur-md px-4 py-2.5 rounded-xl border border-zinc-850 shadow-md">
+          {/* Rank Shield */}
+          <div className={`px-3 py-1.5 rounded-lg bg-gradient-to-br ${tier.color} text-zinc-100 flex flex-col items-center justify-center border border-white/5 shadow-inner`}>
+            <span className="text-[9px] uppercase font-bold tracking-widest text-white/70">RANK</span>
+            <span className="text-xs font-extrabold tracking-wide uppercase font-headline">{tier.name}</span>
           </div>
 
-          {/* Micro XP Profile Summary Widget */}
-          <div className="flex items-center gap-4 bg-zinc-900/50 backdrop-blur-md px-4 py-2.5 rounded-xl border border-zinc-800/80 shadow-md">
+          {/* XP bar details */}
+          <div className="flex flex-col w-36 sm:w-48">
+            <div className="flex justify-between items-center text-[9px] font-bold text-zinc-400 mb-1">
+              <span>MULTIPLIER: <span className="text-indigo-400">{tier.multiplier}x</span></span>
+              <span>{xp} XP</span>
+            </div>
             
-            {/* Rank Shield */}
-            <div className={`px-3 py-1.5 rounded-lg bg-gradient-to-br ${tier.color} text-zinc-100 flex flex-col items-center justify-center border border-white/5 shadow-inner`}>
-              <span className="text-[10px] uppercase font-bold tracking-widest text-white/70">RANK</span>
-              <span className="text-sm font-extrabold tracking-wide uppercase">{tier.name}</span>
+            {/* Progress Slider */}
+            <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-700 ease-out shadow-lg shadow-indigo-500/50"
+                style={{ 
+                  width: `${Math.min(100, Math.max(8, (xp / 700) * 100))}%` 
+                }}
+              />
             </div>
-
-            {/* XP bar details */}
-            <div className="flex flex-col w-36 sm:w-48">
-              <div className="flex justify-between items-center text-[10px] font-bold text-zinc-400 mb-1">
-                <span>MULTIPLIER: <span className="text-indigo-400">{tier.multiplier}x</span></span>
-                <span>{xp} XP</span>
-              </div>
-              
-              {/* Progress Slider */}
-              <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-700 ease-out shadow-lg shadow-indigo-500/50"
-                  style={{ 
-                    width: `${Math.min(100, Math.max(8, (xp / 700) * 100))}%` 
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Reset */}
-            <button 
-              onClick={handleResetProgress}
-              className="text-zinc-600 hover:text-red-400 transition-colors p-1"
-              title="Reset System Core Credentials"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
           </div>
-        </header>
+
+          {/* Reset */}
+          <button 
+            onClick={handleResetProgress}
+            className="text-zinc-600 hover:text-red-400 transition-colors p-1"
+            title="Reset System Core Credentials"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
 
         {/* ================= PHASE 1: LOBBY ================= */}
         {phase === "lobby" && (
@@ -1369,7 +1361,7 @@ export default function VettingArena() {
           </div>
         )}
 
-      </div>
+
 
       {/* ================= LEVEL UP PROMOTION DEEPLINK OVERLAY ================= */}
       {showLevelUp && (
@@ -1437,23 +1429,8 @@ export default function VettingArena() {
         </div>
       )}
 
-      {/* Styled custom transitions in absolute head component */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scaleUp {
-          from { opacity: 0; transform: scale(0.96); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-scale-up {
-          animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-      `}</style>
-    </div>
+    </DashboardLayout>
+
   );
 }
+

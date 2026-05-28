@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
+
 
 // Interfaces for structured types
 interface CalibrationSettings {
@@ -269,7 +271,7 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6 selection:bg-violet-600 selection:text-white pb-20">
+    <DashboardLayout>
       {/* Toast Notification Container */}
       {toast && (
         <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl border shadow-2xl transition-all duration-300 transform translate-y-0 animate-bounce ${
@@ -291,10 +293,10 @@ export default function AdminDashboard() {
       )}
 
       {/* Primary Container */}
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6 select-none">
         
         {/* Global Dashboard Navigation Header */}
-        <header className="bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 rounded-2xl px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl relative overflow-hidden">
+        <header className="bg-[#1f1f28]/40 backdrop-blur-md border border-white/[0.02] rounded-2xl px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-emerald-500"></div>
           
           <div className="flex items-center gap-3">
@@ -305,15 +307,15 @@ export default function AdminDashboard() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-100 to-zinc-400">AXIOM OPERATOR</h1>
-                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-violet-950/60 text-violet-400 border border-violet-800/60 tracking-wider">CONSOLE</span>
+                <h1 className="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-100 to-zinc-400 font-headline">AXIOM OPERATOR</h1>
+                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#bf5af2]/10 text-[#bf5af2] border border-[#bf5af2]/20 tracking-wider">CONSOLE</span>
               </div>
               <p className="text-xs text-zinc-500 mt-0.5">Continuous consensus QA alignment & payout auditing dashboard</p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 bg-zinc-950 px-3.5 py-1.5 rounded-xl border border-zinc-800 text-[11px] font-mono text-zinc-400">
+            <div className="flex items-center gap-2 bg-[#13131a] px-3.5 py-1.5 rounded-xl border border-white/5 text-[11px] font-mono text-zinc-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               API: ONLINE
             </div>
@@ -327,20 +329,21 @@ export default function AdminDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3m0 0l3 3m-3-3v12" />
               </svg>
             </button>
-
+ 
             <div className="flex items-center gap-2 bg-zinc-800/50 border border-zinc-700/60 px-3.5 py-2 rounded-xl text-xs">
-              <label className="text-zinc-400 select-none cursor-pointer flex items-center gap-2">
+              <label className="text-zinc-400 select-none cursor-pointer flex items-center gap-2 font-bold">
                 <input
                   type="checkbox"
                   checked={autoRefresh}
                   onChange={(e) => setAutoRefresh(e.target.checked)}
-                  className="rounded border-zinc-700 bg-zinc-900 text-violet-600 focus:ring-violet-600 focus:ring-offset-zinc-900 w-3.5 h-3.5"
+                  className="rounded border-zinc-700 bg-zinc-900 text-violet-600 focus:ring-violet-600 focus:ring-offset-zinc-900 w-3.5 h-3.5 cursor-pointer"
                 />
                 AUTO-SYNC (8s)
               </label>
             </div>
           </div>
         </header>
+
 
         {/* TOP LEVEL METRICS GRID */}
         <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1159,6 +1162,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-    </div>
+    </DashboardLayout>
   );
 }
+

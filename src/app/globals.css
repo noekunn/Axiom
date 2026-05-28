@@ -1,91 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #030708;
-  --foreground: #f3f4f6;
-  --accent-neon: #10b981; /* Emerald-500 */
-  --accent-neon-glow: rgba(16, 185, 129, 0.15);
+  --background: #0e0e15;
+  --foreground: #e7e4ee;
+  
+  --primary: #a5a5ff;
+  --primary-dim: #6462ec;
+  --primary-container: #9695ff;
+  --on-primary: #1700a1;
+  
+  --secondary: #5f9eff;
+  --secondary-dim: #0073e0;
+  --secondary-container: #005db8;
+  --on-secondary-container: #f7f7ff;
+  
+  --tertiary: #d277ff;
+  --tertiary-dim: #d277ff;
+  --tertiary-container: #bf5af2;
+  
+  --surface: #0e0e15;
+  --surface-container-lowest: #000000;
+  --surface-container-low: #13131a;
+  --surface-container: #191921;
+  --surface-container-high: #1f1f28;
+  --surface-container-highest: #25252f;
+  
+  --on-surface: #e7e4ee;
+  --on-surface-variant: #acaab4;
+  --outline: #76747e;
+  --outline-variant: #48474f;
+  
+  --error: #ff6e84;
+  --error-dim: #d73357;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  overflow-x: hidden;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.03) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(4, 120, 87, 0.04) 0%, transparent 50%),
-    linear-gradient(to bottom, #030708, #050a0d);
+  background-color: var(--background);
+  background-image: radial-gradient(circle at 50% -20%, var(--primary-dim) 0%, transparent 60%);
   background-attachment: fixed;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
-/* Custom scrollbar for premium aesthetic */
+/* Scrollbar styles to match the premium dark terminal aesthetic */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: rgba(3, 7, 8, 0.8);
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.2);
-  border-radius: 9999px;
+  background: var(--surface-container-highest);
+  border-radius: 10px;
   transition: all 0.3s ease;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.5);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  background: var(--outline);
 }
 
 /* Custom Selection style */
 ::selection {
-  background: rgba(16, 185, 129, 0.3);
+  background: rgba(165, 165, 255, 0.3);
   color: #ffffff;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .font-headline {
+    font-family: 'Manrope', sans-serif;
   }
   
-  .glassmorphism {
-    background: rgba(8, 14, 18, 0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .glassmorphism-card {
-    background: linear-gradient(135deg, rgba(8, 15, 18, 0.7) 0%, rgba(5, 10, 12, 0.5) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  }
-
-  .glassmorphism-card-hover {
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  .font-display {
+    font-family: 'Manrope', sans-serif;
   }
   
-  .glassmorphism-card-hover:hover {
-    transform: translateY(-2px);
-    border-color: rgba(16, 185, 129, 0.25);
-    box-shadow: 
-      0 12px 40px 0 rgba(0, 0, 0, 0.45),
-      0 0 20px 2px rgba(16, 185, 129, 0.05);
+  .font-label {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .glass-panel {
+    background: rgba(25, 25, 33, 0.4); /* surface-container based */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border: none; /* The strict no-line boundary rule */
   }
 
-  .neon-glow-emerald {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+  .ambient-shadow-primary {
+    box-shadow: 0 0 40px -10px rgba(165, 165, 255, 0.15);
   }
 
-  .neon-text-emerald {
-    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  .ambient-shadow-tertiary {
+    box-shadow: 0 0 40px -10px rgba(210, 119, 255, 0.15);
+  }
+
+  .glow-text-emerald {
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  }
+  
+  .bg-grid-cyber {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   }
 }
 
@@ -104,42 +126,30 @@ body {
   animation: pulse-slow 3s infinite ease-in-out;
 }
 
-@keyframes heartbeat {
+@keyframes pulse-glow {
   0%, 100% {
-    transform: scale(1);
-    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(165, 165, 255, 0.2);
   }
-  25% {
-    transform: scale(1.15);
+  50% {
+    box-shadow: 0 0 25px rgba(165, 165, 255, 0.5);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
     opacity: 1;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  55% {
-    transform: scale(1.15);
-    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.animate-heartbeat {
-  animation: heartbeat 2.5s infinite ease-in-out;
-}
-
-@keyframes grid-move {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 40px 40px;
-  }
-}
-
-.bg-grid-cyber {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  animation: grid-move 20s linear infinite;
+.animate-fade-in {
+  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

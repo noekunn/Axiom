@@ -17,8 +17,13 @@ import {
   FileText,
   Check,
   Lock as LockIcon,
-  Send
+  Send,
+  HelpCircle,
+  Plus
 } from "lucide-react";
+import DashboardLayout from "@/components/DashboardLayout";
+import RoyaltyAnalytics from "@/components/RoyaltyAnalytics";
+import TerminalConsole from "@/components/TerminalConsole";
 
 interface Expert {
   id: string;
@@ -95,56 +100,7 @@ interface FineTuningJob {
   status: string;
 }
 
-// ==========================================
-// Animated Counter Hook
-// ==========================================
-function useAnimatedCounter(targetValue: number, duration: number = 800): number {
-  const [displayValue, setDisplayValue] = useState(targetValue);
-  const previousValue = useRef(targetValue);
-  const animationRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const startValue = previousValue.current;
-    const diff = targetValue - startValue;
-
-    if (Math.abs(diff) < 0.01) {
-      setDisplayValue(targetValue);
-      previousValue.current = targetValue;
-      return;
-    }
-
-    const startTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease-out cubic for smooth deceleration
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const current = startValue + diff * eased;
-
-      setDisplayValue(parseFloat(current.toFixed(1)));
-
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        setDisplayValue(targetValue);
-        previousValue.current = targetValue;
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    };
-  }, [targetValue, duration]);
-
-  return displayValue;
-}
-
-// ==========================================
-// Pre-seeded expert emails for switcher
-// ==========================================
+// Pre-seeded expert accounts for the demo switcher
 const SEEDED_EXPERTS = [
   { email: 'ananya.iyer@axiom.ai', name: 'Dr. Ananya Iyer' },
   { email: 'rahul.banerjee@axiom.ai', name: 'Adv. Rahul Banerjee' },
@@ -152,7 +108,6 @@ const SEEDED_EXPERTS = [
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'expert' | 'client'>('expert');
   const [loading, setLoading] = useState(true);
 
   // Expert State
@@ -194,31 +149,6 @@ export default function Home() {
   // Error/Success Notifications
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Animated counter for points
-  const animatedPoints = useAnimatedCounter(expertProfile?.points ?? 0);
-
-  // Switch expert handler
-  const handleSwitchExpert = useCallback((email: string) => {
-    setExpertEmail(email);
-    fetchExpertData(email);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Status polling for pending payouts
-  useEffect(() => {
-    const hasPendingPayouts = payouts.some(p => p.status === 'PENDING');
-    if (!hasPendingPayouts || loading) return;
-
-    const pollInterval = setInterval(() => {
-      if (expertProfile?.email) {
-        fetchExpertData(expertProfile.email);
-      }
-    }, 10000); // Poll every 10 seconds
-
-    return () => clearInterval(pollInterval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [payouts, loading, expertProfile?.email]);
-
   // Fetch expert profile and lists
   const fetchExpertData = async (email: string) => {
     try {
@@ -257,6 +187,26 @@ export default function Home() {
     }
   };
 
+  // Switch expert handler
+  const handleSwitchExpert = useCallback((email: string) => {
+    setExpertEmail(email);
+    fetchExpertData(email);
+  }, []);
+
+  // Status polling for pending payouts
+  useEffect(() => {
+    const hasPendingPayouts = payouts.some(p => p.status === 'PENDING');
+    if (!hasPendingPayouts || loading) return;
+
+    const pollInterval = setInterval(() => {
+      if (expertProfile?.email) {
+        fetchExpertData(expertProfile.email);
+      }
+    }, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [payouts, loading, expertProfile?.email]);
+
   // Auto trigger alerts timeout
   useEffect(() => {
     if (alert) {
@@ -268,14 +218,13 @@ export default function Home() {
   useEffect(() => {
     fetchExpertData(expertEmail);
     fetchPools();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Expert Sign Up Action
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!signupName || !signupEmail || !signupUpi) {
-      setAlert({ type: 'error', message: 'Please fill in all the details' });
+      setAlert({ type: 'error', message: 'Please fill in all details' });
       return;
     }
 
@@ -292,11 +241,12 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.success) {
-        setAlert({ type: 'success', message: 'Expert connected successfully!' });
+        setAlert({ type: 'success', message: 'Expert profile connected successfully!' });
         setExpertEmail(signupEmail);
         setExpertProfile(data.expert);
         setIsSignupOpen(false);
         fetchExpertData(signupEmail);
+        fetchPools();
       } else {
         setAlert({ type: 'error', message: data.error || 'Signup failed' });
       }
@@ -341,12 +291,12 @@ export default function Home() {
         setAlert({ 
           type: 'success', 
           message: data.submission.status === 'APPROVED' || data.submission.status === 'BORDERLINE'
-            ? `Approved! Points registered. Baseline payment sent to UPI.`
-            : `Submitted! Response routed for human adjudication.`
+            ? `Consensus Approved! Upfront payment routed via Razorpay.`
+            : `Submitted! Response routed for manual adjudication.`
         });
         setSubmissionPrompt('');
         setSubmissionResponse('');
-        // Reload expert data
+        // Reload expert and pool data
         fetchExpertData(expertProfile.email);
         fetchPools();
       } else {
@@ -390,7 +340,7 @@ export default function Home() {
         });
         setPurchasedPools(prev => ({ ...prev, [licensingPool.id]: data.token }));
         setAlert({ type: 'success', message: 'Dataset licensed successfully! Check download credentials.' });
-        fetchPools(); // refresh pools (check archived status)
+        fetchPools(); // refresh pools
       } else {
         setAlert({ type: 'error', message: data.error || 'Checkout failed' });
       }
@@ -423,7 +373,7 @@ export default function Home() {
         if (data.mock) {
           // Simulate visual training steps locally
           setTimeout(() => setFineTuningStatus('running'), 2000);
-          setTimeout(() => setFineTuningStatus('completed'), 6000);
+          setTimeout(() => setFineTuningStatus('completed'), 8000);
         } else {
           // Track SFT job state directly from OpenAI response
           if (data.status === 'succeeded' || data.status === 'completed') {
@@ -445,899 +395,659 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen font-sans bg-[#08080c] text-[#f1f1f6] p-4 sm:p-8 flex flex-col justify-between">
+    <DashboardLayout>
       {/* Alert Banner */}
       {alert && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg backdrop-blur-md border ${
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl backdrop-blur-md border ${
           alert.type === 'success' 
-            ? 'bg-emerald-955/80 border-emerald-500/30 text-emerald-300' 
-            : 'bg-rose-955/80 border-rose-500/30 text-rose-300'
-        } shadow-lg transition-all duration-300 transform translate-y-0 scale-100`}>
+            ? 'bg-emerald-950/80 border-emerald-500/20 text-emerald-300' 
+            : 'bg-rose-950/80 border-rose-500/20 text-rose-300'
+        } shadow-2xl transition-all duration-300 transform translate-y-0 scale-100`}>
           {alert.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-          <span className="text-sm font-medium">{alert.message}</span>
+          <span className="text-xs font-semibold">{alert.message}</span>
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto w-full space-y-8">
+      {/* Grid Canvas */}
+      <div className="grid grid-cols-12 gap-8 select-none">
         
-        {/* Navigation & Header */}
-        <header className="flex flex-col sm:flex-row items-center justify-between p-5 rounded-2xl glass-card backdrop-blur-md relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-indigo-500/5 pointer-events-none" />
-          
-          <div className="flex items-center gap-3 relative">
-            <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 glow-emerald">
-              <Layers className="w-6 h-6 text-emerald-400" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-wider text-white flex items-center gap-2">
-                AXIOM <span className="text-xs px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-400 font-mono">MVP</span>
-              </h1>
-              <p className="text-xs text-[#acaab4]">Decentralized Royalty-Backed Dataset Platform</p>
-            </div>
-          </div>
-
-          {/* Navigation Tabs */}
-          <div className="flex gap-2 mt-4 sm:mt-0 p-1 rounded-xl bg-black/40 border border-white/5">
-            <button
-              onClick={() => setActiveTab('expert')}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'expert'
-                  ? 'bg-emerald-500 text-black shadow-md shadow-emerald-500/20'
-                  : 'text-[#acaab4] hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Wallet className="w-3.5 h-3.5" />
-              Expert Workbench
-            </button>
-            <button
-              onClick={() => setActiveTab('client')}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'client'
-                  ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
-                  : 'text-[#acaab4] hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Database className="w-3.5 h-3.5" />
-              Client Licensing Portal
-            </button>
-          </div>
-        </header>
-
-        {/* ==================== TAB A: EXPERT WORKBENCH ==================== */}
-        {activeTab === 'expert' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Left Hand: Profile & Statistics */}
-            <div className="lg:col-span-1 space-y-8">
+        {/* Left Analytics Column */}
+        <div className="col-span-12 xl:col-span-3 flex flex-col gap-6">
+          {/* Identity Card */}
+          <div className="glass-panel rounded-2xl p-6 relative overflow-hidden border border-white/[0.01]">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-sm font-display font-black uppercase text-[#e7e4ee] tracking-wider flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-[#a5a5ff]" />
+                Identity Node
+              </h3>
               
-              {/* Expert Profile Panel */}
-              <div className="p-6 rounded-2xl glass-card relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <UserCheck className="w-5 h-5 text-emerald-400" />
-                    Expert Identity
-                  </h3>
-                  {/* Expert Switcher Dropdown */}
-                  <select
-                    value={expertEmail}
-                    onChange={(e) => handleSwitchExpert(e.target.value)}
-                    className="text-[10px] font-mono bg-black/60 border border-white/10 text-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-500/40 transition cursor-pointer"
+              {/* Expert Dropdown Switcher */}
+              <select
+                value={expertEmail}
+                onChange={(e) => handleSwitchExpert(e.target.value)}
+                className="text-[10px] font-mono bg-[#191921]/60 border border-white/10 text-gray-300 rounded-lg px-2.5 py-1 focus:outline-none cursor-pointer hover:border-white/20 transition-all"
+              >
+                {SEEDED_EXPERTS.map((exp) => (
+                  <option key={exp.email} value={exp.email}>
+                    {exp.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {loading ? (
+              <div className="space-y-4 animate-pulse">
+                <div className="h-6 bg-white/5 rounded w-2/3"></div>
+                <div className="h-4 bg-white/5 rounded w-1/2"></div>
+                <div className="h-4 bg-white/5 rounded w-3/4"></div>
+              </div>
+            ) : expertProfile ? (
+              <div className="space-y-4">
+                <div>
+                  <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block font-semibold">Expert Holder</span>
+                  <span className="text-sm font-bold text-white mt-0.5 block">{expertProfile.name}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block font-semibold">Verified Credential</span>
+                  <span className="text-xs font-mono text-[#a5a5ff] mt-0.5 block truncate">{expertProfile.email}</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block font-semibold">Triage Tier</span>
+                    <span className="inline-block px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-[#bf5af2]/10 border border-[#bf5af2]/20 text-[#bf5af2] mt-1 uppercase tracking-wide">
+                      {expertProfile.tier}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block font-semibold">Payout Link</span>
+                    <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-400 mt-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      Razorpay Active
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      setSignupName(expertProfile.name);
+                      setSignupEmail(expertProfile.email);
+                      setSignupUpi(expertProfile.upiId);
+                      setSignupTier(expertProfile.tier);
+                      setIsSignupOpen(true);
+                    }}
+                    className="w-full py-2 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded-xl border border-white/5 hover:border-white/10 transition duration-300"
                   >
-                    {SEEDED_EXPERTS.map((exp) => (
-                      <option key={exp.email} value={exp.email}>
-                        {exp.name}
-                      </option>
+                    Adjust Credentials
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4 space-y-3">
+                <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
+                <p className="text-xs text-[#acaab4]">No active credentials linked.</p>
+                <button
+                  onClick={() => setIsSignupOpen(true)}
+                  className="w-full py-2 bg-[#a5a5ff] text-[#1700a1] text-xs font-bold rounded-xl hover:bg-[#6462ec] hover:text-white transition duration-300"
+                >
+                  Connect Profile
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Royalty Analytics Widgets */}
+          <RoyaltyAnalytics 
+            points={expertProfile?.points ?? 84291.5}
+            earnings={expertProfile?.totalEarnings ?? 115200}
+            poolCount={submissions.reduce((acc, curr) => acc.includes(curr.poolId) ? acc : [...acc, curr.poolId], [] as string[]).length || 3}
+          />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="col-span-12 xl:col-span-9 flex flex-col gap-8">
+          
+          {/* Dataset Licensing Grid Section */}
+          <section>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-display font-extrabold text-xl text-[#e7e4ee] tracking-tight">Dataset Licensing</h2>
+              <span className="text-xs text-[#acaab4] bg-[#1f1f28] px-3 py-1 rounded-full border border-white/5">
+                {pools.length} Pools Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pools.map((pool) => {
+                const isExclusive = pool.exclusivePrice >= 3000;
+                const isPurchased = purchasedPools[pool.id];
+                
+                return (
+                  <div 
+                    key={pool.id}
+                    className="glass-panel rounded-2xl p-1 relative overflow-hidden group hover:scale-[1.01] transition-all duration-300 border border-white/[0.01]"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${
+                      isExclusive ? "from-[#bf5af2]/10" : "from-[#5f9eff]/10"
+                    } to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
+                    
+                    <div className="bg-[#1f1f28]/40 rounded-xl p-5 h-full flex flex-col relative z-10">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-[#0e0e15] flex items-center justify-center border border-white/[0.02]">
+                          <Database className={`w-5 h-5 ${isExclusive ? "text-[#bf5af2]" : "text-[#5f9eff]"}`} />
+                        </div>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
+                          isExclusive 
+                            ? "bg-[#bf5af2]/10 border-[#bf5af2]/20 text-[#bf5af2]" 
+                            : "bg-[#5f9eff]/10 border-[#5f9eff]/20 text-[#5f9eff]"
+                        }`}>
+                          {isExclusive ? "Exclusive" : "Shared"}
+                        </span>
+                      </div>
+
+                      <h3 className="font-display font-bold text-base mb-1.5 text-white group-hover:text-[#a5a5ff] transition-colors">
+                        {pool.title}
+                      </h3>
+                      
+                      <p className="text-xs text-[#acaab4] font-label mb-5 line-clamp-2 leading-relaxed">
+                        {pool.description}
+                      </p>
+
+                      <div className="flex gap-1.5 mb-5 flex-wrap">
+                        {pool.languages.map((lang, index) => (
+                          <span key={index} className="text-[9px] px-2 py-0.5 rounded-md bg-[#13131a] text-[#acaab4] border border-white/5 font-mono">
+                            {lang}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* License Action / Token Display */}
+                      <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-4">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] text-[#acaab4] uppercase">Shared Cost</span>
+                          <span className="font-display font-black text-sm text-[#e7e4ee]">
+                            ${pool.basePrice.toLocaleString()} USD
+                          </span>
+                        </div>
+
+                        {isPurchased ? (
+                          <span className="px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono select-all truncate max-w-[120px]">
+                            {isPurchased}
+                          </span>
+                        ) : (
+                          <button 
+                            onClick={() => {
+                              setLicensingPool(pool);
+                              setLicenseType('SHARED');
+                              setPurchaseSuccess(null);
+                            }}
+                            className="w-8 h-8 rounded-full bg-[#13131a] hover:bg-[#a5a5ff] hover:text-[#1700a1] transition-all flex items-center justify-center text-white border border-white/5"
+                          >
+                            <LockIcon className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Expert Submission Workbench */}
+          <section className="glass-panel rounded-2xl p-6 relative overflow-hidden border border-white/[0.01]">
+            <h3 className="text-lg font-display font-black text-white mb-5 flex items-center gap-2">
+              <Cpu className="w-5 h-5 text-[#a5a5ff] animate-pulse" />
+              Expert Reasoning Workbench
+            </h3>
+
+            <form onSubmit={handleTaskSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Select Asset Pool */}
+                <div>
+                  <label className="text-xs text-[#acaab4] font-semibold block mb-1">Target Asset Pool</label>
+                  <select
+                    value={selectedPoolId}
+                    onChange={(e) => setSelectedPoolId(e.target.value)}
+                    className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#a5a5ff]/40 outline-none transition duration-300"
+                    disabled={submittingTask}
+                  >
+                    {pools.map(pool => (
+                      <option key={pool.id} value={pool.id}>{pool.title}</option>
                     ))}
                   </select>
                 </div>
 
-                {loading ? (
-                  /* Loading Skeleton */
-                  <div className="space-y-4 animate-pulse">
-                    <div className="h-8 bg-white/5 rounded w-2/3"></div>
-                    <div className="h-4 bg-white/5 rounded w-1/2"></div>
-                    <div className="h-4 bg-white/5 rounded w-3/4"></div>
-                    <div className="h-10 bg-white/5 rounded mt-4"></div>
-                  </div>
-                ) : expertProfile ? (
-                  /* Connected State */
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-xs text-[#acaab4] uppercase tracking-wider">Expert Name</p>
-                      <h4 className="text-base font-semibold text-white mt-0.5">{expertProfile.name}</h4>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#acaab4] uppercase tracking-wider">Credential Email</p>
-                      <p className="text-sm font-mono mt-0.5 text-gray-300">{expertProfile.email}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-xs text-[#acaab4] uppercase tracking-wider">Expertise Tier</p>
-                        <span className="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-indigo-950 border border-indigo-500/30 text-indigo-400 mt-1 uppercase tracking-wide">
-                          {expertProfile.tier} (
-                          {expertProfile.tier === 'ELITE' ? '2.0x' : 
-                           expertProfile.tier === 'SENIOR' ? '1.7x' : 
-                           expertProfile.tier === 'GOLD' ? '1.5x' : 
-                           expertProfile.tier === 'SILVER' ? '1.2x' : '1.0x'}
-                           )
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#acaab4] uppercase tracking-wider">Razorpay Payouts</p>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 mt-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                          Connected UPI
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#acaab4] uppercase tracking-wider">UPI VPA</p>
-                      <p className="text-xs font-mono mt-0.5 text-emerald-300/80">{expertProfile.upiId}</p>
-                    </div>
-
-                    <div className="pt-2">
-                      <button
-                        onClick={() => {
-                          setSignupName(expertProfile.name);
-                          setSignupEmail(expertProfile.email);
-                          setSignupUpi(expertProfile.upiId);
-                          setSignupTier(expertProfile.tier);
-                          setIsSignupOpen(true);
-                        }}
-                        className="w-full py-2 bg-white/5 hover:bg-white/10 text-[#f1f1f6] text-xs font-semibold rounded-xl border border-white/5 hover:border-white/10 transition duration-300"
-                      >
-                        Adjust Credentials / Switch Wallet
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  /* Disconnected State */
-                  <div className="text-center py-6 space-y-4">
-                    <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
-                    <div>
-                      <h4 className="text-sm font-semibold text-white">No Connected Expert Credentials</h4>
-                      <p className="text-xs text-[#acaab4] mt-1">Sign up or enter pre-seeded credentials to load active royalty balances.</p>
-                    </div>
-                    <button
-                      onClick={() => setIsSignupOpen(true)}
-                      className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-black text-xs font-bold rounded-xl transition duration-300 glow-emerald"
-                    >
-                      Connect Expert Profile
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Economic Ledger Statistics */}
-              <div className="p-6 rounded-2xl glass-card relative overflow-hidden">
-                <div className="absolute bottom-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
-                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-indigo-400" />
-                  Royalty Ledger
-                </h3>
-
-                {loading ? (
-                  <div className="space-y-4 animate-pulse">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="h-16 bg-white/5 rounded"></div>
-                      <div className="h-16 bg-white/5 rounded"></div>
-                    </div>
-                    <div className="h-20 bg-white/5 rounded"></div>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {/* Points & Earnings Grid */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3.5 bg-white/5 rounded-xl border border-white/5 text-center">
-                        <span className="text-xs text-[#acaab4] block">Accumulated Points</span>
-                        <span className="text-2xl font-bold text-white block mt-1 glow-text-emerald font-mono transition-all duration-300">
-                          {expertProfile ? animatedPoints.toFixed(1) : "0.0"}
-                        </span>
-                      </div>
-                      <div className="p-3.5 bg-white/5 rounded-xl border border-white/5 text-center">
-                        <span className="text-xs text-[#acaab4] block">Total Inflow</span>
-                        <span className="text-lg font-bold text-emerald-400 block mt-1.5 font-mono">
-                          ₹{expertProfile ? expertProfile.totalEarnings.toLocaleString('en-IN') : "0"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Passive Income Breakdown */}
-                    <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/20 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 p-1 bg-indigo-500/10 rounded-bl-xl border-l border-b border-indigo-500/20">
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                      </div>
-                      
-                      <h4 className="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Passive Royalty Dividends</h4>
-                      <p className="text-[11px] text-[#acaab4] leading-relaxed">
-                        Earn a <strong className="text-white">5% perpetual royalty</strong> split pro-rata based on your point contributions every time pool datasets are resold.
-                      </p>
-
-                      <div className="mt-4 flex items-center justify-between border-t border-indigo-500/10 pt-3">
-                        <span className="text-xs text-gray-300">Estimated Active Pools:</span>
-                        <span className="text-xs font-bold text-white font-mono">
-                          {submissions.reduce((acc, curr) => {
-                            if (!acc.includes(curr.poolId)) acc.push(curr.poolId);
-                            return acc;
-                          }, [] as string[]).length} Pools
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-            {/* Right Hand: Submissions Board & Consensus QA Report */}
-            <div className="lg:col-span-2 space-y-8">
-              
-              {/* Task Submission Form */}
-              <div className="p-6 rounded-2xl glass-card relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 to-transparent pointer-events-none" />
-                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <Cpu className="w-5 h-5 text-emerald-400 animate-pulse-glow rounded-full" />
-                  Active Dataset Task Board
-                </h3>
-
-                <form onSubmit={handleTaskSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    {/* Select Asset Pool */}
-                    <div>
-                      <label className="text-xs text-[#acaab4] font-medium block mb-1">Target Asset Pool / Fund</label>
-                      <select
-                        value={selectedPoolId}
-                        onChange={(e) => setSelectedPoolId(e.target.value)}
-                        className="w-full p-2.5 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300"
-                        disabled={submittingTask}
-                      >
-                        {pools.length === 0 ? (
-                          <option>Loading pools...</option>
-                        ) : (
-                          pools.map(pool => (
-                            <option key={pool.id} value={pool.id}>{pool.title}</option>
-                          ))
-                        )}
-                      </select>
-                    </div>
-
-                    {/* Difficulty Multiplier */}
-                    <div>
-                      <label className="text-xs text-[#acaab4] font-medium block mb-1">Complexity / Difficulty Multiplier</label>
-                      <select
-                        value={difficultyMultiplier}
-                        onChange={(e) => setDifficultyMultiplier(Number(e.target.value))}
-                        className="w-full p-2.5 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300"
-                        disabled={submittingTask}
-                      >
-                        <option value="1.0">Standard Reasoning (1.0x)</option>
-                        <option value="1.2">Multi-Step Medical/Legal Diagnostic (1.2x)</option>
-                        <option value="1.5">Bilingual Code-Mixed Expert Synthesizer (1.5x)</option>
-                        <option value="2.0">Hard Consensus Cross-Examination (2.0x)</option>
-                      </select>
-                    </div>
-
-                  </div>
-
-                  {/* Submission Prompt */}
-                  <div>
-                    <label className="text-xs text-[#acaab4] font-medium block mb-1">High-Fidelity Prompt Instruction</label>
-                    <textarea
-                      placeholder="e.g. Patient complaining of acute chest pain, explain diagnostics under West Bengal clinical limits..."
-                      value={submissionPrompt}
-                      onChange={(e) => setSubmissionPrompt(e.target.value)}
-                      rows={2}
-                      className="w-full p-3 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300 resize-none"
-                      disabled={submittingTask}
-                    />
-                  </div>
-
-                  {/* Submission Response */}
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs text-[#acaab4] font-medium block">Reasoning Trace & Domain Expert Response</label>
-                      <span className="text-[10px] text-[#5e5ce6] font-semibold uppercase tracking-wider animate-pulse">Min. 100 characters for optimal consensus approval</span>
-                    </div>
-                    <textarea
-                      placeholder="Dekhiye patient agar chhaban acidity ya pressure ki complaint kare toh primary care me immediate ECG trigger hona chahiye. Emergency clinical steps me sublingual Aspirin 325mg chewable administer karna aur emergency ambulance summon karna key guidelines hain..."
-                      value={submissionResponse}
-                      onChange={(e) => setSubmissionResponse(e.target.value)}
-                      rows={4}
-                      className="w-full p-3 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300 resize-none font-mono text-[11px] leading-relaxed"
-                      disabled={submittingTask}
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={submittingTask || !expertProfile}
-                      className={`w-full py-3 text-xs font-bold rounded-xl transition duration-300 flex items-center justify-center gap-2 ${
-                        submittingTask 
-                          ? 'bg-[#12221b] border border-emerald-500/30 text-emerald-400 cursor-not-allowed animate-pulse-glow'
-                          : 'bg-emerald-500 hover:bg-emerald-600 text-black glow-emerald disabled:opacity-50 disabled:cursor-not-allowed'
-                      }`}
-                    >
-                      {submittingTask ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Consensus QA Vetting in Progress (Llama 3.3 + Claude)...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4" />
-                          Submit to Consensus QA Pipeline
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-              {/* Consensus QA Network Report Overlay / Results Panel */}
-              {consensusReport && (
-                <div className="p-6 rounded-2xl border border-indigo-500/30 bg-indigo-950/20 backdrop-blur-md glow-violet relative overflow-hidden animate-fade-in mb-8">
-                  <div className="absolute top-0 right-0 p-2 bg-indigo-500/10 rounded-bl-xl border-l border-b border-indigo-500/20">
-                    <Cpu className="w-4 h-4 text-indigo-400" />
-                  </div>
-                  
-                  <div className="flex items-center gap-2.5 mb-4">
-                    <span className={`w-3 h-3 rounded-full ${
-                      consensusReport.status === 'APPROVED' ? 'bg-emerald-400 animate-pulse' :
-                      consensusReport.status === 'BORDERLINE' ? 'bg-amber-400' : 'bg-rose-400'
-                    }`} />
-                    <h3 className="text-base font-bold text-white">Consensus AI QA Calibration Report</h3>
-                    <span className="text-xs px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-mono">
-                      Task: {consensusReport?.id || "Pending"}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-[#acaab4] mb-4">
-                    Our multi-model consensus network evaluated the structural coherence, linguistic alignment (Hinglish/Bilingual), and clinical/legal validity of your submission:
-                  </p>
-
-                  {/* Side by side Model Evaluations */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                    {/* Left Column: Groq (Llama 3.3) */}
-                    <div className="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold text-white block">Groq Evaluation</span>
-                          <span className="text-[10px] text-indigo-400 font-mono">llama-3.3-70b-versatile</span>
-                        </div>
-                        <p className="text-xs text-[#acaab4] leading-relaxed italic">
-                          {consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'))?.reasoning || "Evaluation scoring completed successfully by Llama 3.3 model parser."}
-                        </p>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-2">
-                        <span className="text-[10px] text-[#acaab4]">Score Metric (0-1)</span>
-                        <span className="text-xs font-bold font-mono text-emerald-400">
-                          {(() => {
-                            const evalObj = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'));
-                            if (!evalObj || evalObj.score === undefined) return "Loading...";
-                            const rawScore = evalObj.score;
-                            return rawScore > 1 ? (rawScore / 100).toFixed(2) : rawScore.toFixed(2);
-                          })()}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Right Column: OpenAI (GPT-4o) */}
-                    <div className="p-4 rounded-xl bg-black/40 border border-white/5 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-bold text-white block">OpenAI Evaluation</span>
-                          <span className="text-[10px] text-indigo-400 font-mono">gpt-4o</span>
-                        </div>
-                        <p className="text-xs text-[#acaab4] leading-relaxed italic">
-                          &ldquo;{consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'))?.reasoning || "Pending reasoning trace output..."}&rdquo;
-                        </p>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-2">
-                        <span className="text-[10px] text-[#acaab4]">Score Metric (0-1)</span>
-                        <span className="text-xs font-bold font-mono text-emerald-400">
-                          {(() => {
-                            const evalObj = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'));
-                            if (!evalObj || evalObj.score === undefined) return "Loading...";
-                            const rawScore = evalObj.score;
-                            return rawScore > 1 ? (rawScore / 100).toFixed(2) : rawScore.toFixed(2);
-                          })()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Adjudication Outcome */}
-                  <div className="p-4 rounded-xl bg-black/60 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                      <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block">Consensus Verdict</span>
-                      <span className={`text-base font-bold tracking-wide flex items-center gap-1.5 ${
-                        consensusReport.status === 'APPROVED' ? 'text-emerald-400 glow-text-emerald' :
-                        consensusReport.status === 'BORDERLINE' ? 'text-amber-400' : 'text-rose-400'
-                      }`}>
-                        {consensusReport.status === 'APPROVED' && (
-                          <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                          </span>
-                        )}
-                        {consensusReport.status || "PENDING"}
-                      </span>
-                    </div>
-
-                    <div className="text-left sm:text-right">
-                      <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block">Points Credited</span>
-                      <span className="text-base font-bold text-white font-mono">+{consensusReport.pointsEarned?.toFixed(2) || "0.00"} Points</span>
-                    </div>
-
-                    {consensusReport.pointsEarned && consensusReport.pointsEarned > 0 ? (
-                      <div className="px-3 py-1.5 rounded-lg bg-emerald-950 border border-emerald-500/20 text-center">
-                        <span className="text-[9px] text-[#acaab4] uppercase tracking-wider block">UPI Baseline Cash</span>
-                        <span className="text-xs font-bold text-emerald-400">₹{(consensusReport.pointsEarned * 120).toLocaleString('en-IN')} paid</span>
-                      </div>
-                    ) : null}
-                  </div>
+                {/* Multiplier Option */}
+                <div>
+                  <label className="text-xs text-[#acaab4] font-semibold block mb-1">Task Complexity Multiplier</label>
+                  <select
+                    value={difficultyMultiplier}
+                    onChange={(e) => setDifficultyMultiplier(Number(e.target.value))}
+                    className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#a5a5ff]/40 outline-none transition duration-300"
+                    disabled={submittingTask}
+                  >
+                    <option value="1.0">Standard Reasoning (1.0x)</option>
+                    <option value="1.2">Multi-Step Specialized Diagnostic (1.2x)</option>
+                    <option value="1.5">Bilingual Code-Mixed Expert (1.5x)</option>
+                    <option value="2.0">Hard Consensus Cross-Evaluation (2.0x)</option>
+                  </select>
                 </div>
-              )}
-
-              {/* Submissions & Historical LEDGER */}
-              <div className="p-6 rounded-2xl glass-card relative overflow-hidden">
-                <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-indigo-400" />
-                  Your Reasoning Contributions
-                </h3>
-
-                {loading ? (
-                  <div className="space-y-4 animate-pulse">
-                    <div className="h-10 bg-white/5 rounded"></div>
-                    <div className="h-10 bg-white/5 rounded"></div>
-                    <div className="h-10 bg-white/5 rounded"></div>
-                  </div>
-                ) : submissions.length === 0 ? (
-                  <div className="text-center py-8 bg-black/20 rounded-xl border border-white/5">
-                    <FileText className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                    <p className="text-xs text-[#acaab4]">No tasks submitted under this profile yet.</p>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="border-b border-white/5 text-[10px] font-bold text-[#acaab4] uppercase tracking-wider">
-                          <th className="pb-3 pr-2">Task Prompt</th>
-                          <th className="pb-3 px-2">Dataset Fund</th>
-                          <th className="pb-3 px-2 text-center">Score</th>
-                          <th className="pb-3 px-2 text-center">Points</th>
-                          <th className="pb-3 pl-2 text-right">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5 text-xs">
-                        {submissions.map((sub) => (
-                          <tr key={sub.id} className="hover:bg-white/5 transition duration-300">
-                            <td className="py-3 pr-2 font-medium text-white max-w-[200px] truncate">{sub.prompt}</td>
-                            <td className="py-3 px-2 text-[#acaab4] truncate max-w-[120px]">{sub.poolTitle}</td>
-                            <td className="py-3 px-2 text-center font-mono font-bold text-indigo-300">{sub.qualityScore || "-"}</td>
-                            <td className="py-3 px-2 text-center font-mono font-semibold text-emerald-400">+{sub.pointsEarned?.toFixed(2)}</td>
-                            <td className="py-3 pl-2 text-right">
-                              <span className={`px-2 py-0.5 rounded text-[9px] font-bold tracking-wider ${
-                                sub.status === 'APPROVED' ? 'bg-emerald-950/80 border border-emerald-500/20 text-emerald-400' :
-                                sub.status === 'BORDERLINE' ? 'bg-amber-950/80 border border-amber-500/20 text-amber-400' :
-                                'bg-rose-950/80 border border-rose-500/20 text-rose-400'
-                              }`}>
-                                {sub.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
               </div>
 
-              {/* UPI Transaction Ledger */}
-              <div className="p-6 rounded-2xl glass-card relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-emerald-400" />
-                    Razorpay UPI Payout Ledger
-                  </h3>
-                  {payouts.some(p => p.status === 'PENDING') && (
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full">
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                      Polling for updates...
-                    </span>
+              {/* Prompt Input */}
+              <div>
+                <label className="text-xs text-[#acaab4] font-semibold block mb-1">Instruction Prompt</label>
+                <textarea
+                  placeholder="Specify clear, domain-specific instruction challenge..."
+                  value={submissionPrompt}
+                  onChange={(e) => setSubmissionPrompt(e.target.value)}
+                  rows={2}
+                  className="w-full p-3 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#a5a5ff]/40 outline-none transition duration-300 resize-none font-sans"
+                  disabled={submittingTask}
+                />
+              </div>
+
+              {/* Response Input */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-[#acaab4] font-semibold block">Expert Reasoning Response</label>
+                  <span className="text-[10px] text-[#bf5af2] font-bold uppercase tracking-wider animate-pulse">
+                    Consensus calibration scores best on high-density traces
+                  </span>
+                </div>
+                <textarea
+                  placeholder="Provide rich step-by-step reasoning details, incorporating Hinglish/bilingual mix where applicable..."
+                  value={submissionResponse}
+                  onChange={(e) => setSubmissionResponse(e.target.value)}
+                  rows={4}
+                  className="w-full p-3 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-mono focus:border-[#a5a5ff]/40 outline-none transition duration-300 resize-none text-[11px] leading-relaxed"
+                  disabled={submittingTask}
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={submittingTask || !expertProfile}
+                  className={`w-full py-3 text-xs font-bold rounded-xl transition duration-300 flex items-center justify-center gap-2 ${
+                    submittingTask 
+                      ? 'bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 cursor-not-allowed animate-pulse'
+                      : 'bg-[#a5a5ff] hover:bg-[#6462ec] text-[#1700a1] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_-5px_rgba(165,165,255,0.4)]'
+                  }`}
+                >
+                  {submittingTask ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Calibrating Multi-Model Consensus QA (Llama 3.3 + GPT-4o)...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Submit to AI Consensus Pipeline
+                    </>
                   )}
+                </button>
+              </div>
+            </form>
+          </section>
+
+          {/* Consensus AI QA Calibration Report */}
+          {consensusReport && (
+            <div className="glass-panel rounded-2xl p-6 border border-[#bf5af2]/30 bg-[#bf5af2]/5 relative overflow-hidden animate-fade-in mb-4">
+              <div className="absolute top-0 right-0 p-2.5 bg-[#bf5af2]/10 rounded-bl-xl border-l border-b border-[#bf5af2]/20">
+                <Cpu className="w-4 h-4 text-[#bf5af2]" />
+              </div>
+              
+              <div className="flex items-center gap-2.5 mb-4">
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  consensusReport.status === 'APPROVED' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                }`} />
+                <h3 className="text-sm font-display font-black text-white uppercase tracking-wider">
+                  Consensus AI QA Calibration Report
+                </h3>
+              </div>
+
+              <p className="text-xs text-[#acaab4] mb-4 leading-relaxed">
+                Multi-model consensus network scoring aggregates independent critiques:
+              </p>
+
+              {/* Groq / Llama evaluation */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <div className="p-4 rounded-xl bg-[#13131a]/60 border border-white/5 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-bold text-white">Llama 3.3 Score</span>
+                      <span className="text-[9px] text-[#a5a5ff] font-mono">llama-3.3-70b</span>
+                    </div>
+                    <p className="text-xs text-[#acaab4] italic leading-relaxed">
+                      &ldquo;{consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'))?.reasoning || "Evaluation completed successfully by Llama-3.3 parser."}&rdquo;
+                    </p>
+                  </div>
+                  <div className="mt-3 pt-2 border-t border-white/5 flex justify-between items-center text-xs">
+                    <span className="text-[#acaab4]">Adjudication score:</span>
+                    <span className="font-bold text-emerald-400">
+                      {(() => {
+                        const score = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'))?.score ?? 0.85;
+                        return score > 1 ? (score / 100).toFixed(2) : score.toFixed(2);
+                      })()}
+                    </span>
+                  </div>
                 </div>
 
-                {loading ? (
-                  <div className="space-y-4 animate-pulse">
-                    <div className="h-10 bg-white/5 rounded"></div>
-                    <div className="h-10 bg-white/5 rounded"></div>
+                {/* OpenAI evaluation */}
+                <div className="p-4 rounded-xl bg-[#13131a]/60 border border-white/5 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-bold text-white">GPT-4o Score</span>
+                      <span className="text-[9px] text-[#a5a5ff] font-mono">gpt-4o</span>
+                    </div>
+                    <p className="text-xs text-[#acaab4] italic leading-relaxed">
+                      &ldquo;{consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'))?.reasoning || "Evaluation completed successfully by GPT-4o parser."}&rdquo;
+                    </p>
                   </div>
-                ) : payouts.length === 0 ? (
-                  <div className="text-center py-8 bg-black/20 rounded-xl border border-white/5">
-                    <Wallet className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                    <p className="text-xs text-[#acaab4]">No recent payouts recorded.</p>
-                    <p className="text-[10px] text-gray-600 mt-1">Submit a task to earn points and trigger payouts.</p>
+                  <div className="mt-3 pt-2 border-t border-white/5 flex justify-between items-center text-xs">
+                    <span className="text-[#acaab4]">Adjudication score:</span>
+                    <span className="font-bold text-emerald-400">
+                      {(() => {
+                        const score = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'))?.score ?? 0.90;
+                        return score > 1 ? (score / 100).toFixed(2) : score.toFixed(2);
+                      })()}
+                    </span>
                   </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="border-b border-white/5 text-[10px] font-bold text-[#acaab4] uppercase tracking-wider">
-                          <th className="pb-3 pr-2">Transaction ID</th>
-                          <th className="pb-3 px-2">Pool Source</th>
-                          <th className="pb-3 px-2">5% Royalty Stake</th>
-                          <th className="pb-3 px-2">Gross (₹)</th>
-                          <th className="pb-3 px-2">Net (₹)</th>
-                          <th className="pb-3 px-2 text-center">Type</th>
-                          <th className="pb-3 pl-2 text-right">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5 text-xs">
-                        {payouts.map((pay) => {
-                          // Determine if this is a passive royalty or upfront payout
-                          const isPassiveRoyalty = pay.id.includes('royalty');
-                          const poolObj = pools.find(p => p.id === pay.poolId);
-                          const poolBaseINR = poolObj ? poolObj.basePrice * 83 : 0;
-                          const fivePercentStake = poolBaseINR * 0.05;
+                </div>
+              </div>
 
-                          return (
-                            <tr key={pay.id} className="hover:bg-white/5 transition duration-300">
-                              <td className="py-3 pr-2 font-mono text-[10px] text-gray-300 max-w-[120px] truncate">{pay.payoutTransactionId}</td>
-                              <td className="py-3 px-2 text-[#acaab4] max-w-[120px] truncate">{pay.poolTitle}</td>
-                              <td className="py-3 px-2">
-                                {isPassiveRoyalty ? (
-                                  <span className="text-[10px] text-indigo-300 font-mono">
-                                    5% × ₹{poolBaseINR.toLocaleString('en-IN')} = <strong className="text-white">₹{fivePercentStake.toLocaleString('en-IN')}</strong>
-                                  </span>
-                                ) : (
-                                  <span className="text-[10px] text-gray-500">Upfront base</span>
-                                )}
-                              </td>
-                              <td className="py-3 px-2 text-white font-semibold">₹{pay.grossRoyalty.toLocaleString('en-IN')}</td>
-                              <td className="py-3 px-2 text-emerald-400 font-bold">₹{pay.netRoyalty.toLocaleString('en-IN')}</td>
-                              <td className="py-3 px-2 text-center">
-                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide ${
-                                  pay.licenseType === 'EXCLUSIVE'
-                                    ? 'bg-violet-950/60 border border-violet-500/20 text-violet-400'
-                                    : 'bg-sky-950/60 border border-sky-500/20 text-sky-400'
-                                }`}>
-                                  {pay.licenseType}
-                                </span>
-                              </td>
-                              <td className="py-3 pl-2 text-right">
-                                {pay.status === 'SUCCESS' ? (
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
-                                    <Check className="w-3.5 h-3.5" />
-                                    Paid
-                                  </span>
-                                ) : pay.status === 'PENDING' ? (
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400">
-                                    <Loader2 className="w-3 h-3 animate-spin" />
-                                    Processing
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400">
-                                    <AlertCircle className="w-3.5 h-3.5" />
-                                    Failed
-                                  </span>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+              {/* Final Adjudication Banner */}
+              <div className="p-4 rounded-xl bg-[#13131a]/80 border border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                  <span className="text-[9px] text-[#acaab4] uppercase block">Consensus Status</span>
+                  <span className="text-sm font-black text-emerald-400 uppercase tracking-widest block mt-0.5">
+                    {consensusReport.status}
+                  </span>
+                </div>
+                <div className="text-left sm:text-right">
+                  <span className="text-[9px] text-[#acaab4] uppercase block">Points Credited</span>
+                  <span className="text-sm font-bold text-white font-mono block mt-0.5">
+                    +{consensusReport.pointsEarned?.toFixed(2) || "0.00"} PTS
+                  </span>
+                </div>
+                {consensusReport.pointsEarned && (
+                  <div className="px-3.5 py-2 rounded-lg bg-emerald-950/60 border border-emerald-500/20 text-center font-mono">
+                    <span className="text-[9px] text-gray-400 block uppercase font-sans">Razorpay UPI Transfer</span>
+                    <span className="text-xs font-bold text-emerald-400">₹{(consensusReport.pointsEarned * 120).toLocaleString('en-IN')} paid</span>
                   </div>
                 )}
               </div>
-
             </div>
+          )}
 
-          </div>
-        )}
-
-        {/* ==================== TAB B: CLIENT LICENSING PORTAL ==================== */}
-        {activeTab === 'client' && (
-          <div className="space-y-8">
-            
-            {/* Header Description */}
-            <div className="p-6 rounded-2xl glass-card backdrop-blur-md relative overflow-hidden text-center sm:text-left">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-              <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-                Axiom Data-Asset Marketplace
-              </h2>
-              <p className="text-xs sm:text-sm text-[#acaab4] mt-2 max-w-3xl leading-relaxed">
-                Axiom aggregates raw reasoning instruction datasets into themed index funds, locking in quality via automated QA consensus. Clients license pools non-exclusively or opt for exclusive buyouts, unlocking immediate Cloudflare R2 downloads and OpenAI fine-tuning connections.
+          {/* Secure Download and Supervised Fine Tuning panel after Purchase */}
+          {purchaseSuccess && (
+            <div className="glass-panel rounded-2xl p-6 border border-emerald-500/30 bg-emerald-950/5 relative overflow-hidden animate-fade-in">
+              <h3 className="text-base font-display font-black text-white mb-3 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-emerald-400" />
+                Stripe Billing Checkout Success
+              </h3>
+              <p className="text-xs text-[#acaab4] leading-relaxed mb-4">
+                Standard commercial dataset licensing has updated active royalty dividends. Secure Cloudflare R2 download credentials have been generated:
               </p>
-            </div>
 
-            {/* Main Marketplace Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {pools.length === 0 ? (
-                /* Skeleton Loader for Pools */
-                [1, 2, 3].map(i => (
-                  <div key={i} className="p-6 rounded-2xl glass-card animate-pulse space-y-4">
-                    <div className="h-6 bg-white/5 rounded w-3/4"></div>
-                    <div className="h-20 bg-white/5 rounded"></div>
-                    <div className="h-10 bg-white/5 rounded"></div>
-                  </div>
-                ))
-              ) : (
-                pools.map(pool => (
-                  <div key={pool.id} className="p-6 rounded-2xl glass-card glass-card-hover flex flex-col justify-between relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-indigo-500/20 to-emerald-500/20 pointer-events-none" />
-                    
-                    <div>
-                      {/* Category & Languages */}
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="text-[9px] px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-bold uppercase tracking-wider">
-                          {pool.category}
-                        </span>
-                        
-                        <div className="flex gap-1.5">
-                          {pool.languages.map((l, idx) => (
-                            <span key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-gray-300">
-                              {l}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-base font-bold text-white mb-2">{pool.title}</h3>
-                      
-                      {/* Description */}
-                      <p className="text-xs text-[#acaab4] leading-relaxed mb-4">{pool.description}</p>
-
-                      {/* Metadata Statistics */}
-                      <div className="grid grid-cols-2 gap-3 p-3 bg-black/40 border border-white/5 rounded-xl mb-4 text-xs font-mono">
-                        <div>
-                          <span className="text-[10px] text-[#acaab4] block">Accumulated Points:</span>
-                          <span className="text-sm font-bold text-white block mt-0.5">{pool.totalPoints.toFixed(1)} pts</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-[#acaab4] block">Resale Licenses:</span>
-                          <span className="text-sm font-bold text-emerald-400 block mt-0.5">{pool.licenseCount} sold</span>
-                        </div>
-                      </div>
-
-                      {/* Sample Prompt Preview */}
-                      <div className="p-3 bg-indigo-950/20 border border-indigo-500/10 rounded-xl mb-4 text-xs font-mono leading-relaxed">
-                        <span className="text-[9px] text-indigo-400 uppercase tracking-wider font-bold block mb-1">Dataset Instruction Prompt Sample:</span>
-                        <p className="text-[#acaab4] line-clamp-3 text-[10px]">
-                          &ldquo;{pool.samplePrompt}&rdquo;
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 pt-3 border-t border-white/5">
-                      <div className="flex items-center justify-between text-xs font-medium">
-                        <span className="text-gray-300">Standard Shared License:</span>
-                        <span className="text-white font-bold font-mono">${pool.basePrice.toLocaleString()} USD</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs font-medium pb-2">
-                        <span className="text-gray-300">Exclusive Buyout:</span>
-                        <span className="text-indigo-400 font-bold font-mono">${pool.exclusivePrice.toLocaleString()} USD</span>
-                      </div>
-
-                      {purchasedPools[pool.id] ? (
-                        <div className="w-full p-2.5 bg-emerald-950/80 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono rounded-xl text-center select-all truncate break-all relative">
-                          <span className="text-[8px] text-gray-400 block mb-0.5 font-sans uppercase">Licensed Download Token</span>
-                          {purchasedPools[pool.id]}
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setLicensingPool(pool);
-                            setLicenseType('SHARED');
-                            setPurchaseSuccess(null);
-                          }}
-                          className="w-full py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl transition duration-300 flex items-center justify-center gap-1.5"
-                        >
-                          <LockIcon className="w-3.5 h-3.5" />
-                          License Dataset Pool
-                        </button>
-                      )}
-                    </div>
-
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Purchase Success State: Secure Token & OpenAI Fine Tuning trigger */}
-            {purchaseSuccess && (
-              <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-950/10 backdrop-blur-md glow-emerald relative overflow-hidden animate-fade-in max-w-4xl mx-auto">
-                <div className="absolute top-0 right-0 p-2 bg-emerald-500/10 rounded-bl-xl border-l border-b border-emerald-500/20">
-                  <Check className="w-4 h-4 text-emerald-400 animate-bounce" />
+              <div className="p-4 rounded-xl bg-[#0e0e15]/80 border border-white/5 font-mono text-xs space-y-3 mb-6">
+                <div>
+                  <span className="text-[10px] text-[#acaab4] block">Licensed Dataset Pool:</span>
+                  <span className="text-white font-bold">{purchaseSuccess.poolTitle}</span>
                 </div>
+                <div>
+                  <span className="text-[10px] text-[#acaab4] block">Secure Cloudflare R2 Access Token:</span>
+                  <span className="text-emerald-400 font-semibold truncate block select-all">{purchaseSuccess.token}</span>
+                </div>
+                <div className="pt-1">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setAlert({ type: 'success', message: 'Starting secure JSONL dataset download...' });
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:text-white transition duration-300 font-sans font-bold text-xs"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Download JSONL Dataset
+                  </a>
+                </div>
+              </div>
 
-                <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-emerald-400" />
-                  Stripe Checkout Completed & Verified
-                </h3>
-                
+              {/* Fine tuning webhook trigger */}
+              <div className="p-5 rounded-xl bg-[#bf5af2]/5 border border-[#bf5af2]/20">
+                <h4 className="text-sm font-display font-black text-white mb-2 flex items-center gap-2">
+                  <Cpu className="w-4 h-4 text-[#bf5af2]" />
+                  OpenAI Fine-Tuning Integration Webhook
+                </h4>
                 <p className="text-xs text-[#acaab4] leading-relaxed mb-4">
-                  {purchaseSuccess.message} Standard Shared and Exclusive licensing models have updated the royalty distributions. Your secure Cloudflare R2 download credentials are ready:
+                  Co-optimize this licensed dataset and trigger a Supervised Fine-Tuning (SFT) job on OpenAI&apos;s models directly via our webhook.
                 </p>
 
-                {/* Cloudflare R2 secure details */}
-                <div className="p-4 rounded-xl bg-black/60 border border-white/5 font-mono text-xs space-y-3 mb-6 relative">
-                  <div>
-                    <span className="text-[10px] text-[#acaab4] block uppercase">Dataset Target Pool</span>
-                    <span className="text-white font-bold">{purchaseSuccess.poolTitle}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#acaab4] block uppercase">Cloudflare R2 Download Token (72 Hours Egress Free)</span>
-                    <span className="text-emerald-400 font-semibold truncate block max-w-full select-all">{purchaseSuccess.token}</span>
-                  </div>
-                  
-                  <div className="pt-2">
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setAlert({ type: 'success', message: 'Starting secure JSONL dataset download...' });
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:text-white transition duration-300 font-sans"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      Download JSONL Dataset
-                    </a>
-                  </div>
-                </div>
-
-                {/* OpenAI Fine Tuning Webhook integration */}
-                <div className="p-5 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
-                  <h4 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-indigo-400" />
-                    OpenAI Fine-Tuning Integration Webhook
-                  </h4>
-                  <p className="text-xs text-[#acaab4] leading-relaxed mb-4">
-                    co-optimize this licensed dataset and trigger a Supervised Fine-Tuning (SFT) job on OpenAI&apos;s models (<code className="text-white">gpt-4o-mini</code> or <code className="text-white">gpt-4o</code>) directly via our webhook.
-                  </p>
-
-                  {fineTuningStatus === 'idle' ? (
-                    <button
-                      onClick={() => triggerFineTuning(licensingPool?.id || '')}
-                      className="py-2 px-4 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold rounded-lg transition duration-300 flex items-center gap-1.5"
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      Trigger OpenAI Fine-Tuning
-                    </button>
-                  ) : (
-                    <div className="space-y-4">
-                      {/* Job Status Banner */}
-                      <div className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 font-mono text-xs">
-                        <div className="flex items-center gap-2">
-                          <Loader2 className={`w-3.5 h-3.5 text-indigo-400 ${fineTuningStatus !== 'completed' ? 'animate-spin' : ''}`} />
-                          <span>Job: <strong className="text-white">{fineTuningJob?.jobId}</strong></span>
-                        </div>
-                        <div>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold ${
-                            fineTuningStatus === 'submitting' ? 'bg-indigo-955 text-indigo-400 border border-indigo-500/30' :
-                            fineTuningStatus === 'running' ? 'bg-amber-955 text-amber-400 border border-amber-500/30 animate-pulse' :
-                            'bg-emerald-955 text-emerald-400 border border-emerald-500/30'
-                          }`}>
-                            {fineTuningStatus === 'submitting' ? 'Validating Dataset' :
-                             fineTuningStatus === 'running' ? 'Training Active' : 'Training Completed!'}
-                          </span>
-                        </div>
+                {fineTuningStatus === 'idle' ? (
+                  <button
+                    onClick={() => triggerFineTuning(licensingPool?.id || '')}
+                    className="py-2.5 px-4 bg-[#bf5af2] hover:bg-[#d277ff] text-white text-xs font-bold rounded-xl transition duration-300 flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Trigger OpenAI Fine-Tuning Job
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-[#0e0e15]/60 border border-white/5 font-mono text-xs">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className={`w-3.5 h-3.5 text-[#bf5af2] ${fineTuningStatus !== 'completed' ? 'animate-spin' : ''}`} />
+                        <span>Job ID: <strong className="text-white">{fineTuningJob?.jobId}</strong></span>
                       </div>
-
-                      {/* Interactive Logs */}
-                      <div className="p-3 bg-black/80 rounded-lg border border-white/5 font-mono text-[10px] leading-relaxed text-gray-400 h-28 overflow-y-auto">
-                        <p>[INFO] Initializing Supervised Fine-Tuning (SFT) request on Axiom datasets...</p>
-                        <p>[INFO] Uploading formatted JSONL dataset file to OpenAI files API...</p>
-                        {fineTuningStatus !== 'submitting' && (
-                          <>
-                            <p className="text-indigo-300">[INFO] File upload success! File ID: file-{fineTuningJob?.jobId ? fineTuningJob.jobId.slice(6, 15) : 'AxIoM982a'}</p>
-                            <p>[INFO] Creating fine-tuning job model targeted: gpt-4o-mini...</p>
-                            <p className="text-indigo-300">[INFO] Job initiated! Job ID: {fineTuningJob?.jobId}</p>
-                            <p className="text-indigo-400">[STATUS] Current status from OpenAI API: {fineTuningJob?.status || 'validating_files'}</p>
-                          </>
-                        )}
-                        {fineTuningStatus === 'running' && (
-                          <>
-                            <p className="text-amber-400">[TRAIN] Hyperparameters loaded. Epoch 1/3 in progress...</p>
-                            <p className="text-amber-400">[TRAIN] Loss reduction trend: 1.842 -&gt; 0.941...</p>
-                          </>
-                        )}
-                        {fineTuningStatus === 'completed' && (
-                          <>
-                            <p className="text-amber-400">[TRAIN] Loss reduction trend: 0.941 -&gt; 0.224...</p>
-                            <p className="text-emerald-400">[SUCCESS] OpenAI Model gpt-4o-mini successfully fine-tuned! Custom Model ID: ft:gpt-4o-mini:axiom:{licensingPool?.id || 'clinical-hinglish'}</p>
-                            <p className="text-emerald-400">[SUCCESS] Model deployed for inference endpoints.</p>
-                          </>
-                        )}
-                      </div>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold ${
+                        fineTuningStatus === 'submitting' ? 'bg-[#bf5af2]/10 text-[#bf5af2] border border-[#bf5af2]/20' :
+                        fineTuningStatus === 'running' ? 'bg-amber-950/40 text-amber-400 border border-amber-500/20' :
+                        'bg-emerald-950/40 text-emerald-400 border border-emerald-500/20'
+                      }`}>
+                        {fineTuningStatus === 'submitting' ? 'Validating Dataset' :
+                         fineTuningStatus === 'running' ? 'Training Active' : 'Succeeded!'}
+                      </span>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Terminal Console Visualizer */}
+          <TerminalConsole 
+            status={fineTuningStatus}
+            jobId={fineTuningJob?.jobId || "OpenAI-FT-72B"}
+            targetPoolTitle={licensingPool?.title || "Global Chat Corpus v4"}
+          />
+
+          {/* Reasoning Contributions Historical Ledger */}
+          <section className="glass-panel rounded-2xl p-6 border border-white/[0.01]">
+            <h3 className="text-sm font-display font-black uppercase text-[#e7e4ee] tracking-wider mb-4 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-[#a5a5ff]" />
+              Expert Reasoning Ledger
+            </h3>
+
+            {submissions.length === 0 ? (
+              <div className="text-center py-6 bg-[#13131a]/40 rounded-xl border border-white/5">
+                <FileText className="w-6 h-6 text-zinc-600 mx-auto mb-2" />
+                <p className="text-xs text-[#acaab4]">No tasks submitted under this profile yet.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/5 text-[9px] font-bold text-[#acaab4] uppercase tracking-wider">
+                      <th className="pb-3 pr-2">Instruction Prompt</th>
+                      <th className="pb-3 px-2">Dataset Fund</th>
+                      <th className="pb-3 px-2 text-center">QA Score</th>
+                      <th className="pb-3 px-2 text-center">Points</th>
+                      <th className="pb-3 pl-2 text-right">Verdict</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-xs text-[#acaab4]">
+                    {submissions.map((sub) => (
+                      <tr key={sub.id} className="hover:bg-white/[0.02] transition duration-300">
+                        <td className="py-3 pr-2 font-medium text-white max-w-[220px] truncate">{sub.prompt}</td>
+                        <td className="py-3 px-2 truncate max-w-[140px]">{sub.poolTitle}</td>
+                        <td className="py-3 px-2 text-center font-mono font-bold text-[#a5a5ff]">{sub.qualityScore || "-"}</td>
+                        <td className="py-3 px-2 text-center font-mono font-semibold text-emerald-400">+{sub.pointsEarned?.toFixed(2)}</td>
+                        <td className="py-3 pl-2 text-right">
+                          <span className={`px-2 py-0.5 rounded text-[8px] font-bold tracking-wider ${
+                            sub.status === 'APPROVED' ? 'bg-emerald-950/80 border border-emerald-500/20 text-emerald-400' :
+                            'bg-amber-950/80 border border-amber-500/20 text-amber-400'
+                          }`}>
+                            {sub.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
+          </section>
 
-          </div>
-        )}
+          {/* Razorpay UPI Payout Ledger */}
+          <section className="glass-panel rounded-2xl p-6 border border-white/[0.01]">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-sm font-display font-black uppercase text-[#e7e4ee] tracking-wider flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-[#a5a5ff]" />
+                Razorpay Payout Ledger
+              </h3>
+              {payouts.some(p => p.status === 'PENDING') && (
+                <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full animate-pulse">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Processing
+                </span>
+              )}
+            </div>
 
+            {payouts.length === 0 ? (
+              <div className="text-center py-6 bg-[#13131a]/40 rounded-xl border border-white/5">
+                <Wallet className="w-6 h-6 text-zinc-600 mx-auto mb-2" />
+                <p className="text-xs text-[#acaab4]">No payouts recorded yet.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/5 text-[9px] font-bold text-[#acaab4] uppercase tracking-wider">
+                      <th className="pb-3 pr-2">Transaction VPA</th>
+                      <th className="pb-3 px-2">Pool Source</th>
+                      <th className="pb-3 px-2">Royalty Stake</th>
+                      <th className="pb-3 px-2">Gross (₹)</th>
+                      <th className="pb-3 px-2 text-emerald-400">Net Paid</th>
+                      <th className="pb-3 pl-2 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5 text-xs text-[#acaab4]">
+                    {payouts.map((pay) => {
+                      const isPassive = pay.id.includes('royalty');
+                      const poolObj = pools.find(p => p.id === pay.poolId);
+                      const baseINR = poolObj ? poolObj.basePrice * 83 : 0;
+                      const fivePercent = baseINR * 0.05;
+
+                      return (
+                        <tr key={pay.id} className="hover:bg-white/[0.02] transition duration-300">
+                          <td className="py-3 pr-2 font-mono text-[10px] text-gray-300 truncate max-w-[120px]">{pay.payoutTransactionId}</td>
+                          <td className="py-3 px-2 truncate max-w-[120px]">{pay.poolTitle}</td>
+                          <td className="py-3 px-2">
+                            {isPassive ? (
+                              <span className="text-[10px] font-mono text-[#a5a5ff]">
+                                5% split of ₹{baseINR.toLocaleString()}
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-[#acaab4]/60">Upfront payment</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-2 font-semibold text-[#acaab4]">₹{pay.grossRoyalty.toLocaleString('en-IN')}</td>
+                          <td className="py-3 px-2 text-emerald-400 font-bold">₹{pay.netRoyalty.toLocaleString('en-IN')}</td>
+                          <td className="py-3 pl-2 text-right">
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${
+                              pay.status === 'SUCCESS' ? 'text-emerald-400' : 'text-amber-400'
+                            }`}>
+                              {pay.status === 'SUCCESS' ? (
+                                <Check className="w-3.5 h-3.5" />
+                              ) : (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              )}
+                              {pay.status === 'SUCCESS' ? "Paid" : "Processing"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
+        </div>
       </div>
 
-      {/* FOOTER */}
-      <footer className="mt-16 pt-8 border-t border-white/5 max-w-7xl mx-auto w-full text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 relative">
-        <p className="text-xs text-[#acaab4] font-medium">&copy; 2026 Axiom Labs. All rights reserved. Outskill × OpenAI AI Builders Hackathon MVP.</p>
-        
-        <div className="flex gap-6 text-xs text-[#acaab4]">
-          <a href="#" className="hover:text-emerald-400 transition" onClick={(e) => { e.preventDefault(); setAlert({ type: 'success', message: "Razorpay portal active. Contact: payments@axiom.ai" }); }}>Razorpay Payouts</a>
-          <a href="#" className="hover:text-emerald-400 transition" onClick={(e) => { e.preventDefault(); setAlert({ type: 'success', message: "Stripe Billing portal active. Contact: accounts@axiom.ai" }); }}>Stripe Billing</a>
-          <a href="#" className="hover:text-emerald-400 transition" onClick={(e) => { e.preventDefault(); setAlert({ type: 'success', message: "OpenAI fine-tuning endpoint verified and active." }); }}>OpenAI Webhooks</a>
-        </div>
-      </footer>
-
-      {/* ==================== SIGNUP MODAL (EXPERT PROFILE MODAL) ==================== */}
+      {/* ================= EXPERT ONBOARDING MODAL ================= */}
       {isSignupOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
-          <div className="w-full max-w-md p-6 rounded-2xl glass-card backdrop-blur-md glow-emerald relative overflow-hidden animate-scale-up">
-            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-emerald-400" />
-              Connect Expert Profile
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm transition-all duration-300">
+          <div className="w-full max-w-md p-6 rounded-2xl glass-panel relative overflow-hidden animate-fade-in border border-white/5">
+            <h3 className="text-base font-display font-black text-white mb-2 flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-[#a5a5ff]" />
+              Connect Expert Identity
             </h3>
-            <p className="text-xs text-[#acaab4] mb-6">
-              Enter your credentials to connect with Razorpay for instant UPI payouts and access active passive-income royalty ledgers.
+            <p className="text-xs text-[#acaab4] mb-5 leading-relaxed">
+              Register or update credentials linked to Razorpay for compounding royalty dividends and instant UPI distributions.
             </p>
 
             <form onSubmit={handleSignUp} className="space-y-4">
               <div>
-                <label className="text-xs text-[#acaab4] font-medium block mb-1">Full Legal Name</label>
+                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Full Legal Name</label>
                 <input
                   type="text"
                   placeholder="Dr. Ananya Iyer"
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300"
+                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#a5a5ff]/40 outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-[#acaab4] font-medium block mb-1">Credential Email (Pre-seeded matches record)</label>
+                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Holder Email</label>
                 <input
                   type="email"
                   placeholder="ananya.iyer@axiom.ai"
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300 font-mono"
+                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-mono focus:border-[#a5a5ff]/40 outline-none transition"
                 />
-                <span className="text-[9px] text-[#acaab4] block mt-1">Pre-seeded matching emails: <code className="text-indigo-400">ananya.iyer@axiom.ai</code>, <code className="text-indigo-400">rahul.banerjee@axiom.ai</code>, <code className="text-indigo-400">priya.sharma@axiom.ai</code></span>
               </div>
 
               <div>
-                <label className="text-xs text-[#acaab4] font-medium block mb-1">Razorpay Payouts UPI ID (VPA)</label>
+                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Razorpay UPI ID (VPA)</label>
                 <input
                   type="text"
-                  placeholder="ananya.iyer@okaxis"
+                  placeholder="ananya@okaxis"
                   value={signupUpi}
                   onChange={(e) => setSignupUpi(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300 font-mono"
+                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-mono focus:border-[#a5a5ff]/40 outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-[#acaab4] font-medium block mb-1">Expertise Tier Selection</label>
+                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Expertise Calibration Tier</label>
                 <select
                   value={signupTier}
-                  onChange={(e) => setSignupTier(e.target.value as 'BRONZE' | 'SILVER' | 'GOLD' | 'SENIOR' | 'ELITE')}
-                  className="w-full p-2.5 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-emerald-500/50 outline-none transition duration-300"
+                  onChange={(e) => setSignupTier(e.target.value as any)}
+                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#a5a5ff]/40 outline-none transition"
                 >
-                  <option value="BRONZE">Bronze Specialist (1.0x multiplier)</option>
-                  <option value="SILVER">Silver Specialist (1.2x multiplier)</option>
-                  <option value="GOLD">Gold Specialist (1.5x multiplier)</option>
-                  <option value="SENIOR">Senior Specialist (1.7x multiplier)</option>
-                  <option value="ELITE">Elite Specialist (2.0x multiplier)</option>
+                  <option value="BRONZE">Bronze Triage (1.0x multiplier)</option>
+                  <option value="SILVER">Silver Triage (1.2x multiplier)</option>
+                  <option value="GOLD">Gold Triage (1.5x multiplier)</option>
+                  <option value="SENIOR">Senior Triage (1.7x multiplier)</option>
+                  <option value="ELITE">Elite Triage (2.0x multiplier)</option>
                 </select>
               </div>
 
@@ -1345,15 +1055,15 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setIsSignupOpen(false)}
-                  className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-[#f1f1f6] text-xs font-semibold rounded-xl border border-white/5 hover:border-white/10 transition duration-300"
+                  className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded-xl border border-white/5 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-black text-xs font-bold rounded-xl transition duration-300 glow-emerald"
+                  className="flex-1 py-2.5 bg-[#a5a5ff] text-[#1700a1] hover:bg-[#6462ec] hover:text-white text-xs font-bold rounded-xl transition"
                 >
-                  Save & Connect
+                  Register holder
                 </button>
               </div>
             </form>
@@ -1361,74 +1071,64 @@ export default function Home() {
         </div>
       )}
 
-      {/* ==================== STRIPE LICENSING CHECKOUT MODAL ==================== */}
+      {/* ================= STRIPE CHECKOUT MODAL ================= */}
       {licensingPool && !purchaseSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
-          <div className="w-full max-w-md p-6 rounded-2xl glass-card backdrop-blur-md glow-violet relative overflow-hidden animate-scale-up">
-            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-              <LockIcon className="w-5 h-5 text-indigo-400 animate-pulse" />
-              Stripe Dataset Licensing Checkout
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm transition-all duration-300">
+          <div className="w-full max-w-md p-6 rounded-2xl glass-panel relative overflow-hidden animate-fade-in border border-white/5">
+            <h3 className="text-base font-display font-black text-white mb-2 flex items-center gap-2">
+              <LockIcon className="w-5 h-5 text-[#a5a5ff]" />
+              Secure Dataset Checkout
             </h3>
-            <p className="text-xs text-[#acaab4] mb-4">
-              Select your commercial licensing model to acquire Cloudflare R2 download tokens for the thematic index pool <strong className="text-white">{licensingPool.title}</strong>.
+            <p className="text-xs text-[#acaab4] mb-4 leading-relaxed">
+              Select commercial licensing model for dataset pool <strong className="text-white">{licensingPool.title}</strong>.
             </p>
 
             <form onSubmit={handlePurchase} className="space-y-4">
-              
-              {/* Select License Type */}
               <div>
-                <label className="text-xs text-[#acaab4] font-medium block mb-1">Commercial Licensing Model</label>
+                <label className="text-[10px] text-[#acaab4] uppercase block mb-1.5 font-bold">Licensing Tier</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setLicenseType('SHARED')}
                     className={`p-3 rounded-xl border text-left transition duration-300 flex flex-col justify-between h-20 ${
                       licenseType === 'SHARED'
-                        ? 'bg-indigo-950/40 border-indigo-500/50 text-indigo-300'
-                        : 'bg-[#191921] border-white/5 text-gray-300 hover:bg-white/5'
+                        ? 'bg-[#a5a5ff]/10 border-[#a5a5ff]/30 text-[#a5a5ff]'
+                        : 'bg-[#13131a] border-white/5 text-[#acaab4] hover:bg-white/5'
                     }`}
                   >
-                    <span className="text-[10px] font-bold uppercase tracking-wider block">Standard Shared</span>
-                    <span className="text-base font-extrabold font-mono block mt-1">${licensingPool.basePrice.toLocaleString()}</span>
+                    <span className="text-[9px] uppercase font-bold tracking-wider">Shared License</span>
+                    <span className="text-sm font-black font-mono block mt-1">${licensingPool.basePrice.toLocaleString()}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setLicenseType('EXCLUSIVE')}
                     className={`p-3 rounded-xl border text-left transition duration-300 flex flex-col justify-between h-20 ${
                       licenseType === 'EXCLUSIVE'
-                        ? 'bg-indigo-950/40 border-indigo-500/50 text-indigo-300 font-bold'
-                        : 'bg-[#191921] border-white/5 text-gray-300 hover:bg-white/5'
+                        ? 'bg-[#a5a5ff]/10 border-[#a5a5ff]/30 text-[#a5a5ff]'
+                        : 'bg-[#13131a] border-white/5 text-[#acaab4] hover:bg-white/5'
                     }`}
                   >
-                    <span className="text-[10px] font-bold uppercase tracking-wider block">Exclusive Buyout</span>
-                    <span className="text-base font-extrabold font-mono block mt-1">${licensingPool.exclusivePrice.toLocaleString()}</span>
+                    <span className="text-[9px] uppercase font-bold tracking-wider">Exclusive Buyout</span>
+                    <span className="text-sm font-black font-mono block mt-1">${licensingPool.exclusivePrice.toLocaleString()}</span>
                   </button>
                 </div>
-                <span className="text-[9px] text-[#acaab4] block mt-1.5">
-                  {licenseType === 'SHARED' 
-                    ? 'Non-exclusive. Dataset remains active on the marketplace for subsequent buyers.' 
-                    : 'Dataset pool is immediately ARCHIVED and removed from all marketplace active listings to ensure legal competitive advantages.'
-                  }
-                </span>
               </div>
 
-              {/* Enterprise Billing Email */}
               <div>
-                <label className="text-xs text-[#acaab4] font-medium block mb-1">Enterprise Billing Email (Stripe Registered)</label>
+                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Billing Email (Stripe Account)</label>
                 <input
                   type="email"
                   placeholder="billing@openai.com"
                   required
                   value={buyerEmail}
                   onChange={(e) => setBuyerEmail(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#191921] border border-white/10 text-white text-xs font-medium focus:border-indigo-500/50 outline-none transition duration-300 font-mono"
+                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-mono focus:border-[#a5a5ff]/40 outline-none transition"
                 />
               </div>
 
-              {/* Stripe Payment Simulator Card Inputs */}
               <div>
-                <label className="text-xs text-[#acaab4] font-medium block mb-1">Secure Card Details (Simulated Gateway)</label>
-                <div className="p-3 bg-[#191921] border border-white/10 rounded-xl flex items-center justify-between text-xs font-mono text-[#acaab4]">
+                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Simulated Card Gateway</label>
+                <div className="p-3 bg-[#13131a] border border-white/10 rounded-xl flex items-center justify-between text-xs font-mono text-[#acaab4]">
                   <span className="text-white">••••  ••••  ••••  4242</span>
                   <span>12 / 28</span>
                   <span>738</span>
@@ -1439,14 +1139,14 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setLicensingPool(null)}
-                  className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-[#f1f1f6] text-xs font-semibold rounded-xl border border-white/5 hover:border-white/10 transition duration-300"
+                  className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded-xl border border-white/5 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={checkingOut}
-                  className="flex-1 py-2.5 bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-950 disabled:text-indigo-400 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition duration-300 glow-violet flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 bg-[#a5a5ff] text-[#1700a1] hover:bg-[#6462ec] hover:text-white disabled:opacity-50 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5"
                 >
                   {checkingOut ? (
                     <>
@@ -1456,17 +1156,15 @@ export default function Home() {
                   ) : (
                     <>
                       <Check className="w-3.5 h-3.5" />
-                      Authorize & Checkout
+                      Checkout
                     </>
                   )}
                 </button>
               </div>
-
             </form>
           </div>
         </div>
       )}
-
-    </div>
+    </DashboardLayout>
   );
 }
