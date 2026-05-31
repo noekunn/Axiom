@@ -1204,11 +1204,11 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-x-8 gap-y-2 justify-center text-[10px]">
             <span>© 2026 Axiom Protocol Layer. All rights reserved.</span>
             <span className="text-zinc-800">|</span>
-            <a href="#" className="hover:text-white transition-colors">Terminals</a>
+            <Link href="/terminals" className="hover:text-white transition-colors">Terminals</Link>
             <span className="text-zinc-800">|</span>
-            <a href="#" className="hover:text-white transition-colors">Privacy Ledger</a>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Ledger</Link>
             <span className="text-zinc-800">|</span>
-            <a href="#" className="hover:text-white transition-colors">Whitepaper v2.4</a>
+            <Link href="/whitepaper" className="hover:text-white transition-colors">Whitepaper v2.4</Link>
           </div>
 
           <div className="flex items-center gap-2 select-none">
