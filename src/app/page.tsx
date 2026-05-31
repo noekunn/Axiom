@@ -226,6 +226,7 @@ export default function HomePage() {
             <a href="#clients" className="text-zinc-400 hover:text-white transition-colors duration-200">Clients</a>
             <a href="#pricing" className="text-zinc-400 hover:text-white transition-colors duration-200">Pricing</a>
             <a href="#faq" className="text-zinc-400 hover:text-white transition-colors duration-200">FAQ</a>
+            <Link href="/docs" className="text-zinc-400 hover:text-white transition-colors duration-200">Documentation</Link>
           </nav>
 
           <div className="flex items-center gap-4">
