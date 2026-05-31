@@ -5,36 +5,36 @@
 @tailwind utilities;
 
 :root {
-  --background: #141313;
-  --foreground: #e5e2e1;
+  --background: #f8f7f6; /* Premium soft chalk background */
+  --foreground: #1c1917; /* Off-black ink text */
   
-  --primary: #ffffff;
-  --on-primary: #2f3131;
-  --primary-container: #e2e2e2;
+  --primary: #1c1917;
+  --on-primary: #ffffff;
+  --primary-container: #eae7e6;
   
-  --secondary: #c7c6c6;
-  --on-secondary: #2f3131;
-  --secondary-container: #484949;
+  --secondary: #6e6765;
+  --on-secondary: #ffffff;
+  --secondary-container: #eae7e6;
   
-  --tertiary: #ffffff;
-  --tertiary-container: #e2e2e2;
+  --tertiary: #1c1917;
+  --tertiary-container: #eae7e6;
   
-  --surface: #141313;
-  --surface-container-lowest: #0e0e0e;
-  --surface-container-low: #1c1b1b;
-  --surface-container: #201f1f;
-  --surface-container-high: #2a2a2a;
-  --surface-container-highest: #353434;
+  --surface: #f8f7f6;
+  --surface-container-lowest: #ffffff; /* Pure white container base */
+  --surface-container-low: #f1efed;    /* Soft light base */
+  --surface-container: #eae7e6;        /* Tonal card inner */
+  --surface-container-high: #e2dedc;   /* Soft border line outline */
+  --surface-container-highest: #dad5d3;
   
-  --on-surface: #e5e2e1;
-  --on-surface-variant: #c4c7c8;
-  --outline: #8e9192;
-  --outline-variant: #444748;
+  --on-surface: #1c1917;
+  --on-surface-variant: #6e6765;
+  --outline: #8e8380;                  /* Soft charcoal boundary */
+  --outline-variant: #dad5d3;          /* Very thin grey boundary */
   
-  --error: #ffb4ab;
+  --error: #ba1a1a;
   
   /* Scholaris specific success/status colors */
-  --obsidian-accent: #ffffff;
+  --obsidian-accent: #1c1917;
   --obsidian-success: #10B981;
 }
 
@@ -54,7 +54,7 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-container-highest);
+  background: var(--surface-container-high);
   border-radius: 10px;
   transition: all 0.3s ease;
 }
@@ -64,8 +64,8 @@ body {
 
 /* Custom Selection style */
 ::selection {
-  background: rgba(99, 102, 241, 0.3); /* Obsidian accent */
-  color: #ffffff;
+  background: rgba(99, 102, 241, 0.2); /* Soft selection */
+  color: inherit;
 }
 
 @layer utilities {
@@ -82,10 +82,10 @@ body {
   }
   
   .glass-panel {
-    background: var(--surface-container);
+    background: var(--surface-container-lowest);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: none; /* No drop shadows rule */
   }
 
@@ -105,8 +105,8 @@ body {
   .bg-grid-cyber {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      linear-gradient(to right, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
   }
 }
 
@@ -124,3 +124,111 @@ body {
 .animate-fade-in {
   animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ==========================================================================
+   PREMIUM LIGHT MODE TAILWIND CLASS OVERRIDES (STITCH FIDELITY SPECS)
+   ========================================================================= */
+
+/* 1. Core Surfaces & Page Backgrounds */
+.bg-\[\#141313\], .bg-\[\#0e0e15\], .bg-\[\#0b1326\], .bg-\[\#0d0d14\], .bg-\[\#09090b\], .bg-background, .bg-zinc-950, .bg-slate-950, .bg-neutral-950, .bg-black:not(.terminal-box):not(.terminal-console):not(.terminal-screen) {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+.bg-\[\#141313\]\/95 {
+  background-color: rgba(248, 247, 246, 0.95) !important;
+  color: var(--foreground) !important;
+}
+
+/* 2. Container & Card Surface Elements */
+.bg-\[\#121212\], .bg-\#121212, .bg-\[\#0e0e0e\], .bg-\[\#101010\], .bg-\[\#191921\], .bg-\[\#171f33\], .bg-\[\#1e293b\], .bg-\[\#1a1818\], .bg-zinc-900, .bg-slate-900, .bg-neutral-900,
+.bg-zinc-900\/50, .bg-zinc-900\/40, .bg-zinc-900\/20, .bg-zinc-900\/60, .bg-zinc-900\/10, .bg-zinc-950\/40, .bg-zinc-950\/50, .bg-zinc-800\/50, .bg-\[\#141313\]\/40, .bg-\[\#121212\]\/40, .bg-\[\#1f1f28\]\/40 {
+  background-color: var(--surface-container-lowest) !important; /* Pure white card base */
+  color: var(--foreground) !important;
+}
+
+/* 3. Tonal Lower Surfaces & Borders */
+.bg-\[\#13131a\], .bg-\[\#131b2e\], .bg-\[\#060e20\], .bg-\[\#25252f\], .bg-\[\#2b2b36\], .bg-\[\#222a3d\], .bg-\[\#2d3449\], .bg-\[\#1e1c1c\], .bg-zinc-800, .bg-slate-800, .bg-neutral-800 {
+  background-color: var(--surface-container-low) !important; /* Soft grey base */
+  color: var(--foreground) !important;
+}
+
+aside.bg-\[\#121212\], aside.bg-\[\#0b1326\], aside.bg-zinc-950, aside.bg-slate-950, aside.bg-\[\#141313\], .bg-\[\#0b1326\] aside, .bg-\[\#121212\] aside {
+  background-color: var(--surface-container-low) !important; /* Soft grey sidebar base */
+  border-right-color: var(--outline-variant) !important;
+}
+
+header.bg-\[\#141313\]\/80, header.bg-\[\#0e0e15\]\/80, header.bg-\[\#0b1326\]\/80, header.bg-zinc-950\/80, header.bg-slate-950\/80, header.bg-black\/80 {
+  background-color: rgba(248, 247, 246, 0.8) !important; /* Light blurred header */
+  border-bottom-color: var(--outline-variant) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* 4. Interactive Borders */
+.border-\[\#262626\], .border-\[\#1e293b\], .border-\[\#25252f\], .border-\[\#191921\], .border-\[\#1e1c1c\], .border-white\/10, .border-white\/5, .border-zinc-800\/80, .border-zinc-800, .border-zinc-900, .border-slate-800\/80, .border-slate-800, .border-slate-900,
+.border-\[\#1a1a1a\], .border-zinc-800\/60, .border-zinc-850, .border-zinc-800\/85, .border-zinc-700\/60,
+.border-\[\#ffffff\]\/20, .border-\[\#ffffff\]\/10, .border-\[\#ffffff\]\/25, .border-\[\#ffffff\]\/40, .focus\:border-\[\#ffffff\]\/40, .focus\:border-\[\#ffffff\] {
+  border-color: var(--outline-variant) !important;
+}
+.border-white\/20, .border-white\/30, .border-zinc-700, .border-zinc-600, .border-slate-700, .border-slate-600,
+.border-\[\#ffffff\]\/50, .border-\[\#ffffff\] {
+  border-color: var(--outline) !important;
+}
+
+/* 5. Global Text Contrast Overrides */
+.text-white, .text-\[\#e7e4ee\], .text-\[\#dae2fd\], .text-zinc-50, .text-zinc-100, .text-zinc-200, .text-zinc-300, .text-slate-50, .text-slate-100, .text-slate-200, .text-slate-300,
+.text-\[\#ffffff\], .text-\[\#ffffff\]\/90, .text-\[\#ffffff\]\/80, .text-\[\#ffffff\]\/70 {
+  color: var(--foreground) !important;
+}
+
+.text-zinc-400, .text-zinc-500, .text-slate-400, .text-slate-500, .text-\[\#acaab4\], .text-\[\#c4c7c8\] {
+  color: var(--on-surface-variant) !important;
+}
+
+/* 6. Controls & Input Enclosures */
+input.bg-\[\#141313\], textarea.bg-\[\#141313\], select.bg-\[\#121212\], select.bg-\[\#141313\], 
+input.bg-zinc-900, textarea.bg-zinc-900, select.bg-zinc-900, 
+input.bg-slate-900, textarea.bg-slate-900, select.bg-slate-900, 
+.bg-\[\#141313\] input, .bg-\[\#141313\] textarea, .bg-zinc-950 input, .bg-zinc-950 textarea {
+  background-color: var(--surface-container-lowest) !important;
+  color: var(--foreground) !important;
+  border-color: var(--outline-variant) !important;
+}
+input.bg-\[\#141313\]:focus, textarea.bg-\[\#141313\]:focus, select.bg-\[\#121212\]:focus {
+  border-color: var(--foreground) !important;
+  box-shadow: none !important;
+}
+
+/* 7. Solid Active Triggers (Ink buttons in Light Mode) */
+button.bg-white, a.bg-white, .bg-white:not(aside):not(header):not(main) {
+  background-color: var(--foreground) !important; /* Ink black button */
+  color: var(--background) !important;          /* White text */
+}
+button.bg-white:hover, a.bg-white:hover {
+  background-color: var(--secondary) !important;
+}
+
+/* 8. Active Badges & Micro-indicator Surfaces */
+.bg-white\/5, .bg-white\/10, .bg-\[\#ffffff\]\/10, .bg-white\/20, .bg-\[\#ffffff\]\/20, .bg-\[\#ffffff\]\/5 {
+  background-color: var(--primary-container) !important;
+  color: var(--foreground) !important;
+  border-color: var(--outline-variant) !important;
+}
+
+/* 9. Success & Alert Notifications status bands */
+.bg-emerald-950\/20, .bg-emerald-950\/80 {
+  background-color: #d1fae5 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #065f46 !important;
+}
+.bg-rose-950\/20, .bg-rose-950\/80 {
+  background-color: #ffe4e6 !important;
+  border-color: rgba(244, 63, 94, 0.2) !important;
+  color: #9f1239 !important;
+}
+
+/* 10. SVG Icon elements */
+header button svg, header a svg, aside svg {
+  color: var(--foreground) !important;
+}
+

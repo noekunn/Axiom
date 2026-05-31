@@ -532,11 +532,11 @@ export default function SignupPage() {
                           onClick={() => setExpertArea(item.value)}
                           className={`p-3 rounded border flex flex-col items-center justify-center gap-2 transition duration-200 ${
                             isSelected
-                              ? "bg-[#ffffff]/10 border-[#ffffff]/50 text-white"
-                              : "bg-[#141313] border-[#262626] text-zinc-400 hover:border-white/20 hover:text-white"
+                              ? "bg-[#1c1917]/5 border-[#1c1917]/30 text-[#1c1917] font-bold"
+                              : "bg-[#141313] border-[#262626] text-zinc-500 hover:border-[#1c1917]/20 hover:text-[#1c1917]"
                           }`}
                         >
-                          <Icon className={`w-4 h-4 ${isSelected ? "text-[#ffffff]" : "text-zinc-500"}`} />
+                          <Icon className={`w-4 h-4 ${isSelected ? "text-[#1c1917]" : "text-zinc-400"}`} />
                           <span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span>
                         </button>
                       );
@@ -576,8 +576,8 @@ export default function SignupPage() {
                           onClick={() => handleLangToggle(lang)}
                           className={`px-3 py-1.5 rounded text-[10px] font-mono border transition-all duration-200 ${
                             isSelected
-                              ? "bg-[#ffffff]/10 border-[#ffffff]/40 text-[#ffffff]"
-                              : "bg-[#141313] border-[#262626] text-zinc-400 hover:border-white/20 hover:text-white"
+                              ? "bg-[#1c1917]/5 border-[#1c1917]/30 text-[#1c1917] font-bold"
+                              : "bg-[#141313] border-[#262626] text-zinc-500 hover:border-[#1c1917]/20 hover:text-[#1c1917]"
                           }`}
                         >
                           {lang}
@@ -736,8 +736,8 @@ export default function SignupPage() {
                           onClick={() => setClientLlmSize(item.value)}
                           className={`p-3 rounded border flex flex-col items-center justify-center gap-1.5 transition duration-300 ${
                             isSelected
-                              ? "bg-[#ffffff]/10 border-[#ffffff]/50 text-white"
-                              : "bg-[#141313] border-[#262626] text-zinc-400 hover:border-white/20 hover:text-white"
+                              ? "bg-[#1c1917]/5 border-[#1c1917]/30 text-[#1c1917] font-bold"
+                              : "bg-[#141313] border-[#262626] text-zinc-500 hover:border-[#1c1917]/20 hover:text-[#1c1917]"
                           }`}
                         >
                           <span className="text-[10px] font-bold uppercase tracking-wider">{item.value}</span>

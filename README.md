@@ -13,11 +13,16 @@ Axiom is a next-generation decentralized reasoning data marketplace that connect
 
 ## 🛠️ Core Features
 
-1.  **Multi-Model Consensus QA Pipeline**: Crowdsourced dataset submissions (e.g. medical diagnostic reasoning in Hinglish) undergo automated consensus evaluations using Groq (Llama 3.3) and OpenAI (GPT-4o) to calibrate quality scores, automate approvals, or route borderline edge cases to human administrators.
-2.  **Razorpay FinOps Payouts**: Connects experts with Razorpay X UPI payout channels. Upon task approval, experts receive automated upfront base payments (₹120/point) and passive royalty distribution entries.
-3.  **B2B Data-Asset Marketplace**: Enterprises can license dataset index pools non-exclusively or opt for exclusive buyouts, unlocking immediate Cloudflare R2 download tokens.
-4.  **OpenAI Fine-Tuning Integration Webhook**: Enables clients to trigger Supervised Fine-Tuning (SFT) jobs on OpenAI models (`gpt-4o-mini`) using the licensed dataset directly from the Axiom interface.
-5.  **Fail-Safe DB Graceful Degradation**: Both purchase and fine-tune endpoints detect database connection status. If PostgreSQL is offline, the backend gracefully falls back to simulated in-memory `db.ts` database updates, ensuring the demo works flawlessly.
+1.  **Sovereign Light Mode Design Theme**: Re-engineered the entire visual ecosystem from a dark layout into a premium, high-contrast, editorial **Sovereign Light Mode** theme. Outfitted with warm-chalk backgrounds (`#f8f7f6`), pure white cards (`#ffffff`), charcoal ink typography (`#1c1917`), and flat outline grey borders (`#dad5d3`) inspired by the premium Stitch project templates (`projects/14688480690965115472`).
+2.  **Role-Based Security Auth Gates**: Locked down individual workspaces under strict security layers. Visitors at `/expert` and `/client` are greeted with secure authorization gates (Expert security node workstation, Enterprise Access Port) to log in instantly using pre-seeded sandbox accounts or link new credentials.
+3.  **Shortlist Candidate Onboarding Terminal**: Newly registered specialists are initialized with a `"Shortlisted"` status and guided by a premium, multi-stage candidate onboarding terminal tracker. Active task claim boards remain securely locked until vetting is complete.
+4.  **Vetting Arena V2 Grading Engine**: Shortlisted nodes claim timed domain-specific vetting tests (Medical, Legal, Finance). Submitting answers immediately grades their responses, elevates their status to `"Approved"` mainnet nodes, and unlocks the full active claims workbench.
+5.  **Multi-Model Consensus QA Pipeline**: Crowdsourced dataset submissions undergo automated consensus evaluations using Groq (Llama 3.3) and OpenAI (GPT-4o) to calibrate quality scores, automate approvals, or route borderline edge cases to human administrators.
+6.  **Razorpay FinOps Payouts**: Connects experts with Razorpay X UPI payout channels. Upon task approval, experts receive automated upfront base payments (₹120/point) and passive royalty distribution entries.
+7.  **B2B Data-Asset Marketplace**: Enterprises can license dataset index pools non-exclusively or opt for exclusive buyouts, unlocking immediate Cloudflare R2 download tokens.
+8.  **OpenAI Fine-Tuning Integration Webhook**: Enables clients to trigger Supervised Fine-Tuning (SFT) jobs on OpenAI models (`gpt-4o-mini`) using the licensed dataset directly from the Axiom interface.
+9.  **Fail-Safe DB Graceful Degradation**: Both purchase and fine-tune endpoints detect database connection status. If PostgreSQL is offline, the backend gracefully falls back to simulated in-memory `db.ts` database updates, ensuring the demo works flawlessly.
+
 
 ---
 

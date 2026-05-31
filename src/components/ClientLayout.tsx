@@ -159,8 +159,8 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                 <div
                   className={`flex items-center gap-3 px-4 py-3 font-display font-semibold text-sm rounded transition-all duration-200 cursor-pointer active:scale-[0.97] ${
                     isActive
-                      ? "bg-[#10B981]/10 text-white border border-[#10B981]/30"
-                      : "text-zinc-400 hover:text-white hover:bg-white/[0.03] border border-transparent"
+                      ? "bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 font-bold"
+                      : "text-zinc-600 hover:text-[#10B981] hover:bg-[#10B981]/[0.02] border border-transparent"
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? "text-[#10B981]" : "text-zinc-500"}`} />
@@ -268,8 +268,8 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
               onClick={() => setShowWalletModal(true)}
               className={`px-4 py-1.5 rounded border text-xs font-display font-semibold transition-all duration-200 active:scale-95 flex items-center gap-2 ${
                 walletConnected
-                  ? "bg-[#10B981]/10 border-[#10B981]/30 text-white"
-                  : "bg-[#141313] border-[#262626] hover:bg-white/5 text-zinc-400"
+                  ? "bg-[#10B981]/10 border-[#10B981]/20 text-[#10B981]"
+                  : "bg-[#f8f7f6] border-[#dad5d3] hover:bg-[#10B981]/5 text-zinc-600"
               }`}
             >
               <Wallet className="w-3.5 h-3.5" />

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import {
   Cpu,
   CheckCircle2,
@@ -21,6 +22,7 @@ interface Expert {
   points: number;
   totalEarnings: number;
   razorpayStatus: 'CONNECTED' | 'PENDING' | 'NOT_CONNECTED';
+  expertise?: string;
 }
 
 interface AssetPool {

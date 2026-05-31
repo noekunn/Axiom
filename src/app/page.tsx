@@ -557,9 +557,9 @@ export default function HomePage() {
                         step="50"
                         value={expertTasks}
                         onChange={(e) => setExpertTasks(Number(e.target.value))}
-                        className="w-full h-2 bg-zinc-800 rounded appearance-none cursor-pointer accent-[#ffffff]"
+                        className="w-full h-2 bg-zinc-300 rounded appearance-none cursor-pointer accent-[#1c1917]"
                         style={{
-                          background: `linear-gradient(to right, #ffffff 0%, #ffffff ${(expertTasks - 50) / 49.5}%, #3f3d3d ${(expertTasks - 50) / 49.5}%, #3f3d3d 100%)`
+                          background: `linear-gradient(to right, #1c1917 0%, #1c1917 ${(expertTasks - 50) / 49.5}%, #e2dedc ${(expertTasks - 50) / 49.5}%, #e2dedc 100%)`
                         }}
                       />
                       <div className="flex justify-between text-[10px] text-zinc-500 font-mono font-semibold">
@@ -586,9 +586,9 @@ export default function HomePage() {
                         step="1"
                         value={expertResales}
                         onChange={(e) => setExpertResales(Number(e.target.value))}
-                        className="w-full h-2 bg-zinc-800 rounded appearance-none cursor-pointer accent-[#ffffff]"
+                        className="w-full h-2 bg-zinc-300 rounded appearance-none cursor-pointer accent-[#1c1917]"
                         style={{
-                          background: `linear-gradient(to right, #ffffff 0%, #ffffff ${(expertResales - 1) * 2.04}%, #3f3d3d ${(expertResales - 1) * 2.04}%, #3f3d3d 100%)`
+                          background: `linear-gradient(to right, #1c1917 0%, #1c1917 ${(expertResales - 1) * 2.04}%, #e2dedc ${(expertResales - 1) * 2.04}%, #e2dedc 100%)`
                         }}
                       />
                       <div className="flex justify-between text-[10px] text-zinc-500 font-mono font-semibold">
@@ -703,9 +703,9 @@ export default function HomePage() {
                         step="1000"
                         value={clientDataPoints}
                         onChange={(e) => setClientDataPoints(Number(e.target.value))}
-                        className="w-full h-2 bg-zinc-800 rounded appearance-none cursor-pointer accent-[#ffffff]"
+                        className="w-full h-2 bg-zinc-300 rounded appearance-none cursor-pointer accent-[#1c1917]"
                         style={{
-                          background: `linear-gradient(to right, #ffffff 0%, #ffffff ${(clientDataPoints - 1000) / 2490}%, #3f3d3d ${(clientDataPoints - 1000) / 2490}%, #3f3d3d 100%)`
+                          background: `linear-gradient(to right, #1c1917 0%, #1c1917 ${(clientDataPoints - 1000) / 2490}%, #e2dedc ${(clientDataPoints - 1000) / 2490}%, #e2dedc 100%)`
                         }}
                       />
                       <div className="flex justify-between text-[10px] text-zinc-500 font-mono font-semibold">

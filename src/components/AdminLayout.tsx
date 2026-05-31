@@ -85,8 +85,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <div
                   className={`flex items-center gap-3 px-4 py-3 font-display font-semibold text-sm rounded-xl transition-all duration-300 cursor-pointer active:scale-[0.97] ${
                     isActive
-                      ? "bg-violet-500/10 text-[#10B981]"
-                      : "text-[#acaab4] hover:text-[#e7e4ee] hover:bg-white/[0.03]"
+                      ? "bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 font-bold"
+                      : "text-zinc-600 hover:text-[#1c1917] hover:bg-[#1c1917]/[0.02]"
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? "text-[#10B981]" : "text-[#acaab4]"}`} />
@@ -153,8 +153,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               onClick={handleConnectWallet}
               className={`px-4 py-1.5 rounded-full border text-xs font-display font-semibold transition-all duration-300 active:scale-95 flex items-center gap-2 ${
                 walletConnected
-                  ? "bg-violet-500/10 border-violet-500/20 text-[#10B981]"
-                  : "bg-white/[0.02] border-[#262626] hover:bg-white/[0.05] text-[#e7e4ee]"
+                  ? "bg-[#10B981]/10 border-[#10B981]/20 text-[#10B981]"
+                  : "bg-[#f8f7f6] border-[#dad5d3] hover:bg-[#1c1917]/5 text-zinc-600"
               }`}
             >
               <Wallet className="w-3.5 h-3.5" />
