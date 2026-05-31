@@ -128,12 +128,12 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex overflow-x-hidden bg-[#141313] text-[#e7e4ee] font-label select-none selection:bg-[#ffffff]/30 selection:text-white">
+    <div className="min-h-screen flex overflow-x-hidden bg-[#0a0a0a] text-[#e7e4ee] font-label select-none selection:bg-[#ffffff]/30 selection:text-white">
       {/* Persistent Left SideNavBar */}
-      <aside className="w-64 fixed left-0 top-0 h-screen bg-[#121212] border-r border-[#262626] flex flex-col py-8 px-4 z-50">
+      <aside className="w-64 fixed left-0 top-0 h-screen bg-[#080808] border-r border-[#1e1e1e] flex flex-col py-8 px-4 z-50">
         {/* Branding header */}
         <div className="mb-10 px-2 flex items-center gap-3">
-          <div className="w-10 h-10 rounded bg-[#141313] border border-[#262626] flex items-center justify-center text-[#ffffff]">
+          <div className="w-10 h-10 rounded bg-[#0a0a0a] border border-[#1e1e1e] flex items-center justify-center text-[#ffffff]">
             <Database className="w-5 h-5" />
           </div>
           <div>
@@ -161,11 +161,11 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
                 <div
                   className={`flex items-center gap-3 px-4 py-3 font-display font-semibold text-sm rounded transition-all duration-200 cursor-pointer active:scale-[0.97] ${
                     isActive
-                      ? "bg-[#1c1917]/5 text-[#1c1917] border border-[#1c1917]/10 font-bold"
-                      : "text-zinc-600 hover:text-[#1c1917] hover:bg-[#1c1917]/[0.02] border border-transparent"
+                      ? "bg-white/10 text-white border border-white/20 font-bold"
+                      : "text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-current" : "text-zinc-500"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-[#acaab4]"}`} />
                   {item.name}
                 </div>
               </Link>
@@ -174,7 +174,7 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
         </nav>
 
         {/* Support & Connection Status Footer */}
-        <ul className="flex flex-col gap-2 mt-auto pt-6 border-t border-[#262626]">
+        <ul className="flex flex-col gap-2 mt-auto pt-6 border-t border-[#1e1e1e]">
           <li>
             <a 
               href="mailto:support@axiom.ai" 
@@ -188,11 +188,11 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
             <div className="flex items-center justify-between px-4 py-2">
               <div className="flex items-center gap-2 font-display font-bold text-[10px] text-zinc-500 uppercase tracking-widest">
                 <span className="relative flex h-2 w-2">
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#A8A8A8]"></span>
                 </span>
                 Active Node
               </div>
-              <span className="text-[10px] font-mono text-[#10B981]">axm-eu-west</span>
+              <span className="text-[10px] font-mono text-[#A8A8A8]">axm-eu-west</span>
             </div>
           </li>
         </ul>
@@ -201,10 +201,10 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
       {/* Main Canvas & Content Wrapper */}
       <div className="ml-64 flex-1 flex flex-col min-h-screen relative">
         {/* TopNavBar Header */}
-        <header className="bg-[#141313]/80 backdrop-blur-md fixed top-0 right-0 w-[calc(100%-16rem)] z-40 border-b border-[#262626] flex justify-between items-center h-16 px-8">
+        <header className="bg-[#0a0a0a]/80 backdrop-blur-md fixed top-0 right-0 w-[calc(100%-16rem)] z-40 border-b border-[#1e1e1e] flex justify-between items-center h-16 px-8">
           <div className="flex-1 max-w-md relative group">
             <input
-              className="bg-[#141313] border border-[#262626] focus:border-[#ffffff] rounded py-1.5 px-4 pl-10 text-xs focus:ring-0 outline-none text-white placeholder:text-zinc-500 w-48 focus:w-64 transition-all duration-300"
+              className="bg-[#0a0a0a] border border-[#1e1e1e] focus:border-[#ffffff] rounded py-1.5 px-4 pl-10 text-xs focus:ring-0 outline-none text-white placeholder:text-zinc-500 w-48 focus:w-64 transition-all duration-300"
               placeholder="Search expert tasks..."
               type="text"
             />
@@ -223,13 +223,13 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
               >
                 <Bell className="w-4 h-4" />
                 {activeNotificationsCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#A8A8A8]" />
                 )}
               </button>
 
               {/* Notification Popover */}
               {showNotifications && (
-                <div className="absolute right-0 mt-2.5 w-80 bg-[#121212] border border-[#262626] rounded-lg shadow-2xl p-4 z-50 animate-fade-in text-xs">
+                <div className="absolute right-0 mt-2.5 w-80 bg-[#080808] border border-[#1e1e1e] rounded-lg shadow-2xl p-4 z-50 animate-fade-in text-xs">
                   <div className="flex justify-between items-center pb-2.5 border-b border-white/5 mb-3">
                     <span className="font-bold text-white font-display">Notifications</span>
                     {activeNotificationsCount > 0 && (
@@ -270,8 +270,8 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
               onClick={() => setShowWalletModal(true)}
               className={`px-4 py-1.5 rounded border text-xs font-display font-semibold transition-all duration-200 active:scale-95 flex items-center gap-2 ${
                 walletConnected
-                  ? "bg-[#1c1917]/5 border-[#1c1917]/10 text-[#1c1917]"
-                  : "bg-[#f8f7f6] border-[#dad5d3] hover:bg-[#1c1917]/5 text-zinc-600"
+                  ? "bg-white/10 border-white/20 text-white"
+                  : "bg-white/5 border-[#262626] hover:bg-white/10 text-white"
               }`}
             >
               <Wallet className="w-3.5 h-3.5" />
@@ -285,7 +285,7 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
                   setShowProfileMenu(!showProfileMenu);
                   setShowNotifications(false);
                 }}
-                className="w-8 h-8 rounded bg-[#121212] overflow-hidden flex-shrink-0 border border-[#262626] select-none cursor-pointer hover:border-white/20 transition duration-200"
+                className="w-8 h-8 rounded bg-[#080808] overflow-hidden flex-shrink-0 border border-[#1e1e1e] select-none cursor-pointer hover:border-white/20 transition duration-200"
               >
                 <img
                   alt="User Avatar"
@@ -295,7 +295,7 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
               </div>
 
               {showProfileMenu && (
-                <div className="absolute right-0 mt-2.5 w-48 bg-[#121212] border border-[#262626] rounded-lg shadow-2xl p-2 z-50 animate-fade-in text-xs text-zinc-400">
+                <div className="absolute right-0 mt-2.5 w-48 bg-[#080808] border border-[#1e1e1e] rounded-lg shadow-2xl p-2 z-50 animate-fade-in text-xs text-zinc-400">
                   <div className="p-2 border-b border-white/5 mb-1.5">
                     <span className="font-bold text-white block">{sessionUser.name || "Elena Rostova"}</span>
                     <span className="text-[10px] text-zinc-500 block">
@@ -344,17 +344,17 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
 
       {/* Security Auth Gate Overlay */}
       {isAuthenticated === null ? (
-        <div className="fixed inset-0 z-[200] bg-[#141313] flex items-center justify-center">
+        <div className="fixed inset-0 z-[200] bg-[#0a0a0a] flex items-center justify-center">
           <span className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
         </div>
       ) : !isAuthenticated ? (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#141313] text-[#e7e4ee] font-label select-none bg-grid-cyber overflow-hidden animate-fade-in">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[#0a0a0a] text-[#e7e4ee] font-label select-none bg-grid-cyber overflow-hidden animate-fade-in">
           {/* Ambient background glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-zinc-900/10 blur-[120px] pointer-events-none" />
 
-          <div className="w-full max-w-md p-8 bg-[#121212] border border-[#262626] rounded-xl text-center space-y-6 relative z-10 shadow-2xl">
+          <div className="w-full max-w-md p-8 bg-[#080808] border border-[#1e1e1e] rounded-xl text-center space-y-6 relative z-10 shadow-2xl">
             <div className="flex flex-col items-center gap-3">
-              <div className="w-14 h-14 rounded bg-[#141313] border border-[#262626] flex items-center justify-center text-white mb-2">
+              <div className="w-14 h-14 rounded bg-[#0a0a0a] border border-[#1e1e1e] flex items-center justify-center text-white mb-2">
                 <Terminal className="w-7 h-7 text-white" />
               </div>
               <h2 className="text-2xl font-display font-extrabold text-white tracking-tighter uppercase leading-none">
@@ -365,7 +365,7 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
               </span>
             </div>
 
-            <div className="p-4 rounded bg-[#141313] border border-[#262626] text-xs text-zinc-400 leading-relaxed font-mono text-left">
+            <div className="p-4 rounded bg-[#0a0a0a] border border-[#1e1e1e] text-xs text-zinc-400 leading-relaxed font-mono text-left">
               <span className="text-white font-bold block mb-1">🔐 SYSTEM STATUS: LOCKED</span>
               Authentication signature required. Access is strictly limited to authorized domain-expert nodes with verified active credentials.
             </div>
@@ -404,7 +404,7 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
       {/* Simulated Wallet connection modal (Rendered at Root Level to avoid frame clipping) */}
       {showWalletModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-sm p-6 bg-[#121212] border border-[#262626] rounded relative overflow-hidden">
+          <div className="w-full max-w-sm p-6 bg-[#080808] border border-[#1e1e1e] rounded relative overflow-hidden">
             <h3 className="text-sm font-display font-bold text-white mb-2 flex items-center gap-2">
               <Wallet className="w-4 h-4 text-[#ffffff]" />
               Sovereign Wallet Node
@@ -420,10 +420,10 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
               </div>
             ) : walletConnected ? (
               <div className="space-y-4">
-                <div className="p-3.5 rounded bg-[#141313] border border-[#262626] space-y-2.5">
+                <div className="p-3.5 rounded bg-[#0a0a0a] border border-[#1e1e1e] space-y-2.5">
                   <div className="flex justify-between items-center text-[10px] font-mono text-zinc-500">
                     <span>Wallet address</span>
-                    <span className="text-[#10B981]">CONNECTED</span>
+                    <span className="text-[#A8A8A8]">CONNECTED</span>
                   </div>
                   <span className="text-xs font-mono text-white select-all block break-all font-semibold">
                     {walletAddress}
@@ -437,7 +437,7 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-mono text-zinc-500">
                     <span>Mainnet Status</span>
-                    <span className="text-[#10B981]">ACTIVE NODE</span>
+                    <span className="text-[#A8A8A8]">ACTIVE NODE</span>
                   </div>
                 </div>
 
@@ -447,7 +447,7 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
                       navigator.clipboard.writeText(walletAddress);
                       alert("Address copied to clipboard!");
                     }}
-                    className="flex-grow py-2 border border-[#262626] hover:bg-white/5 text-white text-xs font-semibold rounded transition"
+                    className="flex-grow py-2 border border-[#1e1e1e] hover:bg-white/5 text-white text-xs font-semibold rounded transition"
                   >
                     Copy Address
                   </button>
@@ -463,21 +463,21 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
               <div className="space-y-2">
                 <button
                   onClick={() => handleConnectWallet("metamask")}
-                  className="w-full py-2.5 px-4 rounded bg-[#141313] border border-[#262626] hover:border-white/20 text-xs text-left text-white font-semibold flex items-center justify-between transition-all"
+                  className="w-full py-2.5 px-4 rounded bg-[#0a0a0a] border border-[#1e1e1e] hover:border-white/20 text-xs text-left text-white font-semibold flex items-center justify-between transition-all"
                 >
                   <span>MetaMask Extension</span>
                   <span className="text-[10px] text-zinc-500">PROV_1</span>
                 </button>
                 <button
                   onClick={() => handleConnectWallet("coinbase")}
-                  className="w-full py-2.5 px-4 rounded bg-[#141313] border border-[#262626] hover:border-white/20 text-xs text-left text-white font-semibold flex items-center justify-between transition-all"
+                  className="w-full py-2.5 px-4 rounded bg-[#0a0a0a] border border-[#1e1e1e] hover:border-white/20 text-xs text-left text-white font-semibold flex items-center justify-between transition-all"
                 >
                   <span>Coinbase Wallet</span>
                   <span className="text-[10px] text-zinc-500">PROV_2</span>
                 </button>
                 <button
                   onClick={() => handleConnectWallet("axiom-node")}
-                  className="w-full py-2.5 px-4 rounded bg-[#141313] border border-[#262626] hover:border-white/20 text-xs text-left text-white font-semibold flex items-center justify-between transition-all"
+                  className="w-full py-2.5 px-4 rounded bg-[#0a0a0a] border border-[#1e1e1e] hover:border-white/20 text-xs text-left text-white font-semibold flex items-center justify-between transition-all"
                 >
                   <span>Axiom Local Client Key</span>
                   <span className="text-[10px] text-zinc-500">NATIVE</span>
@@ -497,3 +497,5 @@ export default function ExpertLayout({ children }: ExpertLayoutProps) {
     </div>
   );
 }
+
+

@@ -83,7 +83,7 @@ export default function TerminalsPage() {
           }}
         />
         <div className="absolute top-[-5%] left-[-15%] w-[60%] h-[55%] rounded-full bg-[#ffffff]/10 blur-[130px]" />
-        <div className="absolute bottom-[10%] right-[-5%] w-[55%] h-[55%] rounded-full bg-[#10B981]/5 blur-[140px]" />
+        <div className="absolute bottom-[10%] right-[-5%] w-[55%] h-[55%] rounded-full bg-[#A8A8A8]/5 blur-[140px]" />
       </div>
 
       {/* HEADER */}
@@ -135,7 +135,7 @@ export default function TerminalsPage() {
           <h1 className="text-4xl lg:text-5xl font-display font-bold text-white tracking-tight">
             Protocol Terminals &amp; Directories
           </h1>
-          <p className="text-sm text-zinc-600 max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm text-zinc-400 max-w-xl mx-auto leading-relaxed">
             Direct access channels into Axiom's specialist validation pipelines, enterprise marketplace hubs, model ranking index, and administrator queue consoles.
           </p>
         </div>
@@ -151,7 +151,7 @@ export default function TerminalsPage() {
                     <Icon className="w-3.5 h-3.5" /> {node.accentText}
                   </div>
                   <h3 className="text-xl font-bold font-display text-white">{node.title}</h3>
-                  <p className="text-xs text-zinc-600 leading-relaxed font-sans">{node.desc}</p>
+                  <p className="text-xs text-zinc-400 leading-relaxed font-sans">{node.desc}</p>
                 </div>
 
                 <div className="shrink-0 flex items-center md:justify-end">
@@ -191,7 +191,7 @@ export default function TerminalsPage() {
           </div>
 
           <div className="flex items-center gap-2 select-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A8A8A8]" />
             <span className="text-[10px] text-zinc-400 font-bold tracking-wider font-mono">
               ALL PROTOCOL NODES OPERATIONAL
             </span>

@@ -57,7 +57,7 @@ export default function PrivacyPage() {
           }}
         />
         <div className="absolute top-[-5%] right-[-10%] w-[60%] h-[50%] rounded-full bg-[#ffffff]/10 blur-[130px]" />
-        <div className="absolute bottom-[15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-[#10B981]/5 blur-[140px]" />
+        <div className="absolute bottom-[15%] left-[-10%] w-[55%] h-[55%] rounded-full bg-[#A8A8A8]/5 blur-[140px]" />
       </div>
 
       {/* HEADER */}
@@ -115,7 +115,7 @@ export default function PrivacyPage() {
           <h1 className="text-4xl lg:text-5xl font-display font-bold text-white tracking-tight">
             Privacy Ledger &amp; Security Assurances
           </h1>
-          <p className="text-sm text-zinc-600 max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm text-zinc-400 max-w-xl mx-auto leading-relaxed">
             Axiom utilizes mathematical proofs and zero-knowledge credential isolation to sanitise enterprise prompt data, guaranteeing total compliance and zero raw information leaks.
           </p>
         </div>
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
                   <Icon className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold font-display text-white">{p.title}</h3>
-                <p className="text-xs text-zinc-600 leading-relaxed font-sans">{p.desc}</p>
+                <p className="text-xs text-zinc-400 leading-relaxed font-sans">{p.desc}</p>
               </div>
             );
           })}
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
             </p>
             <p className="flex justify-between">
               <span>[CONSENSUS] Randomized blind verification slots allocated to 12 triage nodes...</span>
-              <span className="text-zinc-600">ISOLATED</span>
+              <span className="text-zinc-400">ISOLATED</span>
             </p>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default function PrivacyPage() {
           </div>
 
           <div className="flex items-center gap-2 select-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A8A8A8]" />
             <span className="text-[10px] text-zinc-400 font-bold tracking-wider font-mono">
               ALL PROTOCOL NODES OPERATIONAL
             </span>

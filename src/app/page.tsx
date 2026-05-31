@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -193,26 +193,25 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#141313] text-[#e7e4ee] font-sans selection:bg-[#ffffff]/30 selection:text-[#ffffff] overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#080808] text-[#e7e4ee] font-sans selection:bg-[#ffffff]/30 selection:text-[#ffffff] overflow-x-hidden relative">
       
       {/* AMBIENT NEON GLOW DECORATIONS (Stitch MCP - Neon Nocturne Guidelines) */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         {/* Subtle Cyber Grid */}
-        <div 
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
-            backgroundSize: '50px 50px',
-          }}
-        />
+                <div className="perspective-grid" style={{position:"fixed",zIndex:0,opacity:0.4,pointerEvents:"none",top:0,left:0,width:"100%",height:"100%"}}><div className="perspective-grid-inner" /></div>
+        <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",zIndex:0,pointerEvents:"none",overflow:"hidden",perspective:"400px"}}>
+  <div style={{position:"absolute",width:"200%",height:"200%",top:"-50%",left:"-50%",backgroundImage:"linear-gradient(to right, rgba(180,180,180,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(180,180,180,0.07) 1px, transparent 1px)",backgroundSize:"60px 60px",transform:"rotateX(65deg) translateY(-20px)",animation:"grid-move 8s linear infinite"}} />
+</div>
+<div style={{position:"fixed",top:"-200px",left:"-200px",width:"600px",height:"600px",borderRadius:"50%",background:"radial-gradient(circle, rgba(180,180,180,0.15) 0%, transparent 70%)",animation:"aurora-drift-1 12s ease-in-out infinite",pointerEvents:"none",zIndex:0}} />
+<div style={{position:"fixed",bottom:"-150px",right:"-150px",width:"500px",height:"500px",borderRadius:"50%",background:"radial-gradient(circle, rgba(180,180,180,0.1) 0%, transparent 70%)",animation:"aurora-drift-2 15s ease-in-out infinite",pointerEvents:"none",zIndex:0}} />
         {/* Soft Tonal Ambient Shadows (No line rule) */}
         <div className="absolute top-[-5%] left-[-10%] w-[60%] h-[50%] rounded-full bg-[#ffffff]/10 blur-[130px] " />
         <div className="absolute top-[35%] right-[-10%] w-[60%] h-[60%] rounded-full bg-[#ffffff]/5 blur-[160px]" />
-        <div className="absolute bottom-[10%] left-[5%] w-[55%] h-[55%] rounded-full bg-[#10B981]/5 blur-[140px]" />
+        <div className="absolute bottom-[10%] left-[5%] w-[55%] h-[55%] rounded-full bg-[#A8A8A8]/5 blur-[140px]" />
       </div>
 
       {/* PERSISTENT HEADER NAVIGATION */}
-      <header className="sticky top-0 z-50 w-full bg-[#141313]/80 backdrop-blur-xl border-b border-[#262626]">
+      <header className="sticky top-0 z-50 w-full bg-[#080808]/80 backdrop-blur-xl border-b border-[#181818]">
         <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <LogoIcon />
@@ -232,13 +231,13 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             <Link 
               href="/expert" 
-              className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#262626] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
+              className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#181818] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
             >
               Expert Hub
             </Link>
             <Link 
               href="/client" 
-              className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#262626] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
+              className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#181818] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
             >
               Enterprise Lab
             </Link>
@@ -257,14 +256,41 @@ export default function HomePage() {
         {/* HERO SECTION */}
         <section className="pt-16 pb-20 text-center lg:text-left grid lg:grid-cols-12 gap-gutter items-center">
           <div className="lg:col-span-7 flex flex-col gap-6">
-            <div className="inline-flex items-center gap-2 bg-[#121212] border border-[#262626] px-3 py-1 rounded text-label-sm font-label-sm text-[#dae2fd] self-center lg:self-start w-fit uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 bg-[#080808] border border-[#181818] px-3 py-1 rounded text-label-sm font-label-sm text-[#dae2fd] self-center lg:self-start w-fit uppercase tracking-widest">
               <span className="w-1.5 h-1.5 rounded-full bg-[#ffffff]" />
               SOVEREIGN AI TRAINING DATA LAYER
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight font-display">
-              Uncompromising speed.<br />
-              <span className="text-zinc-500 font-medium">Unquestionable precision.</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.12] font-display">
+              {/* Line 1 — chrome shimmer: white → silver → white */}
+              <span
+                style={{
+                  background: "linear-gradient(100deg, #ffffff 0%, #C0C0C0 35%, #E8E8E8 55%, #909090 72%, #ffffff 100%)",
+                  backgroundSize: "200% auto",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  animation: "shimmer-x 5s linear infinite",
+                  display: "inline-block",
+                }}
+              >
+                Uncompromising speed.
+              </span>
+              <br />
+              {/* Line 2 — muted silver ghost */}
+              <span
+                style={{
+                  background: "linear-gradient(100deg, rgba(180,180,180,0.7) 0%, rgba(220,220,220,0.45) 50%, rgba(160,160,160,0.55) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  display: "inline-block",
+                  fontWeight: 500,
+                  filter: "drop-shadow(0 0 20px rgba(200,200,200,0.12))",
+                }}
+              >
+                Unquestionable precision.
+              </span>
             </h1>
 
             <p className="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-body-lg">
@@ -287,7 +313,7 @@ export default function HomePage() {
             </div>
 
             {/* TRUSTED BY / TAGS */}
-            <div className="pt-8 border-t border-[#262626] mt-4">
+            <div className="pt-8 border-t border-[#181818] mt-4">
               <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 block mb-4">
                 Engineered for Next-Gen Architectures
               </span>
@@ -305,9 +331,9 @@ export default function HomePage() {
 
           {/* DYNAMIC REAL-TIME STATS CARD */}
           <div className="lg:col-span-5">
-            <div className="bg-[#121212] border border-[#262626] rounded-xl p-6 sm:p-8">
+            <div className="bg-[#080808] border border-[#181818] rounded-xl p-6 sm:p-8">
               
-              <div className="flex items-center justify-between pb-6 border-b border-[#262626]">
+              <div className="flex items-center justify-between pb-6 border-b border-[#181818]">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#ffffff]" />
                   <span className="text-xs font-display text-zinc-400 uppercase tracking-wider font-semibold">
@@ -362,22 +388,22 @@ export default function HomePage() {
                   <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono">
                     {networkStats.gasSaved.toFixed(1)}%
                   </div>
-                  <span className="text-[9px] text-[#10B981] font-mono mt-1 block font-bold">
+                  <span className="text-[9px] text-[#A8A8A8] font-mono mt-1 block font-bold">
                     vs consulting firms
                   </span>
                 </div>
               </div>
 
               {/* Live Triage Consensus Stream Console */}
-              <div className="mt-8 pt-6 border-t border-[#262626] space-y-3">
+              <div className="mt-8 pt-6 border-t border-[#181818] space-y-3">
                 <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono">
                   <span>LIVE TRIAGE CONSENSUS STREAM</span>
-                  <span className="text-[#10B981] font-bold uppercase tracking-wider flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
+                  <span className="text-[#A8A8A8] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#A8A8A8] animate-ping" />
                     Node Stream Active
                   </span>
                 </div>
-                <div className="bg-[#141313] border border-white/5 p-4 rounded-xl font-mono text-[9px] leading-relaxed space-y-2 h-36 overflow-hidden flex flex-col justify-end">
+                <div className="bg-[#080808] border border-white/5 p-4 rounded-xl font-mono text-[9px] leading-relaxed space-y-2 h-36 overflow-hidden flex flex-col justify-end">
                   {consensusLogs.map((log, index) => {
                     const isSuccess = log.includes("[SUCCESS]");
                     const isCalibrating = log.includes("[CALIBRATING]");
@@ -385,7 +411,7 @@ export default function HomePage() {
                     
                     return (
                       <div key={index} className="truncate transition-all duration-300 transform translate-y-0 opacity-80 hover:opacity-100">
-                        {isSuccess && <span className="text-[#10B981] font-bold mr-1">[SUCCESS]</span>}
+                        {isSuccess && <span className="text-[#A8A8A8] font-bold mr-1">[SUCCESS]</span>}
                         {isCalibrating && <span className="text-yellow-400 font-bold mr-1">[CALIBRATING]</span>}
                         {isInfo && <span className="text-zinc-400 font-bold mr-1">[INFO]</span>}
                         {!isSuccess && !isCalibrating && !isInfo && <span className="text-[#ffffff] font-bold mr-1">[CONSENSUS]</span>}
@@ -420,9 +446,9 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Feature 1 */}
-            <div className="bg-[#121212] border border-[#262626] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
+            <div className="bg-[#080808] border border-[#181818] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
               <div>
-                <div className="w-12 h-12 rounded bg-[#141313] border border-[#262626] flex items-center justify-center mb-5 group-hover:border-[#ffffff]/50 transition-colors duration-200">
+                <div className="w-12 h-12 rounded bg-[#080808] border border-[#181818] flex items-center justify-center mb-5 group-hover:border-[#ffffff]/50 transition-colors duration-200">
                   <Shield className="w-5 h-5 text-[#ffffff]" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2 font-display">Consensus Validation</h3>
@@ -436,9 +462,9 @@ export default function HomePage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-[#121212] border border-[#262626] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
+            <div className="bg-[#080808] border border-[#181818] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
               <div>
-                <div className="w-12 h-12 rounded bg-[#141313] border border-[#262626] flex items-center justify-center mb-5 group-hover:border-[#ffffff]/50 transition-colors duration-200">
+                <div className="w-12 h-12 rounded bg-[#080808] border border-[#181818] flex items-center justify-center mb-5 group-hover:border-[#ffffff]/50 transition-colors duration-200">
                   <Cpu className="w-5 h-5 text-[#ffffff]" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2 font-display">Fractional Ownership</h3>
@@ -452,25 +478,25 @@ export default function HomePage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-[#121212] border border-[#262626] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
+            <div className="bg-[#080808] border border-[#181818] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
               <div>
-                <div className="w-12 h-12 rounded bg-[#141313] border border-[#262626] flex items-center justify-center mb-5 group-hover:border-[#10B981]/50 transition-colors duration-200">
-                  <Database className="w-5 h-5 text-[#10B981]" />
+                <div className="w-12 h-12 rounded bg-[#080808] border border-[#181818] flex items-center justify-center mb-5 group-hover:border-[#A8A8A8]/50 transition-colors duration-200">
+                  <Database className="w-5 h-5 text-[#A8A8A8]" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2 font-display">Structured DP</h3>
                 <p className="text-zinc-400 text-xs leading-relaxed font-body-md">
                   Built-in mathematical models automatically mask individual variables, preventing corporate dataset leakage or alignment reverse-engineering.
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-[#10B981] mt-6 block tracking-widest font-semibold uppercase">
+              <span className="text-[10px] font-mono text-[#A8A8A8] mt-6 block tracking-widest font-semibold uppercase">
                 DP-SGD Compliance
               </span>
             </div>
 
             {/* Feature 4 */}
-            <div className="bg-[#121212] border border-[#262626] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
+            <div className="bg-[#080808] border border-[#181818] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-6 flex flex-col justify-between group">
               <div>
-                <div className="w-12 h-12 rounded bg-[#141313] border border-[#262626] flex items-center justify-center mb-5 group-hover:border-[#ffffff]/50 transition-colors duration-200">
+                <div className="w-12 h-12 rounded bg-[#080808] border border-[#181818] flex items-center justify-center mb-5 group-hover:border-[#ffffff]/50 transition-colors duration-200">
                   <Key className="w-5 h-5 text-[#ffffff]" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2 font-display">Instant Payouts</h3>
@@ -599,7 +625,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Info Card */}
-                    <div className="bg-[#141313] border border-[#262626] rounded-xl p-4 text-xs text-zinc-400 mt-2 flex gap-3 items-start font-body-md">
+                    <div className="bg-[#080808] border border-[#181818] rounded-xl p-4 text-xs text-zinc-400 mt-2 flex gap-3 items-start font-body-md">
                       <Info className="w-5 h-5 text-[#ffffff] shrink-0 mt-0.5" />
                       <div>
                         <span className="font-semibold text-zinc-200 block mb-1 font-mono">How is this compounding?</span>
@@ -609,7 +635,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Right: Summary Box */}
-                  <div className="lg:col-span-5 bg-[#141313] border border-[#ffffff]/20 rounded-xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+                  <div className="lg:col-span-5 bg-[#080808] border border-[#ffffff]/20 rounded-xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
                     
                     <div className="space-y-6">
                       <div>
@@ -631,7 +657,7 @@ export default function HomePage() {
                         </span>
                       </div>
 
-                      <div className="space-y-3 pt-4 border-t border-[#262626] text-xs font-mono">
+                      <div className="space-y-3 pt-4 border-t border-[#181818] text-xs font-mono">
                         <div className="flex justify-between text-zinc-400">
                           <span>Base Task Pay (Upfront):</span>
                           <span className="text-white font-semibold">${expertActiveEarnings.toLocaleString('en-US')}</span>
@@ -640,14 +666,14 @@ export default function HomePage() {
                           <span>Axiom Secondary Royalties:</span>
                           <span className="text-[#ffffff] font-semibold">${expertRoyaltyEarnings.toLocaleString('en-US')}</span>
                         </div>
-                        <div className="flex justify-between text-zinc-500 pt-2 border-t border-[#262626]">
+                        <div className="flex justify-between text-zinc-500 pt-2 border-t border-[#181818]">
                           <span>Traditional mechanical payout:</span>
                           <span className="line-through">${mturkBaselineEarnings.toLocaleString('en-US')}</span>
                         </div>
                       </div>
 
                       {/* Performance Badge */}
-                      <div className="bg-[#ffffff]/10 border border-[#262626] rounded p-3 text-center mt-2">
+                      <div className="bg-[#ffffff]/10 border border-[#181818] rounded p-3 text-center mt-2">
                         <span className="text-xs text-[#ffffff] font-semibold block font-mono">
                           ≡ƒôê {expertRoyaltyMultiplier}x Yield Performance
                         </span>
@@ -753,7 +779,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Comparison note */}
-                    <div className="bg-[#141313] border border-[#262626] rounded-xl p-4 text-xs text-zinc-400 flex gap-3 items-start mt-2 font-body-md">
+                    <div className="bg-[#080808] border border-[#181818] rounded-xl p-4 text-xs text-zinc-400 flex gap-3 items-start mt-2 font-body-md">
                       <Info className="w-5 h-5 text-[#ffffff] shrink-0 mt-0.5" />
                       <div>
                         <span className="font-semibold text-zinc-200 block mb-1 font-mono">Why is there such a massive gap?</span>
@@ -763,7 +789,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Right: Summary Box */}
-                  <div className="lg:col-span-5 bg-[#141313] border border-[#ffffff]/20 rounded-xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+                  <div className="lg:col-span-5 bg-[#080808] border border-[#ffffff]/20 rounded-xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
                     
                     <div className="space-y-6">
                       <div>
@@ -785,7 +811,7 @@ export default function HomePage() {
                         </span>
                       </div>
 
-                      <div className="space-y-3 pt-4 border-t border-[#262626] text-xs font-mono">
+                      <div className="space-y-3 pt-4 border-t border-[#181818] text-xs font-mono">
                         <div className="flex justify-between text-zinc-400">
                           <span>Legacy Consulting Cost (Vetto):</span>
                           <span className="text-white font-semibold">${vettoCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
@@ -794,14 +820,14 @@ export default function HomePage() {
                           <span>Axiom Ecosystem Cost:</span>
                           <span className="text-[#ffffff] font-semibold">${axiomCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
                         </div>
-                        <div className="flex justify-between text-zinc-500 pt-2 border-t border-[#262626]">
+                        <div className="flex justify-between text-zinc-500 pt-2 border-t border-[#181818]">
                           <span>Setup / Onboarding Overhead:</span>
                           <span className="text-emerald-400 font-bold">$0.00 <span className="line-through text-zinc-600 font-normal">($15k agency fee)</span></span>
                         </div>
                       </div>
 
                       {/* Quality Assurance Badge */}
-                      <div className="bg-[#ffffff]/10 border border-[#262626] rounded p-3 text-center mt-2">
+                      <div className="bg-[#ffffff]/10 border border-[#181818] rounded p-3 text-center mt-2">
                         <span className="text-xs text-[#ffffff] font-semibold block font-mono">
                           ΓÜí 100% Validated Integrity & Zero Risk
                         </span>
@@ -845,7 +871,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16 items-stretch">
             
             {/* Card 1: Shared Dataset Licensing */}
-            <div className="bg-[#121212] border border-[#262626] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-8 flex flex-col justify-between relative group overflow-hidden">
+            <div className="bg-[#080808] border border-[#181818] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-8 flex flex-col justify-between relative group overflow-hidden">
               <div>
                 <span className="text-[10px] font-mono font-bold text-[#ffffff] tracking-widest uppercase block mb-3">
                   COMMERCIAL SHARED
@@ -883,7 +909,7 @@ export default function HomePage() {
             </div>
 
             {/* Card 2: Custom Specialist Sourcing */}
-            <div className="bg-[#121212] border-2 border-[#ffffff]/50 rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-8 flex flex-col justify-between relative group overflow-hidden">
+            <div className="bg-[#080808] border-2 border-[#ffffff]/50 rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-8 flex flex-col justify-between relative group overflow-hidden">
               <div>
                 <span className="text-[10px] font-mono font-bold text-[#ffffff] tracking-widest uppercase block mb-3">
                   ACCELERATED ADJUDICATION
@@ -920,9 +946,9 @@ export default function HomePage() {
             </div>
 
             {/* Card 3: Exclusive Buyout */}
-            <div className="bg-[#121212] border border-[#262626] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-8 flex flex-col justify-between relative group overflow-hidden">
+            <div className="bg-[#080808] border border-[#181818] rounded-xl hover:bg-[#1e293b] transition-all duration-300 p-8 flex flex-col justify-between relative group overflow-hidden">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#10B981] tracking-widest uppercase block mb-3">
+                <span className="text-[10px] font-mono font-bold text-[#A8A8A8] tracking-widest uppercase block mb-3">
                   COMPLETE MONOPOLY IP
                 </span>
                 <h3 className="text-2xl font-bold text-white mb-1.5 font-display">Exclusive Buyout</h3>
@@ -935,15 +961,15 @@ export default function HomePage() {
                 
                 <ul className="space-y-3.5 text-xs text-zinc-300 font-medium mb-8 font-body-md">
                   <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-[#10B981] shrink-0" />
+                    <Check className="w-4 h-4 text-[#A8A8A8] shrink-0" />
                     <span>ERC-1155 smart license buyout</span>
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-[#10B981] shrink-0" />
+                    <Check className="w-4 h-4 text-[#A8A8A8] shrink-0" />
                     <span>Complete dataset exclusion locks</span>
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <Check className="w-4 h-4 text-[#10B981] shrink-0" />
+                    <Check className="w-4 h-4 text-[#A8A8A8] shrink-0" />
                     <span>Attributed validation nodes payouts</span>
                   </li>
                 </ul>
@@ -959,15 +985,15 @@ export default function HomePage() {
           </div>
 
           {/* COMPARATIVE LANDSCAPE TABLE */}
-          <div className="bg-[#121212] border border-[#262626] rounded-xl overflow-hidden max-w-6xl mx-auto">
+          <div className="bg-[#080808] border border-[#181818] rounded-xl overflow-hidden max-w-6xl mx-auto">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#262626] bg-[#141313] font-mono text-[11px] text-zinc-400 uppercase tracking-wider">
+                  <tr className="border-b border-[#181818] bg-[#080808] font-mono text-[11px] text-zinc-400 uppercase tracking-wider">
                     <th className="p-5 font-bold">Core Matrix Features</th>
                     <th className="p-5 font-bold">Legacy Consulting (Vetto)</th>
                     <th className="p-5 font-bold">Legacy Crowd (MTurk)</th>
-                    <th className="p-5 font-bold bg-[#ffffff]/10 text-[#ffffff] font-semibold border-x border-[#262626]">
+                    <th className="p-5 font-bold bg-[#ffffff]/10 text-[#ffffff] font-semibold border-x border-[#181818]">
                       Axiom Protocol Layer
                     </th>
                   </tr>
@@ -977,7 +1003,7 @@ export default function HomePage() {
                     <td className="p-5 font-semibold text-white">Secondary Marketplace Royalties</td>
                     <td className="p-5 text-zinc-500">Γ¥î Zero (Agency retains all value)</td>
                     <td className="p-5 text-zinc-500">Γ¥î Zero (Platform owns data)</td>
-                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#262626] font-semibold text-[#ffffff]">
+                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#181818] font-semibold text-[#ffffff]">
                       <span className="flex items-center gap-1.5 font-mono">
                          Yes ($3.50 per license run)
                       </span>
@@ -987,7 +1013,7 @@ export default function HomePage() {
                     <td className="p-5 font-semibold text-white">Data Cost per Annotation</td>
                     <td className="p-5 text-zinc-400">$2.40 - $7.20 (Extremely Premium markup)</td>
                     <td className="p-5 text-zinc-400">$0.80 - $1.80 (Low quality overhead)</td>
-                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#262626] font-semibold text-[#ffffff]">
+                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#181818] font-semibold text-[#ffffff]">
                       <span className="flex items-center gap-1.5 font-mono">
                          $0.50 (Unmatched programmatic cost)
                       </span>
@@ -997,7 +1023,7 @@ export default function HomePage() {
                     <td className="p-5 font-semibold text-white">Verification Engine</td>
                     <td className="p-5 text-zinc-400">Manual review loops (6-8 weeks)</td>
                     <td className="p-5 text-zinc-400">Basic algorithms (Spam vulnerability)</td>
-                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#262626] font-semibold text-[#ffffff]">
+                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#181818] font-semibold text-[#ffffff]">
                       <span className="flex items-center gap-1.5 font-mono">
                          Peer-Audited Consensus
                       </span>
@@ -1007,7 +1033,7 @@ export default function HomePage() {
                     <td className="p-5 font-semibold text-white">Domain Expert Pool Level</td>
                     <td className="p-5 text-zinc-400">Limited (Slow manual recruitment)</td>
                     <td className="p-5 text-zinc-400">Generalists (Lacks specialized logic)</td>
-                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#262626] font-semibold text-[#ffffff]">
+                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#181818] font-semibold text-[#ffffff]">
                       <span className="flex items-center gap-1.5 font-mono">
                          Decentralized Sovereign Nodes
                       </span>
@@ -1017,7 +1043,7 @@ export default function HomePage() {
                     <td className="p-5 font-semibold text-white">Cryptographic Data Provenance</td>
                     <td className="p-5 text-zinc-500">Γ¥î None (Self-reporting contract)</td>
                     <td className="p-5 text-zinc-500">Γ¥î None (Complete origin opacity)</td>
-                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#262626] font-semibold text-[#ffffff]">
+                    <td className="p-5 bg-[#ffffff]/5 border-x border-[#181818] font-semibold text-[#ffffff]">
                       <span className="flex items-center gap-1.5 font-mono">
                          On-Chain Origin Hash
                       </span>
@@ -1049,14 +1075,14 @@ export default function HomePage() {
             {testimonials.map((test, index) => (
               <div 
                 key={index} 
-                className="bg-[#121212] border border-[#262626] rounded-xl hover:bg-[#1e293b] hover:border-[#ffffff]/50 transition-all duration-300 p-6 sm:p-8 flex flex-col justify-between relative group overflow-hidden"
+                className="bg-[#080808] border border-[#181818] rounded-xl hover:bg-[#1e293b] hover:border-[#ffffff]/50 transition-all duration-300 p-6 sm:p-8 flex flex-col justify-between relative group overflow-hidden"
               >
                 <div className="text-[#ffffff] text-5xl font-serif leading-none mb-4 group-hover:scale-110 transition-transform select-none">&ldquo;</div>
                 <p className="text-zinc-300 text-sm leading-relaxed mb-6 font-body-md">
                   {test.quote}
                 </p>
-                <div className="flex items-center gap-4 border-t border-[#262626] pt-4">
-                  <div className="w-10 h-10 rounded bg-[#141313] border border-[#262626] flex items-center justify-center font-bold text-[#ffffff] text-sm font-mono uppercase">
+                <div className="flex items-center gap-4 border-t border-[#181818] pt-4">
+                  <div className="w-10 h-10 rounded bg-[#080808] border border-[#181818] flex items-center justify-center font-bold text-[#ffffff] text-sm font-mono uppercase">
                     {test.avatarSeed.slice(0, 2)}
                   </div>
                   <div>
@@ -1093,26 +1119,26 @@ export default function HomePage() {
                   placeholder="Search protocol details..."
                   value={faqSearch}
                   onChange={(e) => setFaqSearch(e.target.value)}
-                  className="w-full px-5 py-3.5 pl-11 rounded bg-[#141313] border border-[#262626] focus:border-[#ffffff] focus:outline-none text-xs sm:text-sm text-white font-medium transition-colors"
+                  className="w-full px-5 py-3.5 pl-11 rounded bg-[#080808] border border-[#181818] focus:border-[#ffffff] focus:outline-none text-xs sm:text-sm text-white font-medium transition-colors"
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
               </div>
               <div className="flex gap-2 w-full sm:w-auto overflow-x-auto shrink-0 pb-1 sm:pb-0 font-mono">
                 <button 
                   onClick={() => { setFaqCategory("all"); setOpenFaqIndex(null); }}
-                  className={`px-4 py-2 rounded text-xs font-bold transition-all ${faqCategory === "all" ? "bg-white text-black" : "bg-[#121212] border border-[#262626] text-zinc-400 hover:text-white"}`}
+                  className={`px-4 py-2 rounded text-xs font-bold transition-all ${faqCategory === "all" ? "bg-white text-black" : "bg-[#080808] border border-[#181818] text-zinc-400 hover:text-white"}`}
                 >
                   All
                 </button>
                 <button 
                   onClick={() => { setFaqCategory("expert"); setOpenFaqIndex(null); }}
-                  className={`px-4 py-2 rounded text-xs font-bold transition-all ${faqCategory === "expert" ? "bg-white text-black" : "bg-[#121212] border border-[#262626] text-zinc-400 hover:text-white"}`}
+                  className={`px-4 py-2 rounded text-xs font-bold transition-all ${faqCategory === "expert" ? "bg-white text-black" : "bg-[#080808] border border-[#181818] text-zinc-400 hover:text-white"}`}
                 >
                   Experts
                 </button>
                 <button 
                   onClick={() => { setFaqCategory("client"); setOpenFaqIndex(null); }}
-                  className={`px-4 py-2 rounded text-xs font-bold transition-all ${faqCategory === "client" ? "bg-white text-black" : "bg-[#121212] border border-[#262626] text-zinc-400 hover:text-white"}`}
+                  className={`px-4 py-2 rounded text-xs font-bold transition-all ${faqCategory === "client" ? "bg-white text-black" : "bg-[#080808] border border-[#181818] text-zinc-400 hover:text-white"}`}
                 >
                   Clients
                 </button>
@@ -1127,7 +1153,7 @@ export default function HomePage() {
                 return (
                   <div 
                     key={index} 
-                    className="bg-[#121212] border border-[#262626] hover:border-white/20 transition-all duration-300 rounded overflow-hidden"
+                    className="bg-[#080808] border border-[#181818] hover:border-white/20 transition-all duration-300 rounded overflow-hidden"
                   >
                     <button 
                       onClick={() => setOpenFaqIndex(isOpen ? null : index)}
@@ -1142,7 +1168,7 @@ export default function HomePage() {
                     </button>
                     
                     {isOpen && (
-                      <div className="px-6 pb-6 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-[#262626] pt-4 font-body-md">
+                      <div className="px-6 pb-6 text-xs sm:text-sm text-zinc-400 leading-relaxed border-t border-[#181818] pt-4 font-body-md">
                         {faq.answer}
                       </div>
                     )}
@@ -1159,7 +1185,7 @@ export default function HomePage() {
 
         {/* BOTTOM FINAL CONVERSION BLOCK */}
         <section className="py-16">
-          <div className="relative rounded-xl bg-[#121212] border border-[#262626] p-8 sm:p-16 text-center max-w-5xl mx-auto">
+          <div className="relative rounded-xl bg-[#080808] border border-[#181818] p-8 sm:p-16 text-center max-w-5xl mx-auto">
             
             <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#ffffff] mb-3 block">
               IMMEDIATE PROTOCOL ENROLLMENT
@@ -1192,7 +1218,7 @@ export default function HomePage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-[#262626] bg-[#141313] z-20 relative py-12 text-xs text-zinc-500 font-mono">
+      <footer className="border-t border-[#181818] bg-[#080808] z-20 relative py-12 text-xs text-zinc-500 font-mono">
         <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
             <LogoIcon />
@@ -1202,17 +1228,17 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-wrap gap-x-8 gap-y-2 justify-center text-[10px]">
-            <span>┬⌐ 2026 Axiom Protocol Layer. All rights reserved.</span>
+            <span>© 2026 Axiom Protocol Layer. All rights reserved.</span>
             <span className="text-zinc-800">|</span>
-            <a href="#" className="hover:text-white transition-colors">Terminals</a>
+            <Link href="/terminals" className="hover:text-white transition-colors">Terminals</Link>
             <span className="text-zinc-800">|</span>
-            <a href="#" className="hover:text-white transition-colors">Privacy Ledger</a>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Ledger</Link>
             <span className="text-zinc-800">|</span>
-            <a href="#" className="hover:text-white transition-colors">Whitepaper v2.4</a>
+            <Link href="/whitepaper" className="hover:text-white transition-colors">Whitepaper v2.4</Link>
           </div>
 
           <div className="flex items-center gap-2 select-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#A8A8A8]" />
             <span className="text-[10px] text-zinc-400 font-bold tracking-wider font-mono">
               ALL PROTOCOL NODES OPERATIONAL
             </span>
@@ -1222,3 +1248,8 @@ export default function HomePage() {
     </div>
   );
 }
+
+
+
+
+

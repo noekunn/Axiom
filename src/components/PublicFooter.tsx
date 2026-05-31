@@ -31,7 +31,7 @@ export default function PublicFooter() {
         </div>
 
         <div className="flex items-center gap-2 select-none">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#A8A8A8]" />
           <span className="text-[10px] text-zinc-400 font-bold tracking-wider font-mono">
             ALL PROTOCOL NODES OPERATIONAL
           </span>

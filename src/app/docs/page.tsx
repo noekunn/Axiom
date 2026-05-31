@@ -81,7 +81,7 @@ export default function DocsPage() {
           }}
         />
         <div className="absolute top-[-10%] right-[-12%] w-[55%] h-[45%] rounded-full bg-white/10 blur-[130px]" />
-        <div className="absolute bottom-[15%] left-[-10%] w-[50%] h-[45%] rounded-full bg-[#10B981]/5 blur-[140px]" />
+        <div className="absolute bottom-[15%] left-[-10%] w-[50%] h-[45%] rounded-full bg-[#A8A8A8]/5 blur-[140px]" />
       </div>
 
       <header className="sticky top-0 z-50 w-full bg-[#141313]/80 backdrop-blur-xl border-b border-[#262626]">
@@ -192,7 +192,7 @@ export default function DocsPage() {
                 {systemRoutes.map((route) => (
                   <tr key={route.path}>
                     <td className="py-3 pr-4 whitespace-nowrap">
-                      <Link href={route.path} className="text-white hover:text-[#10B981] font-mono transition-colors">
+                      <Link href={route.path} className="text-white hover:text-[#A8A8A8] font-mono transition-colors">
                         {route.path}
                       </Link>
                     </td>
