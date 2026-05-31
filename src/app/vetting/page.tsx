@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import ExpertLayout from "@/components/ExpertLayout";
 
 
@@ -248,6 +249,7 @@ export default function VettingArena() {
 
   // Grading Result State
   const [gradeReport, setGradeReport] = useState<GradeReport | null>(null);
+  const [newlyActivated, setNewlyActivated] = useState(false);
 
   // Level Up Promotion Overlay
   const [showLevelUp, setShowLevelUp] = useState(false);
@@ -631,6 +633,15 @@ export default function VettingArena() {
       localStorage.setItem("axiom_vetting_xp", newXp.toString());
       updateTierForXp(newXp);
 
+      // Node activation hook for shortlisted nodes
+      if (typeof window !== "undefined") {
+        const storedStatus = localStorage.getItem("axiom_expert_status");
+        if (storedStatus === "Shortlisted") {
+          localStorage.setItem("axiom_expert_status", "Approved");
+          setNewlyActivated(true);
+        }
+      }
+
       // Check if user has advanced tiers to fire Level-Up sequence
       if (data.promoted) {
         setTimeout(() => {
@@ -669,15 +680,15 @@ export default function VettingArena() {
       <div className="flex flex-col md:flex-row items-center justify-between border-b border-zinc-800 pb-6 mb-8 gap-4 select-none">
         <div>
           <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 via-zinc-300 to-zinc-400 font-headline">
-            AXIOM <span className="text-[#a5a5ff] font-extrabold text-xs px-2 py-0.5 rounded border border-[#a5a5ff]/20 bg-[#a5a5ff]/5 font-mono">VETTING CORE</span>
+            AXIOM <span className="text-[#ffffff] font-extrabold text-xs px-2 py-0.5 rounded border border-[#ffffff]/20 bg-[#ffffff]/5 font-mono">VETTING CORE</span>
           </h1>
           <p className="text-[10px] text-zinc-500 tracking-wider font-mono">PREMIUM ALGORITHMIC PLAYGROUND</p>
         </div>
 
         {/* Micro XP Profile Summary Widget */}
-        <div className="flex items-center gap-4 bg-zinc-900/50 backdrop-blur-md px-4 py-2.5 rounded-xl border border-zinc-850 shadow-md">
+        <div className="flex items-center gap-4 bg-zinc-900/50 backdrop-blur-md px-4 py-2.5 rounded border border-zinc-850 shadow-md">
           {/* Rank Shield */}
-          <div className={`px-3 py-1.5 rounded-lg bg-gradient-to-br ${tier.color} text-zinc-100 flex flex-col items-center justify-center border border-white/5 shadow-inner`}>
+          <div className={`px-3 py-1.5 rounded-lg bg-gradient-to-br ${tier.color} text-zinc-100 flex flex-col items-center justify-center border border-[#262626] shadow-inner`}>
             <span className="text-[9px] uppercase font-bold tracking-widest text-white/70">RANK</span>
             <span className="text-xs font-extrabold tracking-wide uppercase font-headline">{tier.name}</span>
           </div>
@@ -719,7 +730,7 @@ export default function VettingArena() {
           <div className="space-y-12 animate-fade-in">
             {/* Hero Panel */}
             <div className="text-center max-w-3xl mx-auto space-y-4 py-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/25 bg-indigo-500/5 text-xs text-indigo-300 font-bold uppercase tracking-wider animate-pulse">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/25 bg-indigo-500/5 text-xs text-indigo-300 font-bold uppercase tracking-wider ">
                 <span className="w-2 h-2 rounded-full bg-indigo-400" />
                 Next-Gen Gamified Triage System Active
               </div>
@@ -737,14 +748,13 @@ export default function VettingArena() {
               {/* CARD 1: MEDICAL DIAGNOSIS */}
               <div 
                 onClick={() => handleStartVetting("medical")}
-                className="group relative rounded-2xl border border-zinc-800 bg-[#09090b]/80 p-6 flex flex-col justify-between hover:border-pink-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/5 cursor-pointer hover:-translate-y-1"
+                className="group relative rounded border border-[#262626] bg-[#121212] p-6 flex flex-col justify-between hover:border-white/20 transition-all duration-200 cursor-pointer"
               >
-                {/* Glow filter */}
-                <div className="absolute inset-0 bg-gradient-to-b from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl duration-500 pointer-events-none" />
+                
                 
                 <div className="space-y-6">
                   {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-400 border border-pink-500/20 group-hover:bg-pink-500/20 transition-colors duration-500">
+                  <div className="w-12 h-12 rounded bg-pink-500/10 flex items-center justify-center text-pink-400 border border-pink-500/20 group-hover:bg-pink-500/20 transition-colors duration-500">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
@@ -776,14 +786,13 @@ export default function VettingArena() {
               {/* CARD 2: LEGAL STATUTES */}
               <div 
                 onClick={() => handleStartVetting("legal")}
-                className="group relative rounded-2xl border border-zinc-800 bg-[#09090b]/80 p-6 flex flex-col justify-between hover:border-indigo-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/5 cursor-pointer hover:-translate-y-1"
+                className="group relative rounded border border-[#262626] bg-[#121212] p-6 flex flex-col justify-between hover:border-white/20 transition-all duration-200 cursor-pointer"
               >
-                {/* Glow filter */}
-                <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl duration-500 pointer-events-none" />
+                
 
                 <div className="space-y-6">
                   {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 group-hover:bg-indigo-500/20 transition-colors duration-500">
+                  <div className="w-12 h-12 rounded bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20 group-hover:bg-indigo-500/20 transition-colors duration-500">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                     </svg>
@@ -815,14 +824,13 @@ export default function VettingArena() {
               {/* CARD 3: CODING LOGIC */}
               <div 
                 onClick={() => handleStartVetting("coding")}
-                className="group relative rounded-2xl border border-zinc-800 bg-[#09090b]/80 p-6 flex flex-col justify-between hover:border-emerald-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/5 cursor-pointer hover:-translate-y-1"
+                className="group relative rounded border border-[#262626] bg-[#121212] p-6 flex flex-col justify-between hover:border-white/20 transition-all duration-200 cursor-pointer"
               >
-                {/* Glow filter */}
-                <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl duration-500 pointer-events-none" />
+                
 
                 <div className="space-y-6">
                   {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors duration-500">
+                  <div className="w-12 h-12 rounded bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors duration-500">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
@@ -860,7 +868,7 @@ export default function VettingArena() {
           <div className="space-y-6 animate-fade-in">
             
             {/* Header: Progress & Active Timer Bar */}
-            <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl flex flex-col gap-4">
+            <div className="bg-zinc-900/60 border border-zinc-800 p-4 rounded flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 rounded border border-indigo-500/20 bg-indigo-500/5 text-xs text-indigo-400 font-extrabold uppercase">
@@ -873,10 +881,10 @@ export default function VettingArena() {
                 
                 {/* Numeric Timer */}
                 <div className="flex items-center gap-1.5 font-mono text-sm">
-                  <svg className={`w-4 h-4 ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-indigo-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`w-4 h-4 ${timeLeft < 10 ? 'text-red-500 ' : 'text-indigo-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className={`font-bold ${timeLeft < 10 ? 'text-red-400 animate-pulse' : 'text-zinc-200'}`}>
+                  <span className={`font-bold ${timeLeft < 10 ? 'text-red-400 ' : 'text-zinc-200'}`}>
                     {timeLeft.toFixed(1)}s SECONDS LEFT
                   </span>
                 </div>
@@ -890,7 +898,7 @@ export default function VettingArena() {
                       ? "bg-gradient-to-r from-emerald-500 to-emerald-400 shadow-emerald-500/20" 
                       : timeLeft > 7 
                         ? "bg-gradient-to-r from-amber-500 to-amber-400 shadow-amber-500/20"
-                        : "bg-gradient-to-r from-red-600 to-red-400 animate-pulse shadow-red-500/30"
+                        : "bg-gradient-to-r from-red-600 to-red-400  shadow-red-500/30"
                   }`}
                   style={{ width: `${(timeLeft / 30) * 100}%` }}
                 />
@@ -901,7 +909,7 @@ export default function VettingArena() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               
               {/* LEFT PANEL: Scenario or Patient Card */}
-              <div className="lg:col-span-6 bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between space-y-6">
+              <div className="lg:col-span-6 bg-zinc-950 border border-zinc-800 rounded p-6 flex flex-col justify-between space-y-6">
                 
                 <div className="space-y-4">
                   {/* Decorative Terminal Header */}
@@ -919,13 +927,13 @@ export default function VettingArena() {
                   </h4>
 
                   {/* Narrative Body */}
-                  <p className="text-zinc-300 text-sm leading-relaxed bg-[#060608] p-4 rounded-xl border border-zinc-900 font-sans shadow-inner">
+                  <p className="text-zinc-300 text-sm leading-relaxed bg-[#141313] p-4 rounded border border-[#262626] font-sans shadow-inner">
                     {QUESTIONS[selectedDomain][currentQuestionIndex].scenario}
                   </p>
                   
                   {/* Nested metadata cards based on Domain */}
                   {selectedDomain === "medical" && QUESTIONS[selectedDomain][currentQuestionIndex].patientRecord && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/60">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-zinc-900/60 p-4 rounded border border-zinc-800/60">
                       <div>
                         <span className="text-zinc-500 block font-semibold mb-0.5">AGE/GENDER</span>
                         <span className="text-zinc-300 font-bold">{QUESTIONS[selectedDomain][currentQuestionIndex].patientRecord?.age} / {QUESTIONS[selectedDomain][currentQuestionIndex].patientRecord?.gender}</span>
@@ -950,7 +958,7 @@ export default function VettingArena() {
                   )}
 
                   {selectedDomain === "legal" && QUESTIONS[selectedDomain][currentQuestionIndex].caseRecord && (
-                    <div className="space-y-2 text-xs bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/60">
+                    <div className="space-y-2 text-xs bg-zinc-900/60 p-4 rounded border border-zinc-800/60">
                       <div className="grid grid-cols-2 gap-2 border-b border-zinc-800/80 pb-2">
                         <div>
                           <span className="text-zinc-500 block font-semibold">PLAINTIFF vs. DEFENDANT</span>
@@ -987,7 +995,7 @@ export default function VettingArena() {
               <div className="lg:col-span-6 flex flex-col gap-6">
                 
                 {/* interactive Question Options Selectors */}
-                <div className="bg-[#09090b]/80 border border-zinc-800/80 p-6 rounded-2xl space-y-4">
+                <div className="bg-[#121212] border border-[#262626] p-6 rounded space-y-4">
                   <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Choose Resolution Pathway:</span>
                   
                   <div className="space-y-3">
@@ -997,7 +1005,7 @@ export default function VettingArena() {
                         <button
                           key={opt.label}
                           onClick={() => handleSelectOption(opt.label)}
-                          className={`w-full text-left p-4 rounded-xl border transition-all duration-300 flex items-start gap-4 relative group ${
+                          className={`w-full text-left p-4 rounded border transition-all duration-300 flex items-start gap-4 relative group ${
                             isSelected 
                               ? "bg-indigo-500/10 border-indigo-500 shadow-md shadow-indigo-500/5 text-zinc-100" 
                               : "bg-zinc-950 border-zinc-800/80 hover:border-zinc-700 text-zinc-300"
@@ -1028,7 +1036,7 @@ export default function VettingArena() {
                 </div>
 
                 {/* Dynamic Editor Workspace Input */}
-                <div className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col flex-1 min-h-[300px]">
+                <div className="bg-zinc-950 border border-zinc-800 rounded overflow-hidden flex flex-col flex-1 min-h-[300px]">
                   
                   {/* Editor Header tabs */}
                   <div className="bg-zinc-900 px-4 py-2 border-b border-zinc-800 flex justify-between items-center text-xs font-mono text-zinc-400">
@@ -1059,7 +1067,7 @@ export default function VettingArena() {
                   </div>
 
                   {/* Terminal console frame */}
-                  <div className="bg-[#050507] border-t border-zinc-800 p-4 font-mono text-[10px] space-y-2 flex flex-col h-40 overflow-y-auto shadow-inner">
+                  <div className="bg-[#141313] border-t border-[#262626] p-4 font-mono text-[10px] space-y-2 flex flex-col h-40 overflow-y-auto shadow-inner">
                     <div className="text-zinc-500 font-bold border-b border-zinc-900 pb-1.5 flex justify-between items-center uppercase tracking-wider">
                       <span>SANDBOX DIAGNOSTIC STAGES</span>
                       <span>BUFFER: ONLINE</span>
@@ -1088,7 +1096,7 @@ export default function VettingArena() {
                     <button
                       onClick={handleRunCompiler}
                       disabled={isRunningCode}
-                      className="px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 disabled:opacity-40 transition-all font-mono text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-2 select-none"
+                      className="px-4 py-2 rounded bg-zinc-950 border border-zinc-800 hover:border-zinc-700 disabled:opacity-40 transition-all font-mono text-[11px] font-bold text-zinc-300 hover:text-white flex items-center gap-2 select-none"
                     >
                       {isRunningCode ? (
                         <>
@@ -1107,7 +1115,7 @@ export default function VettingArena() {
 
                     <button
                       onClick={handleNextQuestion}
-                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 font-semibold text-xs tracking-wide text-white flex items-center gap-2 shadow-lg shadow-indigo-600/20 active:translate-y-px transition-all select-none"
+                      className="px-5 py-2.5 rounded bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 font-semibold text-xs tracking-wide text-white flex items-center gap-2 shadow-lg shadow-indigo-600/20 active:translate-y-px transition-all select-none"
                     >
                       {currentQuestionIndex < QUESTIONS[selectedDomain].length - 1 ? (
                         <>
@@ -1142,11 +1150,42 @@ export default function VettingArena() {
             {gradeReport ? (
               <div className="space-y-8">
                 
+                {/* Node Operational Activation Success Banner */}
+                {newlyActivated && (
+                  <div className="bg-emerald-950/20 border border-emerald-500/30 p-6 rounded-lg space-y-4 animate-fade-in relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 font-mono text-sm shrink-0 font-bold">
+                        ✓
+                      </span>
+                      <div>
+                        <h4 className="text-sm font-display font-black text-white uppercase tracking-wider">
+                          Cryptographic Node Operational Activation
+                        </h4>
+                        <span className="text-[9px] font-mono tracking-widest text-emerald-400 uppercase font-bold">
+                          STATUS: ACTIVE MAINNET NODE
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-zinc-400 text-xs leading-relaxed font-body-md">
+                      Congratulations! You have successfully passed the cognitive vetting challenge with an accuracy score of <span className="text-white font-bold">{gradeReport.accuracy}%</span>. 
+                      Your validator node is now fully verified. Your status has been promoted from Shortlisted Candidate to **Approved Expert Specialist**. Active claim workbenches, mainnet payouts, and secondary royalties are now unlocked.
+                    </p>
+                    <div className="pt-2">
+                      <Link href="/expert">
+                        <button className="bg-white text-black hover:bg-zinc-200 font-bold px-6 py-2.5 rounded text-xs font-mono uppercase tracking-wider">
+                          Enter Active Workbench
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Score Header Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   
                   {/* accuracy circular progress meter */}
-                  <div className="bg-[#09090b]/80 border border-zinc-800 p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg gap-4">
+                  <div className="bg-[#121212] border border-[#262626] p-6 rounded flex flex-col items-center justify-center text-center shadow-lg gap-4">
                     <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">ACCURACY SCORE</span>
                     <div className="relative w-32 h-32">
                       {/* SVG Gauge */}
@@ -1172,7 +1211,7 @@ export default function VettingArena() {
                   </div>
 
                   {/* speed metric and speed multiplier */}
-                  <div className="bg-[#09090b]/80 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between shadow-lg">
+                  <div className="bg-[#121212] border border-[#262626] p-6 rounded flex flex-col justify-between shadow-lg">
                     <div className="space-y-1">
                       <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 block">RESPONSE VELOCITY</span>
                       <span className="text-3xl font-black text-white font-mono">{gradeReport.timeSpent}s</span>
@@ -1186,7 +1225,7 @@ export default function VettingArena() {
                   </div>
 
                   {/* XP Gained display */}
-                  <div className="bg-[#09090b]/80 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between shadow-lg relative overflow-hidden">
+                  <div className="bg-[#121212] border border-[#262626] p-6 rounded flex flex-col justify-between shadow-lg relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
                     
                     <div className="space-y-1">
@@ -1210,7 +1249,7 @@ export default function VettingArena() {
                   </div>
 
                   {/* Tier status indicator */}
-                  <div className="bg-[#09090b]/80 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between shadow-lg relative overflow-hidden">
+                  <div className="bg-[#121212] border border-[#262626] p-6 rounded flex flex-col justify-between shadow-lg relative overflow-hidden">
                     <div className="space-y-1">
                       <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 block">CURRENT RANK CLEARANCE</span>
                       <span className={`text-2xl font-black bg-gradient-to-r ${gradeReport.tierConfig.color} bg-clip-text text-transparent uppercase tracking-wider`}>
@@ -1235,7 +1274,7 @@ export default function VettingArena() {
                 </div>
 
                 {/* Professional feedback box */}
-                <div className="bg-zinc-950 border border-zinc-800 p-8 rounded-3xl space-y-6">
+                <div className="bg-zinc-950 border border-zinc-800 p-8 rounded space-y-6">
                   <div className="border-b border-zinc-800 pb-4">
                     <h3 className="text-lg font-bold text-zinc-200 tracking-wide">
                       {gradeReport.feedbackHeadline}
@@ -1288,7 +1327,7 @@ export default function VettingArena() {
                       return (
                         <div 
                           key={res.questionId}
-                          className={`border rounded-2xl p-6 ${
+                          className={`border rounded p-6 ${
                             res.correct 
                               ? "bg-emerald-950/5 border-emerald-900/30" 
                               : "bg-red-950/5 border-red-900/30"
@@ -1333,7 +1372,7 @@ export default function VettingArena() {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => selectedDomain && handleStartVetting(selectedDomain)}
-                    className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-xs tracking-wider uppercase text-white shadow-lg shadow-indigo-600/20 active:translate-y-px transition-all select-none"
+                    className="px-6 py-3 rounded bg-indigo-600 hover:bg-indigo-500 font-semibold text-xs tracking-wider uppercase text-white shadow-lg shadow-indigo-600/20 active:translate-y-px transition-all select-none"
                   >
                     RE-RUN SIMULATION
                   </button>
@@ -1343,7 +1382,7 @@ export default function VettingArena() {
                       setSelectedDomain(null);
                       setGradeReport(null);
                     }}
-                    className="px-6 py-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 font-semibold text-xs tracking-wider uppercase text-zinc-300 hover:text-white transition-all select-none"
+                    className="px-6 py-3 rounded bg-zinc-900 border border-zinc-800 hover:border-zinc-700 font-semibold text-xs tracking-wider uppercase text-zinc-300 hover:text-white transition-all select-none"
                   >
                     BACK TO DOMAIN DECK
                   </button>
@@ -1351,8 +1390,8 @@ export default function VettingArena() {
 
               </div>
             ) : (
-              <div className="text-center py-20 bg-zinc-950 border border-zinc-900 rounded-3xl space-y-4">
-                <div className="w-10 h-10 border-3 border-indigo-400/20 border-t-indigo-400 rounded-full animate-spin mx-auto" />
+              <div className="text-center py-20 bg-zinc-950 border border-zinc-900 rounded space-y-4">
+                <div className="w-10 h-10 border-[#404040] border-indigo-400/20 border-t-indigo-400 rounded-full animate-spin mx-auto" />
                 <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">
                   COMPILING GRADE SCHEDULER PATHWAYS...
                 </p>
@@ -1370,7 +1409,7 @@ export default function VettingArena() {
           {/* Confetti Explosion Canvas */}
           <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none w-full h-full" />
           
-          <div className="relative max-w-lg w-full bg-[#08080a] border border-yellow-500/30 rounded-3xl p-8 text-center shadow-[0_0_80px_rgba(234,179,8,0.06)] overflow-hidden space-y-8 animate-scale-up z-10">
+          <div className="relative max-w-lg w-full bg-[#121212] border border-yellow-500/30 rounded p-8 text-center overflow-hidden space-y-8 animate-scale-up z-10">
             
             {/* Spinning Cyber-rings decoration */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] border border-yellow-500/5 rounded-full animate-spin pointer-events-none" style={{ animationDuration: '30s' }} />
@@ -1389,7 +1428,7 @@ export default function VettingArena() {
             {/* Glowing Rank Crest Shield Badge */}
             <div className="relative w-36 h-36 mx-auto flex items-center justify-center my-6">
               {/* Pulsing Backlight */}
-              <div className="absolute inset-0 bg-yellow-500/20 rounded-full blur-2xl animate-pulse" />
+              <div className="absolute inset-0 bg-yellow-500/20 rounded-full blur-2xl " />
               
               {/* Golden Crest */}
               <svg className="w-28 h-28 text-yellow-400 filter drop-shadow-[0_0_20px_rgba(234,179,8,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
@@ -1408,7 +1447,7 @@ export default function VettingArena() {
             </div>
 
             {/* Point Multiplier details */}
-            <div className="bg-yellow-500/5 border border-yellow-500/20 py-3.5 px-6 rounded-2xl max-w-xs mx-auto text-center space-y-1 relative">
+            <div className="bg-yellow-500/5 border border-yellow-500/20 py-3.5 px-6 rounded max-w-xs mx-auto text-center space-y-1 relative">
               <span className="text-yellow-400/90 text-sm font-extrabold tracking-wider font-mono">
                 {unlockedMultiplier}x XP MULTIPLIER ACTIVE
               </span>
@@ -1420,7 +1459,7 @@ export default function VettingArena() {
             {/* Dismiss Button */}
             <button
               onClick={() => setShowLevelUp(false)}
-              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-extrabold text-xs tracking-widest uppercase hover:brightness-105 active:translate-y-px transition-all select-none shadow-lg shadow-yellow-500/20 relative"
+              className="px-8 py-3.5 rounded bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-extrabold text-xs tracking-widest uppercase hover:brightness-105 active:translate-y-px transition-all select-none shadow-lg shadow-yellow-500/20 relative"
             >
               ACCEPT SYSTEM COMMISSION
             </button>

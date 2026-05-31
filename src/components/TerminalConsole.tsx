@@ -96,17 +96,17 @@ export default function TerminalConsole({ status, jobId = "OpenAI-FT-72B", targe
     <section className="flex flex-col h-full min-h-[420px] select-none">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-extrabold text-lg text-[#e7e4ee] flex items-center gap-2">
-          <Terminal className="w-5 h-5 text-[#a5a5ff]" />
+          <Terminal className="w-5 h-5 text-[#ffffff]" />
           Terminal Visualizer
-          <span className="text-xs font-normal text-[#acaab4] bg-[#1f1f28] px-2 py-0.5 rounded-md border border-white/5">
+          <span className="text-xs font-normal text-[#acaab4] bg-[#1f1f28] px-2 py-0.5 rounded-md border border-[#262626]">
             Job: {jobId}
           </span>
         </h2>
       </div>
 
-      <div className="glass-panel rounded-2xl flex-1 flex flex-col overflow-hidden relative border border-white/[0.01]">
+      <div className="bg-[#1e293b] border border-[#262626] rounded-xl rounded-2xl flex-1 flex flex-col overflow-hidden relative border border-white/[0.01]">
         {/* Terminal Header */}
-        <div className="bg-[#000000]/60 px-4 py-3 border-b border-white/[0.03] flex items-center justify-between backdrop-blur-md z-10">
+        <div className="bg-[#000000]/60 px-4 py-3 border-b border-[#262626] flex items-center justify-between backdrop-blur-md z-10">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#ff6e84]/80" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#5f9eff]/80" />
@@ -118,10 +118,10 @@ export default function TerminalConsole({ status, jobId = "OpenAI-FT-72B", targe
           <div>
             <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest border ${
               status === "running" 
-                ? "bg-emerald-950/40 text-emerald-400 border-emerald-500/25 animate-pulse" 
+                ? "bg-emerald-950/40 text-emerald-400 border-emerald-500/25 " 
                 : status === "completed" 
-                  ? "bg-indigo-950/40 text-[#a5a5ff] border-[#a5a5ff]/25"
-                  : "bg-white/5 text-[#acaab4] border-white/5"
+                  ? "bg-indigo-950/40 text-[#ffffff] border-[#ffffff]/25"
+                  : "bg-white/5 text-[#acaab4] border-[#262626]"
             }`}>
               {status}
             </span>
@@ -157,7 +157,7 @@ export default function TerminalConsole({ status, jobId = "OpenAI-FT-72B", targe
           </div>
 
           {/* Floating Curve Graph Overlay */}
-          <div className="absolute bottom-5 right-5 w-44 h-24 bg-[#1f1f28]/60 border border-white/[0.04] rounded-xl p-3 flex flex-col justify-between overflow-hidden backdrop-blur-md pointer-events-none shadow-2xl">
+          <div className="absolute bottom-5 right-5 w-44 h-24 bg-[#1f1f28]/60 border border-[#262626] rounded-xl p-3 flex flex-col justify-between overflow-hidden backdrop-blur-md pointer-events-none shadow-2xl">
             <div className="flex justify-between items-center text-[8px] text-[#acaab4] uppercase tracking-wider font-sans">
               <span>Loss Curve</span>
               <span className="font-mono text-emerald-400 font-bold">{loss.toFixed(3)}</span>
@@ -174,7 +174,7 @@ export default function TerminalConsole({ status, jobId = "OpenAI-FT-72B", targe
                   className="opacity-80 transition-all duration-500" 
                   d="M0,10 Q20,15 40,30 T80,45 L100,48" 
                   fill="none" 
-                  stroke="#a5a5ff" 
+                  stroke="#ffffff" 
                   strokeWidth="1.5"
                 />
               </svg>

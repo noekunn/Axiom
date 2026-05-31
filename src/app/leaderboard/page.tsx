@@ -322,8 +322,8 @@ export default function LeaderboardPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
-                <span className="text-xs font-semibold tracking-widest text-violet-400 uppercase">Axiom Analytics Benchmarks</span>
+                <span className="h-2 w-2 rounded-full bg-violet-500 " />
+                <span className="text-xs font-semibold tracking-widest text-[#10B981] uppercase">Axiom Analytics Benchmarks</span>
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
                 Indic & Hinglish LLM Leaderboard
@@ -337,9 +337,9 @@ export default function LeaderboardPage() {
             <div className="flex flex-wrap gap-3">
               <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800/60 rounded-xl px-4 py-3 min-w-[130px]">
                 <div className="text-xs text-zinc-500 font-medium">Active Test Cases</div>
-                <div className="text-xl font-bold text-violet-400 mt-0.5">
+                <div className="text-xl font-bold text-[#10B981] mt-0.5">
                   {loading ? (
-                    <span className="inline-block h-5 w-16 bg-zinc-800 animate-pulse rounded" />
+                    <span className="inline-block h-5 w-16 bg-zinc-800  rounded" />
                   ) : (
                     data.stats.testCases.toLocaleString()
                   )}
@@ -383,7 +383,7 @@ export default function LeaderboardPage() {
                     onClick={() => setSelectedDomain(dom.id)}
                     className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200 ${
                       selectedDomain === dom.id
-                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/10'
+                        ? 'bg-white text-black text-white shadow-lg shadow-violet-500/10'
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                     }`}
                   >
@@ -433,7 +433,7 @@ export default function LeaderboardPage() {
               <div className="flex items-center justify-between border-b border-zinc-800/60 pb-4 mb-6">
                 <div>
                   <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                    <svg className="h-5 w-5 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg className="h-5 w-5 text-[#10B981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 20V10M12 20V4M6 20v-6"/>
                     </svg>
                     Interactive Benchmark Analytics
@@ -446,7 +446,7 @@ export default function LeaderboardPage() {
                   <button
                     onClick={() => setActiveTab('comparison')}
                     className={`px-3 py-1.5 font-medium rounded-md transition-colors ${
-                      activeTab === 'comparison' ? 'bg-zinc-900 text-violet-400 font-semibold' : 'text-zinc-400 hover:text-zinc-200'
+                      activeTab === 'comparison' ? 'bg-zinc-900 text-[#10B981] font-semibold' : 'text-zinc-400 hover:text-zinc-200'
                     }`}
                   >
                     3-Dimension Stack
@@ -624,7 +624,7 @@ export default function LeaderboardPage() {
                   /* Custom Interactive Latency vs. Accuracy Scatter Plot */
                   <svg viewBox="0 0 800 260" className="w-full h-full text-zinc-400 select-none">
                     {/* Reference Line for 'Efficiency Frontier' */}
-                    <path d="M120 40 Q 220 50 720 180" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeDasharray="5 5" className="opacity-30" />
+                    <path d="M120 40 Q 220 50 720 180" fill="none" stroke="#ffffff" strokeWidth="1.5" strokeDasharray="5 5" className="opacity-30" />
                     <text x="130" y="35" className="text-[9px] font-semibold tracking-wider uppercase fill-violet-400/50">Efficiency Frontier</text>
 
                     {/* Horizontal Reference Lines (Scores) */}
@@ -838,7 +838,7 @@ export default function LeaderboardPage() {
 
             {/* Model Insight Comment Box */}
             <div className="mt-6 pt-4 border-t border-zinc-800/60 bg-zinc-950/40 rounded-xl p-3 border border-zinc-900/60">
-              <span className="text-[10px] font-bold tracking-wider text-violet-400 uppercase block mb-1">Expert Contextual Evaluation</span>
+              <span className="text-[10px] font-bold tracking-wider text-[#10B981] uppercase block mb-1">Expert Contextual Evaluation</span>
               <p className="text-[11px] text-zinc-400 italic leading-relaxed">
                 "{getModelInsights(activeModel.id, selectedDomain, selectedLanguage)}"
               </p>
@@ -922,7 +922,7 @@ export default function LeaderboardPage() {
                       {/* Model & Metadata details */}
                       <td className="py-4 px-6">
                         <div className="flex flex-col">
-                          <span className={`font-bold transition-colors ${isInspected ? 'text-violet-400' : 'text-zinc-100 group-hover:text-violet-400'}`}>
+                          <span className={`font-bold transition-colors ${isInspected ? 'text-[#10B981]' : 'text-zinc-100 group-hover:text-[#10B981]'}`}>
                             {model.name}
                           </span>
                           <span className="text-[10px] text-zinc-500 font-medium">
@@ -991,7 +991,7 @@ export default function LeaderboardPage() {
         {/* Methodology explanation section */}
         <section className="bg-zinc-900/20 border border-zinc-800/60 rounded-2xl p-6 shadow-md shadow-black/10">
           <h3 className="text-base font-bold text-zinc-200 mb-3 flex items-center gap-2">
-            <svg className="h-4 w-4 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="h-4 w-4 text-[#10B981]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <path d="M12 16v-4M12 8h.01"/>
             </svg>

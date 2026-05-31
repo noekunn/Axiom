@@ -11,7 +11,17 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        obsidian: {
+          base: "#141313",
+          surface: "#201f1f",
+          accent: "#ffffff",
+          success: "#10B981"
+        }
       },
+      fontFamily: {
+        sans: ['Manrope', 'Inter', 'sans-serif'],
+        display: ['Noto Serif', 'serif'],
+      }
     },
   },
   plugins: [],

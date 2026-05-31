@@ -60,9 +60,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex overflow-x-hidden bg-[#0e0e15] text-[#e7e4ee] font-label select-none selection:bg-violet-500/30 selection:text-white">
+    <div className="min-h-screen flex overflow-x-hidden bg-[#141313] text-[#e7e4ee] font-label select-none selection:bg-violet-500/30 selection:text-white">
       {/* Persistent Left SideNavBar */}
-      <aside className="w-64 fixed left-0 top-0 h-screen bg-[#13131a]/40 backdrop-blur-xl border-r border-white/[0.03] shadow-2xl flex flex-col py-8 px-4 z-50">
+      <aside className="w-64 fixed left-0 top-0 h-screen bg-[#121212]/40 backdrop-blur-xl border-r border-[#262626] shadow-2xl flex flex-col py-8 px-4 z-50">
         {/* Branding header */}
         <div className="mb-10 px-2 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 text-white">
@@ -85,11 +85,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <div
                   className={`flex items-center gap-3 px-4 py-3 font-display font-semibold text-sm rounded-xl transition-all duration-300 cursor-pointer active:scale-[0.97] ${
                     isActive
-                      ? "bg-violet-500/10 text-violet-400"
+                      ? "bg-violet-500/10 text-[#10B981]"
                       : "text-[#acaab4] hover:text-[#e7e4ee] hover:bg-white/[0.03]"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-violet-400" : "text-[#acaab4]"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-[#10B981]" : "text-[#acaab4]"}`} />
                   {item.name}
                 </div>
               </Link>
@@ -98,7 +98,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         {/* Support & Connection Status Footer */}
-        <ul className="flex flex-col gap-2 mt-auto pt-6 border-t border-white/5">
+        <ul className="flex flex-col gap-2 mt-auto pt-6 border-t border-[#262626]">
           <li>
             <a 
               href="mailto:support@axiom.ai" 
@@ -126,10 +126,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main Canvas & Content Wrapper */}
       <div className="ml-64 flex-1 flex flex-col min-h-screen relative">
         {/* TopNavBar Header */}
-        <header className="bg-[#0e0e15]/40 backdrop-blur-md fixed top-0 right-0 w-[calc(100%-16rem)] z-40 border-b border-white/[0.02] flex justify-between items-center h-16 px-8">
+        <header className="bg-[#141313]/40 backdrop-blur-md fixed top-0 right-0 w-[calc(100%-16rem)] z-40 border-b border-[#1a1a1a] flex justify-between items-center h-16 px-8">
           <div className="flex-1 max-w-md relative group">
             <input
-              className="bg-[#1f1f28]/40 border border-white/[0.04] group-hover:border-white/[0.08] focus:border-violet-500/40 rounded-full py-1.5 px-4 pl-10 text-xs focus:ring-0 outline-none text-[#e7e4ee] placeholder:text-[#acaab4]/60 w-48 focus:w-64 transition-all duration-300"
+              className="bg-[#1f1f28]/40 border border-[#262626] group-hover:border-white/[0.08] focus:border-violet-500/40 rounded-full py-1.5 px-4 pl-10 text-xs focus:ring-0 outline-none text-[#e7e4ee] placeholder:text-[#acaab4]/60 w-48 focus:w-64 transition-all duration-300"
               placeholder="Search console logs..."
               type="text"
             />
@@ -140,7 +140,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {/* Notification bell */}
             <button 
               onClick={() => setNotificationActive(false)}
-              className="text-[#acaab4] hover:text-violet-400 hover:bg-[#1f1f28]/40 p-2 rounded-full transition-all relative"
+              className="text-[#acaab4] hover:text-[#10B981] hover:bg-[#1f1f28]/40 p-2 rounded-full transition-all relative"
             >
               <Bell className="w-4 h-4" />
               {notificationActive && (
@@ -153,8 +153,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               onClick={handleConnectWallet}
               className={`px-4 py-1.5 rounded-full border text-xs font-display font-semibold transition-all duration-300 active:scale-95 flex items-center gap-2 ${
                 walletConnected
-                  ? "bg-violet-500/10 border-violet-500/20 text-violet-400"
-                  : "bg-white/[0.02] border-white/10 hover:bg-white/[0.05] text-[#e7e4ee]"
+                  ? "bg-violet-500/10 border-violet-500/20 text-[#10B981]"
+                  : "bg-white/[0.02] border-[#262626] hover:bg-white/[0.05] text-[#e7e4ee]"
               }`}
             >
               <Wallet className="w-3.5 h-3.5" />
@@ -162,7 +162,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </button>
 
             {/* Avatar */}
-            <div className="w-8 h-8 rounded-full bg-[#1f1f28] overflow-hidden flex-shrink-0 border border-white/10 select-none">
+            <div className="w-8 h-8 rounded-full bg-[#1f1f28] overflow-hidden flex-shrink-0 border border-[#262626] select-none">
               <img
                 alt="User Avatar"
                 className="w-full h-full object-cover"

@@ -274,7 +274,7 @@ export default function AdminDashboard() {
     <AdminLayout>
       {/* Toast Notification Container */}
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded-xl border shadow-2xl transition-all duration-300 transform translate-y-0 animate-bounce ${
+        <div className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-4 rounded border  transition-all duration-300 transform translate-y-0 animate-bounce ${
           toast.type === 'success'
             ? 'bg-emerald-950/80 border-emerald-800 text-emerald-300 shadow-emerald-950/40'
             : 'bg-rose-950/80 border-rose-800 text-rose-300 shadow-rose-950/40'
@@ -296,11 +296,11 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto space-y-6 select-none">
         
         {/* Global Dashboard Navigation Header */}
-        <header className="bg-[#1f1f28]/40 backdrop-blur-md border border-white/[0.02] rounded-2xl px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl relative overflow-hidden">
+        <header className="bg-[#121212] border border-[#262626] rounded px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4  relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-500 via-indigo-500 to-emerald-500"></div>
           
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+            <div className="w-10 h-10 rounded bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center  shadow-violet-500/20">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
@@ -308,21 +308,21 @@ export default function AdminDashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-100 to-zinc-400 font-headline">AXIOM OPERATOR</h1>
-                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#bf5af2]/10 text-[#bf5af2] border border-[#bf5af2]/20 tracking-wider">CONSOLE</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#ffffff]/10 text-[#ffffff] border border-[#ffffff]/20 tracking-wider">CONSOLE</span>
               </div>
               <p className="text-xs text-zinc-500 mt-0.5">Continuous consensus QA alignment & payout auditing dashboard</p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 bg-[#13131a] px-3.5 py-1.5 rounded-xl border border-white/5 text-[11px] font-mono text-zinc-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div className="flex items-center gap-2 bg-[#141313] px-3.5 py-1.5 rounded border border-[#262626] text-[11px] font-mono text-zinc-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 "></span>
               API: ONLINE
             </div>
             
             <button
               onClick={() => fetchStats(false)}
-              className="p-2.5 rounded-xl bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/60 hover:border-zinc-600/80 text-zinc-300 hover:text-white transition-all shadow-md group active:scale-95"
+              className="p-2.5 rounded bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/60 hover:border-zinc-600/80 text-zinc-300 hover:text-white transition-all shadow-md group active:scale-95"
               title="Reload Dashboard metrics"
             >
               <svg className={`w-4 h-4 ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
               </svg>
             </button>
  
-            <div className="flex items-center gap-2 bg-zinc-800/50 border border-zinc-700/60 px-3.5 py-2 rounded-xl text-xs">
+            <div className="flex items-center gap-2 bg-zinc-800/50 border border-zinc-700/60 px-3.5 py-2 rounded text-xs">
               <label className="text-zinc-400 select-none cursor-pointer flex items-center gap-2 font-bold">
                 <input
                   type="checkbox"
@@ -348,10 +348,10 @@ export default function AdminDashboard() {
         {/* TOP LEVEL METRICS GRID */}
         <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Total Payout volume card */}
-          <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-5 shadow-lg shadow-black/30 hover:border-zinc-800 transition-all">
+          <div className="bg-[#121212] border border-[#262626] rounded p-5  shadow-black/30 hover:border-zinc-800 transition-all">
             <div className="flex justify-between items-start">
               <span className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Total Volume</span>
-              <div className="p-1.5 rounded-lg bg-violet-950/40 text-violet-400 border border-violet-800/30">
+              <div className="p-1.5 rounded-lg bg-violet-950/40 text-[#10B981] border border-violet-800/30">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -379,7 +379,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Paid card */}
-          <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-5 shadow-lg shadow-black/30 hover:border-zinc-800 transition-all">
+          <div className="bg-[#121212] border border-[#262626] rounded p-5  shadow-black/30 hover:border-zinc-800 transition-all">
             <div className="flex justify-between items-start">
               <span className="text-xs font-bold tracking-wider text-emerald-500 uppercase">Paid Ledger</span>
               <div className="p-1.5 rounded-lg bg-emerald-950/40 text-emerald-400 border border-emerald-800/30">
@@ -406,7 +406,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Processing card */}
-          <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-5 shadow-lg shadow-black/30 hover:border-zinc-800 transition-all">
+          <div className="bg-[#121212] border border-[#262626] rounded p-5  shadow-black/30 hover:border-zinc-800 transition-all">
             <div className="flex justify-between items-start">
               <span className="text-xs font-bold tracking-wider text-amber-500 uppercase">Processing</span>
               <div className="p-1.5 rounded-lg bg-amber-950/40 text-amber-400 border border-amber-800/30">
@@ -433,7 +433,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Failed card */}
-          <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-5 shadow-lg shadow-black/30 hover:border-zinc-800 transition-all">
+          <div className="bg-[#121212] border border-[#262626] rounded p-5  shadow-black/30 hover:border-zinc-800 transition-all">
             <div className="flex justify-between items-start">
               <span className="text-xs font-bold tracking-wider text-rose-500 uppercase">Failed Audit</span>
               <div className="p-1.5 rounded-lg bg-rose-950/40 text-rose-400 border border-rose-800/30">
@@ -464,11 +464,11 @@ export default function AdminDashboard() {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* BULLMQ QUEUES STATS (7 cols) */}
-          <div className="lg:col-span-7 bg-zinc-900/50 border border-zinc-800/85 rounded-2xl p-6 shadow-2xl space-y-6 flex flex-col justify-between">
+          <div className="lg:col-span-7 bg-zinc-900/50 border border-zinc-800/85 rounded p-6  space-y-6 flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 "></div>
                   <h2 className="text-lg font-black tracking-wide text-white">BullMQ Backlog Dashboard</h2>
                 </div>
                 <span className="text-[10px] font-mono text-zinc-500 font-bold bg-zinc-950 border border-zinc-800 px-2 py-0.5 rounded">3 Active Workers</span>
@@ -481,7 +481,7 @@ export default function AdminDashboard() {
               {queues.length === 0 ? (
                 // Skeleton loading state
                 [1, 2, 3].map((idx) => (
-                  <div key={idx} className="bg-zinc-950/40 border border-zinc-800 rounded-xl p-4 animate-pulse h-28"></div>
+                  <div key={idx} className="bg-[#141313] border border-[#262626] rounded p-4  h-28"></div>
                 ))
               ) : (
                 queues.map((q) => {
@@ -489,7 +489,7 @@ export default function AdminDashboard() {
                   return (
                     <div
                       key={q.name}
-                      className={`bg-zinc-950 border rounded-xl p-4.5 hover:border-zinc-700/60 transition-all ${
+                      className={`bg-zinc-950 border rounded p-4.5 hover:border-zinc-700/60 transition-all ${
                         isPaused ? 'border-zinc-900 opacity-60' : 'border-zinc-800/80 shadow-md shadow-black/10'
                       }`}
                     >
@@ -578,7 +578,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* CALIBRATION PANEL (5 cols) */}
-          <form onSubmit={handleCalibrationSave} className="lg:col-span-5 bg-zinc-900/50 border border-zinc-800/85 rounded-2xl p-6 shadow-2xl flex flex-col justify-between gap-5 relative overflow-hidden">
+          <form onSubmit={handleCalibrationSave} className="lg:col-span-5 bg-zinc-900/50 border border-zinc-800/85 rounded p-6  flex flex-col justify-between gap-5 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-5 hover:opacity-10 transition-opacity pointer-events-none">
               <svg className="w-36 h-36 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -587,7 +587,7 @@ export default function AdminDashboard() {
 
             <div className="space-y-1 relative">
               <div className="flex items-center gap-2">
-                <div className="p-1 bg-violet-950 text-violet-400 rounded-md border border-violet-800/40">
+                <div className="p-1 bg-violet-950 text-[#10B981] rounded-md border border-violet-800/40">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -605,7 +605,7 @@ export default function AdminDashboard() {
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-bold text-zinc-300">Agreement Margin</span>
-                  <span className="px-2 py-0.5 rounded font-mono font-bold bg-violet-950/80 text-violet-400 border border-violet-800/40 text-[11px]">
+                  <span className="px-2 py-0.5 rounded font-mono font-bold bg-violet-950/80 text-[#10B981] border border-violet-800/40 text-[11px]">
                     {settings.agreementMargin}%
                   </span>
                 </div>
@@ -688,7 +688,7 @@ export default function AdminDashboard() {
                 <select
                   value={settings.strategy}
                   onChange={(e) => setSettings({ ...settings, strategy: e.target.value as CalibrationSettings['strategy'] })}
-                  className="w-full bg-zinc-950 border border-zinc-850 hover:border-zinc-750 text-xs rounded-xl p-2.5 text-zinc-200 focus:outline-none focus:ring-1 focus:ring-violet-500 font-mono tracking-wide"
+                  className="w-full bg-zinc-950 border border-[#262626] hover:border-zinc-750 text-xs rounded p-2.5 text-zinc-200 focus:outline-none focus:ring-1 focus:ring-violet-500 font-mono tracking-wide"
                 >
                   <option value="strict">Consensus Match (Strict Verification)</option>
                   <option value="highest_confidence">Highest Confidence Pipeline Winner</option>
@@ -704,7 +704,7 @@ export default function AdminDashboard() {
                     type="checkbox"
                     checked={settings.strictAlignment}
                     onChange={(e) => setSettings({ ...settings, strictAlignment: e.target.checked })}
-                    className="rounded border-zinc-800 bg-zinc-950 text-violet-500 focus:ring-violet-500 focus:ring-offset-zinc-950 w-4 h-4 cursor-pointer"
+                    className="rounded border-zinc-800 bg-zinc-950 text-white focus:ring-violet-500 focus:ring-offset-zinc-950 w-4 h-4 cursor-pointer"
                   />
                   Strict Alignment
                 </label>
@@ -713,7 +713,7 @@ export default function AdminDashboard() {
                     type="checkbox"
                     checked={settings.logDiscrepancies}
                     onChange={(e) => setSettings({ ...settings, logDiscrepancies: e.target.checked })}
-                    className="rounded border-zinc-800 bg-zinc-950 text-violet-500 focus:ring-violet-500 focus:ring-offset-zinc-950 w-4 h-4 cursor-pointer"
+                    className="rounded border-zinc-800 bg-zinc-950 text-white focus:ring-violet-500 focus:ring-offset-zinc-950 w-4 h-4 cursor-pointer"
                   />
                   Log Discrepancies
                 </label>
@@ -724,7 +724,7 @@ export default function AdminDashboard() {
             <button
               type="submit"
               disabled={updatingSettings}
-              className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs tracking-wider uppercase transition-all duration-350 shadow-md shadow-indigo-950/50 hover:shadow-indigo-500/20 focus:outline-none active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none mt-2"
+              className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded text-xs tracking-wider uppercase transition-all duration-350 shadow-md shadow-indigo-950/50 hover:shadow-indigo-500/20 focus:outline-none active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none mt-2"
             >
               {updatingSettings ? 'Applying parameters...' : 'Apply Calibrated Settings'}
             </button>
@@ -733,7 +733,7 @@ export default function AdminDashboard() {
         </section>
 
         {/* LIVE SYSTEM TERMINAL CONSOLE */}
-        <section className="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+        <section className="bg-[#121212] border border-[#262626] rounded p-5  relative overflow-hidden">
           {/* Header Controls */}
           <div className="flex justify-between items-center pb-3 border-b border-zinc-800/80">
             <div className="flex items-center gap-2">
@@ -760,13 +760,13 @@ export default function AdminDashboard() {
           </div>
 
           {/* Log outputs */}
-          <div className="mt-3 bg-black/90 rounded-xl border border-zinc-950/40 p-4 h-48 overflow-y-auto font-mono text-[11px] text-emerald-400 space-y-1.5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+          <div className="mt-3 bg-black/90 rounded border border-zinc-950/40 p-4 h-48 overflow-y-auto font-mono text-[11px] text-emerald-400 space-y-1.5 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
             {terminalLogs.length === 0 ? (
               <div className="text-zinc-600 text-center py-10 select-none">No active tracers logged. Stream is empty.</div>
             ) : (
               terminalLogs.map((log, idx) => {
                 let colorClass = 'text-emerald-400';
-                if (log.includes('[System]')) colorClass = 'text-violet-400';
+                if (log.includes('[System]')) colorClass = 'text-[#10B981]';
                 if (log.includes('Warning') || log.includes('Escalating')) colorClass = 'text-amber-400';
                 if (log.includes('Failed')) colorClass = 'text-rose-400';
                 return (
@@ -781,7 +781,7 @@ export default function AdminDashboard() {
         </section>
 
         {/* AUDITOR TABBED LOG LISTINGS */}
-        <section className="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl shadow-2xl overflow-hidden">
+        <section className="bg-[#121212] border border-[#262626] rounded  overflow-hidden">
           
           {/* Tab selector bar */}
           <div className="flex border-b border-zinc-800/80 bg-zinc-900/40 px-5 pt-3 justify-between items-center flex-col md:flex-row gap-3 pb-3 md:pb-0">
@@ -838,12 +838,12 @@ export default function AdminDashboard() {
                     placeholder="Search recipient / ID..."
                     value={payoutSearch}
                     onChange={(e) => setPayoutSearch(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-xs px-3 py-1.5 rounded-xl w-48 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500"
+                    className="bg-[#141313] border border-[#262626] text-xs px-3 py-1.5 rounded w-48 text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500"
                   />
                   <select
                     value={payoutStatusFilter}
                     onChange={(e) => setPayoutStatusFilter(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-xs px-3 py-1.5 rounded-xl text-zinc-300 focus:outline-none"
+                    className="bg-[#141313] border border-[#262626] text-xs px-3 py-1.5 rounded text-zinc-300 focus:outline-none"
                   >
                     <option value="all">All Statuses</option>
                     <option value="paid">Paid</option>
@@ -858,7 +858,7 @@ export default function AdminDashboard() {
                   <select
                     value={webhookProviderFilter}
                     onChange={(e) => setWebhookProviderFilter(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-xs px-3 py-1.5 rounded-xl text-zinc-300 focus:outline-none"
+                    className="bg-[#141313] border border-[#262626] text-xs px-3 py-1.5 rounded text-zinc-300 focus:outline-none"
                   >
                     <option value="all">All Providers</option>
                     <option value="stripe">Stripe</option>
@@ -868,7 +868,7 @@ export default function AdminDashboard() {
                   <select
                     value={webhookStatusFilter}
                     onChange={(e) => setWebhookStatusFilter(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-xs px-3 py-1.5 rounded-xl text-zinc-300 focus:outline-none"
+                    className="bg-[#141313] border border-[#262626] text-xs px-3 py-1.5 rounded text-zinc-300 focus:outline-none"
                   >
                     <option value="all">All Results</option>
                     <option value="success">Success</option>
@@ -884,7 +884,7 @@ export default function AdminDashboard() {
           {activeTab === 'payouts' && (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs text-zinc-400">
-                <thead className="bg-zinc-950/60 text-zinc-300 uppercase text-[10px] font-black font-mono tracking-wider border-b border-zinc-850">
+                <thead className="bg-[#141313] text-zinc-300 uppercase text-[10px] font-black font-mono tracking-wider border-b border-[#262626]">
                   <tr>
                     <th className="px-6 py-4">Ledger Block ID</th>
                     <th className="px-6 py-4">Recipient Detail</th>
@@ -958,7 +958,7 @@ export default function AdminDashboard() {
           {activeTab === 'webhooks' && (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs text-zinc-400">
-                <thead className="bg-zinc-950/60 text-zinc-300 uppercase text-[10px] font-black font-mono tracking-wider border-b border-zinc-850">
+                <thead className="bg-[#141313] text-zinc-300 uppercase text-[10px] font-black font-mono tracking-wider border-b border-[#262626]">
                   <tr>
                     <th className="px-6 py-4">Event ID</th>
                     <th className="px-6 py-4">Provider</th>
@@ -1012,7 +1012,7 @@ export default function AdminDashboard() {
                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wide ${
                               w.idempotency === 'Verified'
                                 ? 'bg-emerald-950/20 text-emerald-400 border border-emerald-900/30'
-                                : 'bg-violet-950/30 text-violet-400 border border-violet-900/30 font-bold animate-pulse'
+                                : 'bg-violet-950/30 text-[#10B981] border border-violet-900/30 font-bold '
                             }`}>
                               {w.idempotency}
                             </span>
@@ -1041,7 +1041,7 @@ export default function AdminDashboard() {
           {activeTab === 'idempotency' && (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-left text-xs text-zinc-400">
-                <thead className="bg-zinc-950/60 text-zinc-300 uppercase text-[10px] font-black font-mono tracking-wider border-b border-zinc-850">
+                <thead className="bg-[#141313] text-zinc-300 uppercase text-[10px] font-black font-mono tracking-wider border-b border-[#262626]">
                   <tr>
                     <th className="px-6 py-4">Deduplication Registry Key</th>
                     <th className="px-6 py-4">Provider</th>
@@ -1071,7 +1071,7 @@ export default function AdminDashboard() {
                         <td className="px-6 py-4">
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wide border ${
                             evt.matchType === 'Cache Hit'
-                              ? 'bg-amber-950/30 text-amber-400 border-amber-900/30 font-extrabold animate-pulse'
+                              ? 'bg-amber-950/30 text-amber-400 border-amber-900/30 font-extrabold '
                               : evt.matchType === 'Lock Acquired'
                               ? 'bg-cyan-950/20 text-cyan-400 border-cyan-900/30'
                               : 'bg-zinc-800 text-zinc-400 border-zinc-700/60'
@@ -1098,7 +1098,7 @@ export default function AdminDashboard() {
       {/* WEBHOOK INSPECTION COLLAPSIBLE CODE DRAWER/MODAL */}
       {inspectingWebhook && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
-          <div className="bg-zinc-900 border border-zinc-850 rounded-2xl w-full max-w-2xl shadow-2xl relative flex flex-col max-h-[85vh] animate-fade-in">
+          <div className="bg-[#121212] border border-[#262626] rounded w-full max-w-2xl  relative flex flex-col max-h-[85vh] animate-fade-in">
             {/* Modal Header */}
             <div className="flex justify-between items-center p-5 border-b border-zinc-800">
               <div>
@@ -1119,7 +1119,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Ingestion status breakdown */}
-            <div className="px-5 py-4 bg-zinc-950/50 border-b border-zinc-850 flex justify-between flex-wrap gap-4 text-xs font-mono">
+            <div className="px-5 py-4 bg-zinc-950/50 border-b border-[#262626] flex justify-between flex-wrap gap-4 text-xs font-mono">
               <div>
                 <span className="text-zinc-500 text-[10px]">EVENT ID</span>
                 <p className="text-zinc-300 font-bold mt-0.5">{inspectingWebhook.id}</p>
@@ -1152,7 +1152,7 @@ export default function AdminDashboard() {
               <span className="text-[10px] font-mono text-zinc-500">DIGEST SIGNATURE: SHA-256 HMAC VERIFIED</span>
               <button
                 onClick={() => setInspectingWebhook(null)}
-                className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-750 text-xs font-bold text-white transition-all hover:scale-98 border border-zinc-750"
+                className="px-4 py-2 rounded bg-zinc-800 hover:bg-zinc-750 text-xs font-bold text-white transition-all hover:scale-98 border border-zinc-750"
               >
                 Close Inspector
               </button>

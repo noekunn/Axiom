@@ -1,53 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #0e0e15;
-  --foreground: #e7e4ee;
+  --background: #141313;
+  --foreground: #e5e2e1;
   
-  --primary: #a5a5ff;
-  --primary-dim: #6462ec;
-  --primary-container: #9695ff;
-  --on-primary: #1700a1;
+  --primary: #ffffff;
+  --on-primary: #2f3131;
+  --primary-container: #e2e2e2;
   
-  --secondary: #5f9eff;
-  --secondary-dim: #0073e0;
-  --secondary-container: #005db8;
-  --on-secondary-container: #f7f7ff;
+  --secondary: #c7c6c6;
+  --on-secondary: #2f3131;
+  --secondary-container: #484949;
   
-  --tertiary: #d277ff;
-  --tertiary-dim: #d277ff;
-  --tertiary-container: #bf5af2;
+  --tertiary: #ffffff;
+  --tertiary-container: #e2e2e2;
   
-  --surface: #0e0e15;
-  --surface-container-lowest: #000000;
-  --surface-container-low: #13131a;
-  --surface-container: #191921;
-  --surface-container-high: #1f1f28;
-  --surface-container-highest: #25252f;
+  --surface: #141313;
+  --surface-container-lowest: #0e0e0e;
+  --surface-container-low: #1c1b1b;
+  --surface-container: #201f1f;
+  --surface-container-high: #2a2a2a;
+  --surface-container-highest: #353434;
   
-  --on-surface: #e7e4ee;
-  --on-surface-variant: #acaab4;
-  --outline: #76747e;
-  --outline-variant: #48474f;
+  --on-surface: #e5e2e1;
+  --on-surface-variant: #c4c7c8;
+  --outline: #8e9192;
+  --outline-variant: #444748;
   
-  --error: #ff6e84;
-  --error-dim: #d73357;
+  --error: #ffb4ab;
+  
+  /* Scholaris specific success/status colors */
+  --obsidian-accent: #ffffff;
+  --obsidian-success: #10B981;
 }
 
 body {
   color: var(--foreground);
   background-color: var(--background);
-  background-image: radial-gradient(circle at 50% -20%, var(--primary-dim) 0%, transparent 60%);
-  background-attachment: fixed;
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
   overflow-x: hidden;
 }
 
-/* Scrollbar styles to match the premium dark terminal aesthetic */
+/* Scrollbar styles to match the premium minimal aesthetic */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -66,41 +64,42 @@ body {
 
 /* Custom Selection style */
 ::selection {
-  background: rgba(165, 165, 255, 0.3);
+  background: rgba(99, 102, 241, 0.3); /* Obsidian accent */
   color: #ffffff;
 }
 
 @layer utilities {
   .font-headline {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Noto Serif', serif;
   }
   
   .font-display {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Noto Serif', serif;
   }
   
   .font-label {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Manrope', sans-serif;
   }
   
   .glass-panel {
-    background: rgba(25, 25, 33, 0.4); /* surface-container based */
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    border: none; /* The strict no-line boundary rule */
+    background: var(--surface-container);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none; /* No drop shadows rule */
   }
 
   .ambient-shadow-primary {
-    box-shadow: 0 0 40px -10px rgba(165, 165, 255, 0.15);
+    box-shadow: none; /* Replaced by tonal borders */
   }
 
   .ambient-shadow-tertiary {
-    box-shadow: 0 0 40px -10px rgba(210, 119, 255, 0.15);
+    box-shadow: none; /* Replaced by tonal borders */
   }
 
   .glow-text-emerald {
-    text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    text-shadow: none; /* Corporate minimalism */
+    color: var(--obsidian-success);
   }
   
   .bg-grid-cyber {
@@ -109,34 +108,6 @@ body {
       linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   }
-}
-
-@keyframes pulse-slow {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 3s infinite ease-in-out;
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(165, 165, 255, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(165, 165, 255, 0.5);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s infinite ease-in-out;
 }
 
 @keyframes fade-in {

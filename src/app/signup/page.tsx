@@ -33,6 +33,16 @@ import {
 export default function SignupPage() {
   const router = useRouter();
   const [activeTrack, setActiveTrack] = useState<"expert" | "client">("expert");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const track = params.get("track");
+      if (track === "expert" || track === "client") {
+        setActiveTrack(track);
+      }
+    }
+  }, []);
   
   // Expert Form State
   const [expertName, setExpertName] = useState("");
@@ -205,6 +215,10 @@ export default function SignupPage() {
     // Store expert identity in localStorage to auto login on dashboard
     if (typeof window !== "undefined") {
       localStorage.setItem("axiom_expert_email", expertEmail);
+      localStorage.setItem("axiom_user_role", "expert");
+      localStorage.setItem("axiom_user_email", expertEmail);
+      localStorage.setItem("axiom_user_name", expertName);
+      localStorage.setItem("axiom_expert_status", "Shortlisted");
     }
 
     setSuccessData({
@@ -333,6 +347,14 @@ export default function SignupPage() {
     });
     setSubmissionComplete(true);
 
+    // Store client identity in localStorage to auto login on dashboard
+    if (typeof window !== "undefined") {
+      localStorage.setItem("axiom_client_email", clientEmail);
+      localStorage.setItem("axiom_user_role", "client");
+      localStorage.setItem("axiom_user_email", clientEmail);
+      localStorage.setItem("axiom_user_name", clientCompany);
+    }
+
     // Redirect to home dashboard after a brief delay
     setTimeout(() => {
       setIsSubmitting(false);
@@ -341,26 +363,21 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e0e15] text-[#e7e4ee] font-label relative flex flex-col items-center justify-center py-12 px-4 bg-grid-cyber selection:bg-[#a5a5ff]/30 selection:text-white overflow-hidden">
+    <div className="min-h-screen bg-[#141313] text-[#e7e4ee] font-label relative flex flex-col items-center justify-center py-12 px-4 bg-grid-cyber selection:bg-[#ffffff]/30 selection:text-white overflow-hidden">
       
-      {/* Premium ambient radial glows to replace border styling lines */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-[#5E5CE6]/15 via-transparent to-transparent blur-[120px] rounded-full pointer-events-none z-0" />
-      <div className="absolute bottom-0 right-10 w-[500px] h-[500px] bg-[#BF5AF2]/5 blur-[150px] rounded-full pointer-events-none z-0" />
-      <div className="absolute top-1/3 left-10 w-[400px] h-[400px] bg-[#0A84FF]/5 blur-[150px] rounded-full pointer-events-none z-0" />
-
       {/* Floating Header Navbar */}
       <header className="absolute top-0 left-0 w-full h-20 px-8 flex justify-between items-center z-40 bg-transparent">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-[#5E5CE6]/10 flex items-center justify-center border border-white/5 group-hover:bg-[#5E5CE6]/20 transition-all">
-            <Database className="w-4 h-4 text-[#5E5CE6]" />
+          <div className="w-9 h-9 rounded bg-[#121212] flex items-center justify-center border border-[#262626] group-hover:bg-[#1e293b] transition-all">
+            <Database className="w-4 h-4 text-[#ffffff]" />
           </div>
           <div>
-            <h1 className="text-xl font-display font-black tracking-tight text-white group-hover:text-[#5E5CE6] transition-colors leading-none">Axiom</h1>
-            <p className="text-[9px] text-[#acaab4] uppercase tracking-widest mt-1">Decentralized Data</p>
+            <h1 className="text-xl font-display font-bold tracking-tight text-white group-hover:text-[#ffffff] transition-colors leading-none">Axiom</h1>
+            <p className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1 font-mono">Decentralized Data</p>
           </div>
         </Link>
         <Link href="/">
-          <button className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#acaab4] hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/5 transition-all">
+          <button className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded border border-[#262626] transition-all">
             <ArrowLeft className="w-3.5 h-3.5" />
             Back to Marketplace
           </button>
@@ -372,27 +389,25 @@ export default function SignupPage() {
         
         {/* Pitch Headline */}
         <div className="text-center mb-10 max-w-2xl px-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#5E5CE6]/10 border border-[#5E5CE6]/20 text-[#5E5CE6] text-[10px] font-bold uppercase tracking-wider mb-4 animate-pulse">
-            <Sparkles className="w-3 h-3" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#121212] border border-[#262626] text-zinc-300 text-[10px] font-bold uppercase tracking-wider mb-4 font-mono">
+            <Sparkles className="w-3 h-3 text-[#ffffff]" />
             Consensus Data Network Onboarding
           </div>
-          <h2 className="text-4xl sm:text-5xl font-display font-black tracking-tight text-white mb-4 leading-[1.1]">
+          <h2 className="text-4xl sm:text-5xl font-display font-bold tracking-tight text-white mb-4 leading-[1.1]">
             Own the Future of <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-[#a5a5ff] via-[#BF5AF2] to-[#0A84FF] bg-clip-text text-transparent">
-              Bilingual Intelligence
-            </span>
+            <span className="text-zinc-500 font-medium">Bilingual Intelligence</span>
           </h2>
-          <p className="text-xs sm:text-sm text-[#acaab4] leading-relaxed max-w-lg mx-auto">
+          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-lg mx-auto font-body-md">
             Choose your gateway. Specialists earn compounding passive royalties by contributing high-density clinical, legal, or tech reasoning traces. Enterprises license elite custom sets instantly.
           </p>
         </div>
 
         {/* Unified Sliding Switcher Toggle */}
-        <div className="p-1 rounded-full bg-[#13131a]/80 backdrop-blur-md ambient-shadow-primary max-w-md w-full mb-8 flex relative z-10 select-none">
+        <div className="p-1 rounded bg-[#121212] border border-[#262626] max-w-md w-full mb-8 flex relative z-10 select-none">
           <button
             onClick={() => setActiveTrack("expert")}
-            className={`flex-1 py-3 px-6 rounded-full text-xs font-display font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 relative z-10 ${
-              activeTrack === "expert" ? "text-[#1700a1]" : "text-[#acaab4] hover:text-white"
+            className={`flex-1 py-3 px-6 rounded text-xs font-display font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 relative z-10 ${
+              activeTrack === "expert" ? "text-black" : "text-zinc-400 hover:text-white"
             }`}
           >
             <Shield className="w-4 h-4" />
@@ -401,8 +416,8 @@ export default function SignupPage() {
           
           <button
             onClick={() => setActiveTrack("client")}
-            className={`flex-1 py-3 px-6 rounded-full text-xs font-display font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 relative z-10 ${
-              activeTrack === "client" ? "text-[#1700a1]" : "text-[#acaab4] hover:text-white"
+            className={`flex-1 py-3 px-6 rounded text-xs font-display font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 relative z-10 ${
+              activeTrack === "client" ? "text-black" : "text-zinc-400 hover:text-white"
             }`}
           >
             <Building className="w-4 h-4" />
@@ -411,7 +426,7 @@ export default function SignupPage() {
 
           {/* Sliding highlight pill */}
           <div
-            className={`absolute top-1 bottom-1 left-1 rounded-full bg-gradient-to-r from-[#a5a5ff] to-[#5E5CE6] transition-all duration-500 shadow-[0_0_15px_rgba(94,92,230,0.4)] ${
+            className={`absolute top-1 bottom-1 left-1 rounded bg-white transition-all duration-300 ${
               activeTrack === "expert" ? "w-[calc(50%-4px)] translate-x-0" : "w-[calc(50%-4px)] translate-x-full"
             }`}
           />
@@ -428,23 +443,19 @@ export default function SignupPage() {
                 : "hidden lg:opacity-40 lg:scale-[0.98] lg:pointer-events-none"
             }`}
           >
-            <div className={`glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300 ${
+            <div className={`bg-[#121212] border rounded-xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300 ${
               activeTrack === "expert" 
-                ? "bg-[#191921]/50 border-2 border-[#5E5CE6]/30 shadow-[0_0_50px_-10px_rgba(94,92,230,0.25)]" 
-                : "bg-[#13131a]/40"
+                ? "border-[#ffffff]/50 bg-[#121212]" 
+                : "border-[#262626] opacity-60"
             }`}>
-              {/* Inner glowing element */}
-              {activeTrack === "expert" && (
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#5E5CE6]/10 blur-3xl rounded-full" />
-              )}
 
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-[#5E5CE6]/10 flex items-center justify-center text-[#5E5CE6]">
-                  <Shield className="w-6 h-6" />
+                <div className="w-12 h-12 rounded bg-[#141313] border border-[#262626] flex items-center justify-center text-[#ffffff]">
+                  <Shield className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-display font-black text-white">Specialist Expert Onboarding</h3>
-                  <p className="text-[10px] text-[#acaab4] uppercase tracking-wider mt-0.5">Route payouts via Razorpay UPI</p>
+                  <h3 className="text-xl font-display font-bold text-white">Specialist Expert Onboarding</h3>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5 font-mono">Route payouts via Razorpay UPI</p>
                 </div>
               </div>
 
@@ -453,18 +464,18 @@ export default function SignupPage() {
                 
                 {/* Name */}
                 <div className="relative">
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-1.5">Expert Full Name</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-1.5">Expert Full Name</label>
                   <input
-                    type="text"
-                    required
-                    placeholder="e.g. Dr. Ananya Iyer"
-                    value={expertName}
-                    onChange={(e) => {
-                      setExpertName(e.target.value);
-                      setExpertNameTouched(true);
-                    }}
-                    onBlur={() => setExpertNameTouched(true)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#5E5CE6]/60 focus:bg-[#191921] focus:shadow-[0_0_20px_rgba(94,92,230,0.2)] focus:ring-0 outline-none transition duration-300 font-semibold"
+                     type="text"
+                     required
+                     placeholder="e.g. Dr. Ananya Iyer"
+                     value={expertName}
+                     onChange={(e) => {
+                       setExpertName(e.target.value);
+                       setExpertNameTouched(true);
+                     }}
+                     onBlur={() => setExpertNameTouched(true)}
+                     className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-200 font-semibold"
                   />
                   {expertNameTouched && (
                     <span className="absolute right-3.5 top-[38px]">
@@ -479,18 +490,18 @@ export default function SignupPage() {
 
                 {/* Email */}
                 <div className="relative">
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-1.5">Professional Email Address</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-1.5">Professional Email Address</label>
                   <input
-                    type="email"
-                    required
-                    placeholder="e.g. ananya.iyer@axiom.ai"
-                    value={expertEmail}
-                    onChange={(e) => {
-                      setExpertEmail(e.target.value);
-                      setExpertEmailTouched(true);
-                    }}
-                    onBlur={() => setExpertEmailTouched(true)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#5E5CE6]/60 focus:bg-[#191921] focus:shadow-[0_0_20px_rgba(94,92,230,0.2)] focus:ring-0 outline-none transition duration-300 font-mono"
+                     type="email"
+                     required
+                     placeholder="e.g. ananya.iyer@axiom.ai"
+                     value={expertEmail}
+                     onChange={(e) => {
+                       setExpertEmail(e.target.value);
+                       setExpertEmailTouched(true);
+                     }}
+                     onBlur={() => setExpertEmailTouched(true)}
+                     className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-200 font-mono"
                   />
                   {expertEmailTouched && (
                     <span className="absolute right-3.5 top-[38px]">
@@ -505,12 +516,12 @@ export default function SignupPage() {
 
                 {/* Area of Expertise */}
                 <div>
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-2">Area of Core Expertise</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-2">Area of Core Expertise</label>
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { value: "Medical" as const, icon: Heart, label: "Medical", color: "text-rose-400 bg-rose-400/5 border-rose-400/10" },
-                      { value: "Legal" as const, icon: Scale, label: "Legal", color: "text-amber-400 bg-amber-400/5 border-amber-400/10" },
-                      { value: "Tech" as const, icon: Code, label: "Tech", color: "text-[#0A84FF] bg-[#0A84FF]/5 border-[#0A84FF]/10" }
+                      { value: "Medical" as const, icon: Heart, label: "Medical" },
+                      { value: "Legal" as const, icon: Scale, label: "Legal" },
+                      { value: "Tech" as const, icon: Code, label: "Tech" }
                     ].map((item) => {
                       const Icon = item.icon;
                       const isSelected = expertArea === item.value;
@@ -519,13 +530,13 @@ export default function SignupPage() {
                           key={item.value}
                           type="button"
                           onClick={() => setExpertArea(item.value)}
-                          className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-2 transition duration-300 ${
+                          className={`p-3 rounded border flex flex-col items-center justify-center gap-2 transition duration-200 ${
                             isSelected
-                              ? "bg-[#5E5CE6]/10 border-[#5E5CE6]/50 text-white shadow-[0_0_15px_rgba(94,92,230,0.25)]"
-                              : "bg-[#13131a]/60 border-white/5 text-[#acaab4] hover:border-white/10 hover:text-white"
+                              ? "bg-[#ffffff]/10 border-[#ffffff]/50 text-white"
+                              : "bg-[#141313] border-[#262626] text-zinc-400 hover:border-white/20 hover:text-white"
                           }`}
                         >
-                          <Icon className={`w-4 h-4 ${isSelected ? "text-[#a5a5ff]" : "text-gray-400"}`} />
+                          <Icon className={`w-4 h-4 ${isSelected ? "text-[#ffffff]" : "text-zinc-500"}`} />
                           <span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span>
                         </button>
                       );
@@ -535,11 +546,11 @@ export default function SignupPage() {
 
                 {/* Triage Tier Dropdown Selection */}
                 <div>
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-1.5">Starting Vetting Tier</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-1.5">Starting Vetting Tier</label>
                   <select
                     value={expertTier}
                     onChange={(e) => setExpertTier(e.target.value as any)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#5E5CE6]/60 focus:bg-[#191921] focus:ring-0 outline-none transition duration-300 font-semibold cursor-pointer"
+                    className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-200 font-semibold cursor-pointer"
                   >
                     <option value="BRONZE">Bronze (1.0x Point Multiplier)</option>
                     <option value="SILVER">Silver (1.2x Point Multiplier)</option>
@@ -552,8 +563,8 @@ export default function SignupPage() {
                 {/* Dialect Languages (Hinglish/regional) */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <label className="text-xs text-[#acaab4] font-semibold block">Instruction Languages</label>
-                    <span className="text-[9px] text-[#5E5CE6] font-bold uppercase tracking-wider">Select 1 or more</span>
+                    <label className="text-xs text-zinc-400 font-semibold block">Instruction Languages</label>
+                    <span className="text-[9px] text-[#ffffff] font-bold uppercase tracking-wider font-mono">Select 1 or more</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {availableLanguages.map((lang) => {
@@ -563,10 +574,10 @@ export default function SignupPage() {
                           key={lang}
                           type="button"
                           onClick={() => handleLangToggle(lang)}
-                          className={`px-3 py-1.5 rounded-lg text-[10px] font-mono border transition-all duration-300 ${
+                          className={`px-3 py-1.5 rounded text-[10px] font-mono border transition-all duration-200 ${
                             isSelected
-                              ? "bg-[#BF5AF2]/10 border-[#BF5AF2]/40 text-[#BF5AF2] shadow-[0_0_10px_rgba(191,90,242,0.15)]"
-                              : "bg-[#13131a]/40 border-white/5 text-[#acaab4] hover:border-white/10 hover:text-white"
+                              ? "bg-[#ffffff]/10 border-[#ffffff]/40 text-[#ffffff]"
+                              : "bg-[#141313] border-[#262626] text-zinc-400 hover:border-white/20 hover:text-white"
                           }`}
                         >
                           {lang}
@@ -579,9 +590,9 @@ export default function SignupPage() {
                 {/* Razorpay UPI VPA */}
                 <div className="relative">
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs text-[#acaab4] font-semibold block">Razorpay UPI VPA ID</label>
-                    <span className="text-[9px] font-bold text-emerald-400 flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-emerald-400 animate-ping" />
+                    <label className="text-xs text-zinc-400 font-semibold block">Razorpay UPI VPA ID</label>
+                    <span className="text-[9px] font-bold text-emerald-400 flex items-center gap-1 font-mono">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       Razorpay X Rails
                     </span>
                   </div>
@@ -595,7 +606,7 @@ export default function SignupPage() {
                       setExpertUpiTouched(true);
                     }}
                     onBlur={() => setExpertUpiTouched(true)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#5E5CE6]/60 focus:bg-[#191921] focus:shadow-[0_0_20px_rgba(94,92,230,0.2)] focus:ring-0 outline-none transition duration-300 font-mono"
+                    className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-200 font-mono"
                   />
                   {expertUpiTouched && (
                     <span className="absolute right-3.5 top-[38px]">
@@ -618,7 +629,7 @@ export default function SignupPage() {
                   <button
                     type="submit"
                     disabled={!isExpertFormValid}
-                    className="w-full py-3.5 bg-gradient-to-r from-[#a5a5ff] to-[#5E5CE6] text-[#1700a1] hover:text-white font-display font-black uppercase text-xs rounded-xl shadow-[0_0_30px_-5px_rgba(94,92,230,0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none hover:shadow-[0_0_35px_-2px_rgba(94,92,230,0.6)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-white text-black hover:bg-zinc-200 font-display font-bold uppercase text-xs rounded disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     <span>Activate Expert Node</span>
                     <ArrowRight className="w-4 h-4" />
@@ -637,23 +648,19 @@ export default function SignupPage() {
                 : "hidden lg:opacity-40 lg:scale-[0.98] lg:pointer-events-none"
             }`}
           >
-            <div className={`glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300 ${
+            <div className={`bg-[#121212] border rounded-xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300 ${
               activeTrack === "client" 
-                ? "bg-[#191921]/50 border-2 border-[#BF5AF2]/30 shadow-[0_0_50px_-10px_rgba(191,90,242,0.25)]" 
-                : "bg-[#13131a]/40"
+                ? "border-[#ffffff]/50 bg-[#121212]" 
+                : "border-[#262626] opacity-60"
             }`}>
-              {/* Inner glowing element */}
-              {activeTrack === "client" && (
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#BF5AF2]/10 blur-3xl rounded-full" />
-              )}
 
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-[#BF5AF2]/10 flex items-center justify-center text-[#BF5AF2]">
+                <div className="w-12 h-12 rounded bg-[#141313] border border-[#262626] flex items-center justify-center text-[#ffffff]">
                   <Building className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-display font-black text-white">Enterprise Client Gateway</h3>
-                  <p className="text-[10px] text-[#acaab4] uppercase tracking-wider mt-0.5">Integrate Stripe billing profiles</p>
+                  <h3 className="text-xl font-display font-bold text-white">Enterprise Client Gateway</h3>
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mt-0.5 font-mono">Integrate Stripe billing profiles</p>
                 </div>
               </div>
 
@@ -662,7 +669,7 @@ export default function SignupPage() {
                 
                 {/* Company Name */}
                 <div className="relative">
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-1.5">Enterprise Organization Name</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-1.5">Enterprise Organization Name</label>
                   <input
                     type="text"
                     required
@@ -673,12 +680,12 @@ export default function SignupPage() {
                       setClientCompanyTouched(true);
                     }}
                     onBlur={() => setClientCompanyTouched(true)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#BF5AF2]/60 focus:bg-[#191921] focus:shadow-[0_0_20px_rgba(191,90,242,0.2)] focus:ring-0 outline-none transition duration-300 font-semibold"
+                    className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-300 font-semibold"
                   />
                   {clientCompanyTouched && (
                     <span className="absolute right-3.5 top-[38px]">
                       {isClientCompanyValid ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
                       ) : (
                         <AlertCircle className="w-4 h-4 text-rose-400" />
                       )}
@@ -688,7 +695,7 @@ export default function SignupPage() {
 
                 {/* Email Address */}
                 <div className="relative">
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-1.5">Corporate Email Address</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-1.5">Corporate Email Address</label>
                   <input
                     type="email"
                     required
@@ -699,12 +706,12 @@ export default function SignupPage() {
                       setClientEmailTouched(true);
                     }}
                     onBlur={() => setClientEmailTouched(true)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#BF5AF2]/60 focus:bg-[#191921] focus:shadow-[0_0_20px_rgba(191,90,242,0.2)] focus:ring-0 outline-none transition duration-300 font-mono"
+                    className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-300 font-mono"
                   />
                   {clientEmailTouched && (
                     <span className="absolute right-3.5 top-[38px]">
                       {isClientEmailValid ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
                       ) : (
                         <AlertCircle className="w-4 h-4 text-rose-400" />
                       )}
@@ -714,7 +721,7 @@ export default function SignupPage() {
 
                 {/* Model Size Interest */}
                 <div>
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-2">Targeted LLM Architecture Size</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-2">Targeted LLM Architecture Size</label>
                   <div className="grid grid-cols-3 gap-3">
                     {[
                       { value: "Small (<7B)", desc: "Sub-7B params" },
@@ -727,14 +734,14 @@ export default function SignupPage() {
                           key={item.value}
                           type="button"
                           onClick={() => setClientLlmSize(item.value)}
-                          className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition duration-300 ${
+                          className={`p-3 rounded border flex flex-col items-center justify-center gap-1.5 transition duration-300 ${
                             isSelected
-                              ? "bg-[#BF5AF2]/10 border-[#BF5AF2]/50 text-white shadow-[0_0_15px_rgba(191,90,242,0.25)]"
-                              : "bg-[#13131a]/60 border-white/5 text-[#acaab4] hover:border-white/10 hover:text-white"
+                              ? "bg-[#ffffff]/10 border-[#ffffff]/50 text-white"
+                              : "bg-[#141313] border-[#262626] text-zinc-400 hover:border-white/20 hover:text-white"
                           }`}
                         >
                           <span className="text-[10px] font-bold uppercase tracking-wider">{item.value}</span>
-                          <span className="text-[8px] text-[#acaab4]/70 tracking-tight">{item.desc}</span>
+                          <span className="text-[8px] text-zinc-500 tracking-tight">{item.desc}</span>
                         </button>
                       );
                     })}
@@ -744,9 +751,9 @@ export default function SignupPage() {
                 {/* Stripe Billing Contact info */}
                 <div className="relative">
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs text-[#acaab4] font-semibold block">Stripe Billing Contact</label>
-                    <span className="text-[9px] font-bold text-[#0A84FF] flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-[#0A84FF] animate-ping" />
+                    <label className="text-xs text-zinc-400 font-semibold block">Stripe Billing Contact</label>
+                    <span className="text-[9px] font-bold text-[#10B981] flex items-center gap-1 font-mono">
+                      <span className="w-1 h-1 rounded-full bg-[#10B981] animate-ping" />
                       International Checkout API
                     </span>
                   </div>
@@ -760,12 +767,12 @@ export default function SignupPage() {
                       setClientStripeTouched(true);
                     }}
                     onBlur={() => setClientStripeTouched(true)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#BF5AF2]/60 focus:bg-[#191921] focus:shadow-[0_0_20px_rgba(191,90,242,0.2)] focus:ring-0 outline-none transition duration-300 font-mono"
+                    className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-300 font-mono"
                   />
                   {clientStripeTouched && (
                     <span className="absolute right-3.5 top-[38px]">
                       {isClientStripeValid ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
                       ) : (
                         <AlertCircle className="w-4 h-4 text-rose-400" />
                       )}
@@ -781,8 +788,8 @@ export default function SignupPage() {
                 {/* Custom Dataset Demand Text */}
                 <div className="relative">
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs text-[#acaab4] font-semibold block">Custom Dataset Specifications</label>
-                    <span className="text-[9px] text-[#acaab4]/70 font-mono">Min 10 characters</span>
+                    <label className="text-xs text-zinc-400 font-semibold block">Custom Dataset Specifications</label>
+                    <span className="text-[9px] text-zinc-500 font-mono">Min 10 characters</span>
                   </div>
                   <textarea
                     required
@@ -794,12 +801,12 @@ export default function SignupPage() {
                       setClientNeedsTouched(true);
                     }}
                     onBlur={() => setClientNeedsTouched(true)}
-                    className="w-full p-3 rounded-xl bg-[#13131a]/80 text-white text-xs border border-white/5 focus:border-[#BF5AF2]/60 focus:bg-[#191921] focus:shadow-[0_0_20px_rgba(191,90,242,0.2)] focus:ring-0 outline-none transition duration-300 font-sans resize-none"
+                    className="w-full p-3 rounded bg-[#141313] text-white text-xs border border-[#262626] focus:border-[#ffffff] focus:bg-[#141313] focus:ring-0 outline-none transition duration-300 font-sans resize-none"
                   />
                   {clientNeedsTouched && (
                     <span className="absolute right-3.5 bottom-3.5">
                       {isClientNeedsValid ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
                       ) : (
                         <AlertCircle className="w-4 h-4 text-rose-400" />
                       )}
@@ -812,7 +819,7 @@ export default function SignupPage() {
                   <button
                     type="submit"
                     disabled={!isClientFormValid}
-                    className="w-full py-3.5 bg-gradient-to-r from-[#BF5AF2] to-[#0A84FF] text-white hover:text-white font-display font-black uppercase text-xs rounded-xl shadow-[0_0_30px_-5px_rgba(191,90,242,0.4)] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none hover:shadow-[0_0_35px_-2px_rgba(191,90,242,0.6)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 bg-white text-black hover:bg-zinc-200 font-display font-bold uppercase text-xs rounded disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     <span>Provision Enterprise Gateway</span>
                     <ArrowRight className="w-4 h-4" />
@@ -829,84 +836,82 @@ export default function SignupPage() {
 
       {/* Sci-Fi Submission Log Terminal Modal Overlay */}
       {isSubmitting && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0e0e15]/95 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-xl p-1 bg-gradient-to-br from-[#5E5CE6] via-[#BF5AF2] to-[#0A84FF] rounded-2xl shadow-[0_0_80px_rgba(94,92,230,0.3)]">
-            <div className="bg-[#0e0e15] rounded-xl p-6 relative overflow-hidden">
-              
-              {/* Star/grid terminal particles */}
-              <div className="absolute inset-0 bg-grid-cyber opacity-20 pointer-events-none" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#141313]/95 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-xl border border-[#ffffff]/50 bg-[#141313] rounded-xl shadow-none p-6 relative overflow-hidden">
+            
+            {/* Star/grid terminal particles */}
+            <div className="absolute inset-0 bg-grid-cyber opacity-25 pointer-events-none" />
 
-              <div className="flex items-center justify-between mb-5 relative pb-3 border-b border-white/5">
-                <div className="flex items-center gap-3">
-                  <Terminal className="w-5 h-5 text-[#a5a5ff] animate-pulse" />
-                  <span className="font-mono text-xs text-white font-bold tracking-widest uppercase">
-                    Axiom Node Calibration Sequence
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                  <span className="font-mono text-[9px] text-[#acaab4] uppercase font-bold tracking-wider">
-                    Secure Channel
-                  </span>
-                </div>
+            <div className="flex items-center justify-between mb-5 relative pb-3 border-b border-[#262626]">
+              <div className="flex items-center gap-3">
+                <Terminal className="w-5 h-5 text-[#ffffff]" />
+                <span className="font-mono text-xs text-white font-bold tracking-widest uppercase">
+                  Axiom Node Calibration Sequence
+                </span>
               </div>
+              <div className="flex items-center gap-1.5 font-mono">
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                <span className="text-[9px] text-zinc-500 uppercase font-bold tracking-wider">
+                  Secure Channel
+                </span>
+              </div>
+            </div>
 
-              {/* Progress Logs */}
-              <div className="font-mono text-[11px] leading-relaxed space-y-3.5 mb-6 max-h-[300px] overflow-y-auto pr-2">
-                {subProgress.map((prog, index) => {
-                  let indicatorColor = "text-gray-500";
-                  let statusText = "[ PENDING ]";
-                  
-                  if (prog.status === "running") {
-                    indicatorColor = "text-[#a5a5ff] animate-pulse";
-                    statusText = "[ RUNNING ]";
-                  } else if (prog.status === "success") {
-                    indicatorColor = "text-emerald-400";
-                    statusText = "[   OK    ]";
-                  } else if (prog.status === "error") {
-                    indicatorColor = "text-rose-400";
-                    statusText = "[  FAIL   ]";
-                  }
+            {/* Progress Logs */}
+            <div className="font-mono text-[11px] leading-relaxed space-y-3.5 mb-6 max-h-[300px] overflow-y-auto pr-2">
+              {subProgress.map((prog, index) => {
+                let indicatorColor = "text-zinc-600";
+                let statusText = "[ PENDING ]";
+                
+                if (prog.status === "running") {
+                  indicatorColor = "text-[#ffffff]";
+                  statusText = "[ RUNNING ]";
+                } else if (prog.status === "success") {
+                  indicatorColor = "text-[#10B981]";
+                  statusText = "[   OK    ]";
+                } else if (prog.status === "error") {
+                  indicatorColor = "text-rose-400";
+                  statusText = "[  FAIL   ]";
+                }
 
-                  return (
-                    <div key={index} className="flex justify-between items-start gap-4">
-                      <div className="flex items-start gap-2 text-gray-300">
-                        <span className={`${indicatorColor} select-none`}>&gt;</span>
-                        <span className={prog.status === "running" ? "text-white font-bold" : ""}>
-                          {prog.text}
-                        </span>
-                      </div>
-                      <span className={`font-bold shrink-0 ${indicatorColor}`}>
-                        {statusText}
+                return (
+                  <div key={index} className="flex justify-between items-start gap-4">
+                    <div className="flex items-start gap-2 text-zinc-300">
+                      <span className={`${indicatorColor} select-none`}>&gt;</span>
+                      <span className={prog.status === "running" ? "text-white font-bold" : ""}>
+                        {prog.text}
                       </span>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Loader or Success Summary */}
-              {submissionComplete ? (
-                <div className="p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/20 text-center animate-fade-in">
-                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <span className={`font-bold shrink-0 ${indicatorColor}`}>
+                      {statusText}
+                    </span>
                   </div>
-                  <h4 className="text-sm font-display font-black text-white uppercase tracking-wider mb-2">
-                    Onboarding Node Synced
-                  </h4>
-                  <p className="text-[10px] text-[#acaab4] leading-relaxed max-w-sm mx-auto">
-                    Key pairs authorized. System is loading. Enjoy compounding royalties in the decentralized bilingual marketplace.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-3.5 py-4 border-t border-white/5">
-                  <Loader2 className="w-4 h-4 text-[#a5a5ff] animate-spin" />
-                  <span className="font-mono text-[10px] text-[#acaab4] uppercase font-bold tracking-widest animate-pulse">
-                    Broadcasting node transaction state...
-                  </span>
-                </div>
-              )}
-
+                );
+              })}
             </div>
+
+            {/* Loader or Success Summary */}
+            {submissionComplete ? (
+              <div className="p-4 rounded bg-[#10B981]/10 border border-[#10B981]/25 text-center animate-fade-in">
+                <div className="w-10 h-10 rounded-full bg-[#10B981]/10 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 className="w-5 h-5 text-[#10B981]" />
+                </div>
+                <h4 className="text-sm font-display font-bold text-white uppercase tracking-wider mb-2">
+                  Onboarding Node Synced
+                </h4>
+                <p className="text-[10px] text-zinc-400 leading-relaxed max-w-sm mx-auto">
+                  Key pairs authorized. System is loading. Enjoy compounding royalties in the decentralized bilingual marketplace.
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-3.5 py-4 border-t border-[#262626]">
+                <Loader2 className="w-4 h-4 text-[#ffffff] animate-spin" />
+                <span className="font-mono text-[10px] text-zinc-500 uppercase font-bold tracking-widest ">
+                  Broadcasting node transaction state...
+                </span>
+              </div>
+            )}
+
           </div>
         </div>
       )}

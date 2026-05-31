@@ -61,23 +61,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex overflow-x-hidden bg-[#0e0e15] text-[#e7e4ee] font-label select-none selection:bg-[#a5a5ff]/30 selection:text-white">
+    <div className="min-h-screen flex overflow-x-hidden bg-[#141313] text-[#e7e4ee] font-label select-none selection:bg-[#ffffff]/30 selection:text-white">
       {/* Persistent Left SideNavBar */}
-      <aside className="w-64 fixed left-0 top-0 h-screen bg-[#13131a]/40 backdrop-blur-xl border-r border-white/[0.03] shadow-2xl flex flex-col py-8 px-4 z-50">
+      <aside className="w-64 fixed left-0 top-0 h-screen bg-[#121212]/40 backdrop-blur-xl border-r border-[#262626] shadow-2xl flex flex-col py-8 px-4 z-50">
         {/* Branding header */}
         <div className="mb-10 px-2 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#a5a5ff]/20 flex items-center justify-center ambient-shadow-primary text-[#a5a5ff]">
+          <div className="w-10 h-10 rounded-xl bg-[#ffffff]/20 flex items-center justify-center  text-[#ffffff]">
             <Database className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-display font-black tracking-tighter text-[#a5a5ff] leading-none">Axiom</h1>
+            <h1 className="text-2xl font-display font-black tracking-tighter text-[#ffffff] leading-none">Axiom</h1>
             <p className="text-[10px] text-[#acaab4] font-label uppercase tracking-widest mt-1">Decentralized Data</p>
           </div>
         </div>
 
         {/* Global Action CTA */}
         <Link href="/vetting">
-          <button className="mb-8 w-full py-3 px-4 rounded-xl bg-[#a5a5ff] text-[#1700a1] font-display font-bold text-xs hover:bg-[#6462ec] hover:text-white transition-all duration-300 shadow-[0_0_20px_-5px_rgba(165,165,255,0.4)] active:scale-[0.98] flex items-center justify-center gap-2">
+          <button className="mb-8 w-full py-3 px-4 rounded-xl bg-[#ffffff] text-[#1700a1] font-display font-bold text-xs hover:bg-[#6462ec] hover:text-white transition-all duration-300 shadow-[0_0_20px_-5px_rgba(165,165,255,0.4)] active:scale-[0.98] flex items-center justify-center gap-2">
             <ShieldCheck className="w-4 h-4" />
             Enter Vetting Arena
           </button>
@@ -94,11 +94,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <div
                   className={`flex items-center gap-3 px-4 py-3 font-display font-semibold text-sm rounded-xl transition-all duration-300 cursor-pointer active:scale-[0.97] ${
                     isActive
-                      ? "bg-[#a5a5ff]/10 text-[#a5a5ff]"
+                      ? "bg-[#ffffff]/10 text-[#ffffff]"
                       : "text-[#acaab4] hover:text-[#e7e4ee] hover:bg-white/[0.03]"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? "text-[#a5a5ff]" : "text-[#acaab4]"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-[#ffffff]" : "text-[#acaab4]"}`} />
                   {item.name}
                 </div>
               </Link>
@@ -107,7 +107,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </nav>
 
         {/* Support & Connection Status Footer */}
-        <ul className="flex flex-col gap-2 mt-auto pt-6 border-t border-white/5">
+        <ul className="flex flex-col gap-2 mt-auto pt-6 border-t border-[#262626]">
           <li>
             <a 
               href="mailto:support@axiom.ai" 
@@ -135,10 +135,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Canvas & Content Wrapper */}
       <div className="ml-64 flex-1 flex flex-col min-h-screen relative">
         {/* TopNavBar Header */}
-        <header className="bg-[#0e0e15]/40 backdrop-blur-md fixed top-0 right-0 w-[calc(100%-16rem)] z-40 border-b border-white/[0.02] flex justify-between items-center h-16 px-8">
+        <header className="bg-[#141313]/40 backdrop-blur-md fixed top-0 right-0 w-[calc(100%-16rem)] z-40 border-b border-[#1a1a1a] flex justify-between items-center h-16 px-8">
           <div className="flex-1 max-w-md relative group">
             <input
-              className="bg-[#1f1f28]/40 border border-white/[0.04] group-hover:border-white/[0.08] focus:border-[#a5a5ff]/40 rounded-full py-1.5 px-4 pl-10 text-xs focus:ring-0 outline-none text-[#e7e4ee] placeholder:text-[#acaab4]/60 w-48 focus:w-64 transition-all duration-300"
+              className="bg-[#1f1f28]/40 border border-[#262626] group-hover:border-white/[0.08] focus:border-[#ffffff]/40 rounded-full py-1.5 px-4 pl-10 text-xs focus:ring-0 outline-none text-[#e7e4ee] placeholder:text-[#acaab4]/60 w-48 focus:w-64 transition-all duration-300"
               placeholder="Search datasets, logs..."
               type="text"
             />
@@ -149,7 +149,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Notification bell */}
             <button 
               onClick={() => setNotificationActive(false)}
-              className="text-[#acaab4] hover:text-[#a5a5ff] hover:bg-[#1f1f28]/40 p-2 rounded-full transition-all relative"
+              className="text-[#acaab4] hover:text-[#ffffff] hover:bg-[#1f1f28]/40 p-2 rounded-full transition-all relative"
             >
               <Bell className="w-4 h-4" />
               {notificationActive && (
@@ -162,8 +162,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               onClick={handleConnectWallet}
               className={`px-4 py-1.5 rounded-full border text-xs font-display font-semibold transition-all duration-300 active:scale-95 flex items-center gap-2 ${
                 walletConnected
-                  ? "bg-[#a5a5ff]/10 border-[#a5a5ff]/20 text-[#a5a5ff]"
-                  : "bg-white/[0.02] border-white/10 hover:bg-white/[0.05] text-[#e7e4ee]"
+                  ? "bg-[#ffffff]/10 border-[#ffffff]/20 text-[#ffffff]"
+                  : "bg-white/[0.02] border-[#262626] hover:bg-white/[0.05] text-[#e7e4ee]"
               }`}
             >
               <Wallet className="w-3.5 h-3.5" />
@@ -171,7 +171,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
 
             {/* Custom User Avatar */}
-            <div className="w-8 h-8 rounded-full bg-[#1f1f28] overflow-hidden flex-shrink-0 border border-white/10 select-none">
+            <div className="w-8 h-8 rounded-full bg-[#1f1f28] overflow-hidden flex-shrink-0 border border-[#262626] select-none">
               <img
                 alt="User Avatar"
                 className="w-full h-full object-cover"

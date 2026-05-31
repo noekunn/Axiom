@@ -2,25 +2,15 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  Layers,
   Cpu,
-  Database,
-  TrendingUp,
-  Wallet,
-  DollarSign,
   CheckCircle2,
   AlertCircle,
   Loader2,
-  Sparkles,
   UserCheck,
   FileText,
-  Check,
-  Send,
-  HelpCircle,
-  Plus
+  Send
 } from "lucide-react";
 import ExpertLayout from "@/components/ExpertLayout";
-import RoyaltyAnalytics from "@/components/RoyaltyAnalytics";
 
 interface Expert {
   id: string;
@@ -70,20 +60,6 @@ interface TaskSubmission {
   }>;
 }
 
-interface RoyaltyPayout {
-  id: string;
-  expertId: string;
-  expertName: string;
-  poolId: string;
-  poolTitle: string;
-  licenseType: 'SHARED' | 'EXCLUSIVE';
-  grossRoyalty: number;
-  netRoyalty: number;
-  timestamp: string;
-  status: 'SUCCESS' | 'PENDING' | 'FAILED';
-  payoutTransactionId: string;
-}
-
 // Pre-seeded expert accounts for the demo switcher
 const SEEDED_EXPERTS = [
   { email: 'ananya.iyer@axiom.ai', name: 'Dr. Ananya Iyer' },
@@ -98,7 +74,6 @@ export default function ExpertDashboard() {
   const [expertEmail, setExpertEmail] = useState('ananya.iyer@axiom.ai');
   const [expertProfile, setExpertProfile] = useState<Expert | null>(null);
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([]);
-  const [payouts, setPayouts] = useState<RoyaltyPayout[]>([]);
 
   // Pools State
   const [pools, setPools] = useState<AssetPool[]>([]);
@@ -130,11 +105,9 @@ export default function ExpertDashboard() {
       if (data.success) {
         setExpertProfile(data.expert);
         setSubmissions(data.submissions || []);
-        setPayouts(data.payouts || []);
       } else {
         setExpertProfile(null);
         setSubmissions([]);
-        setPayouts([]);
       }
     } catch (err) {
       console.error(err);
@@ -163,21 +136,22 @@ export default function ExpertDashboard() {
   const handleSwitchExpert = useCallback((email: string) => {
     setExpertEmail(email);
     fetchExpertData(email);
-  }, []);
-
-  // Status polling for pending payouts
-  useEffect(() => {
-    const hasPendingPayouts = payouts.some(p => p.status === 'PENDING');
-    if (!hasPendingPayouts || loading) return;
-
-    const pollInterval = setInterval(() => {
-      if (expertProfile?.email) {
-        fetchExpertData(expertProfile.email);
+    // Auto-approve seeded expert nodes for convenience
+    if (typeof window !== "undefined") {
+      const isSeeded = SEEDED_EXPERTS.some(exp => exp.email === email);
+      if (isSeeded) {
+        localStorage.setItem("axiom_expert_status", "Approved");
+        localStorage.setItem("axiom_user_role", "expert");
+        localStorage.setItem("axiom_user_email", email);
+        const name = SEEDED_EXPERTS.find(exp => exp.email === email)?.name || "";
+        localStorage.setItem("axiom_user_name", name);
+        setExpertStatus("Approved");
+      } else {
+        const storedStatus = localStorage.getItem("axiom_expert_status") || "Shortlisted";
+        setExpertStatus(storedStatus);
       }
-    }, 10000); // Poll every 10 seconds
-
-    return () => clearInterval(pollInterval);
-  }, [payouts, loading, expertProfile?.email]);
+    }
+  }, []);
 
   // Auto trigger alerts timeout
   useEffect(() => {
@@ -187,8 +161,27 @@ export default function ExpertDashboard() {
     }
   }, [alert]);
 
+  // Read local storage on mount to identify active expert
+  const [expertStatus, setExpertStatus] = useState<string>("Approved");
+
   useEffect(() => {
-    fetchExpertData(expertEmail);
+    let email = "ananya.iyer@axiom.ai";
+    let status = "Approved";
+    if (typeof window !== "undefined") {
+      const storedEmail = localStorage.getItem("axiom_user_email");
+      const storedStatus = localStorage.getItem("axiom_expert_status");
+      if (storedEmail) {
+        email = storedEmail;
+        setExpertEmail(storedEmail);
+      }
+      if (storedStatus) {
+        status = storedStatus;
+        setExpertStatus(storedStatus);
+      } else {
+        localStorage.setItem("axiom_expert_status", "Approved");
+      }
+    }
+    fetchExpertData(email);
     fetchPools();
   }, []);
 
@@ -295,35 +288,43 @@ export default function ExpertDashboard() {
         </div>
       )}
 
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#262626] pb-6 mb-8">
+        <div>
+          <h2 className="text-2xl font-display font-bold text-white tracking-tight">Expert Workbench</h2>
+          <p className="text-xs text-[#acaab4] font-label mt-1">Claim active dataset instruction challenges and verify responses</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-zinc-500 font-label">Switch Node:</span>
+          <select
+            value={expertEmail}
+            onChange={(e) => handleSwitchExpert(e.target.value)}
+            className="text-xs font-mono bg-[#121212] border border-[#262626] text-white rounded px-3 py-1.5 focus:outline-none hover:border-white/20 transition-all cursor-pointer"
+          >
+            {SEEDED_EXPERTS.map((exp) => (
+              <option key={exp.email} value={exp.email}>
+                {exp.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Grid Canvas */}
       <div className="grid grid-cols-12 gap-8 select-none">
         
-        {/* Left Analytics Column */}
-        <div className="col-span-12 xl:col-span-3 flex flex-col gap-6">
-          {/* Identity Card */}
-          <div id="settings" className="glass-panel rounded-2xl p-6 relative overflow-hidden border border-white/[0.01]">
+        {/* Left Identity Column (Left 3 Columns) */}
+        <div className="col-span-12 lg:col-span-3 flex flex-col gap-6">
+          <div id="settings" className="bg-[#121212] border border-[#262626] rounded p-6 relative overflow-hidden">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-display font-black uppercase text-[#e7e4ee] tracking-wider flex items-center gap-2">
-                <UserCheck className="w-4 h-4 text-[#5E5CE6]" />
-                Identity Node
+              <h3 className="text-xs font-display font-bold uppercase text-[#e7e4ee] tracking-wider flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-white" />
+                Active Node
               </h3>
-              
-              {/* Expert Dropdown Switcher */}
-              <select
-                value={expertEmail}
-                onChange={(e) => handleSwitchExpert(e.target.value)}
-                className="text-[10px] font-mono bg-[#191921]/60 border border-white/10 text-gray-300 rounded-lg px-2.5 py-1 focus:outline-none cursor-pointer hover:border-white/20 transition-all"
-              >
-                {SEEDED_EXPERTS.map((exp) => (
-                  <option key={exp.email} value={exp.email}>
-                    {exp.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {loading ? (
-              <div className="space-y-4 animate-pulse">
+              <div className="space-y-4">
                 <div className="h-6 bg-white/5 rounded w-2/3"></div>
                 <div className="h-4 bg-white/5 rounded w-1/2"></div>
                 <div className="h-4 bg-white/5 rounded w-3/4"></div>
@@ -336,13 +337,13 @@ export default function ExpertDashboard() {
                 </div>
                 <div>
                   <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block font-semibold">Verified Credential</span>
-                  <span className="text-xs font-mono text-[#5E5CE6] mt-0.5 block truncate">{expertProfile.email}</span>
+                  <span className="text-xs font-mono text-zinc-400 mt-0.5 block truncate">{expertProfile.email}</span>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   <div>
                     <span className="text-[10px] text-[#acaab4] uppercase tracking-wider block font-semibold">Triage Tier</span>
-                    <span className="inline-block px-2.5 py-0.5 text-[9px] font-bold rounded-full bg-[#bf5af2]/10 border border-[#bf5af2]/20 text-[#bf5af2] mt-1 uppercase tracking-wide">
+                    <span className="inline-block px-2 py-0.5 text-[9px] font-bold rounded bg-white/10 border border-white/20 text-[#ffffff] mt-1 uppercase tracking-wide">
                       {expertProfile.tier}
                     </span>
                   </div>
@@ -364,7 +365,7 @@ export default function ExpertDashboard() {
                       setSignupTier(expertProfile.tier);
                       setIsSignupOpen(true);
                     }}
-                    className="w-full py-2 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded-xl border border-white/5 hover:border-white/10 transition duration-300"
+                    className="w-full py-2 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded border border-[#262626] transition duration-200"
                   >
                     Adjust Credentials
                   </button>
@@ -376,31 +377,148 @@ export default function ExpertDashboard() {
                 <p className="text-xs text-[#acaab4]">No active credentials linked.</p>
                 <button
                   onClick={() => setIsSignupOpen(true)}
-                  className="w-full py-2 bg-[#5E5CE6] text-white text-xs font-bold rounded-xl hover:bg-[#4a48c4] transition duration-300"
+                  className="w-full py-2 bg-white text-black font-bold rounded hover:bg-zinc-200 transition duration-200"
                 >
                   Connect Profile
                 </button>
               </div>
             )}
           </div>
-
-          {/* Royalty Analytics Widgets */}
-          <div id="royalty">
-            <RoyaltyAnalytics 
-              points={expertProfile?.points ?? 84291.5}
-              earnings={expertProfile?.totalEarnings ?? 115200}
-              poolCount={submissions.reduce((acc, curr) => acc.includes(curr.poolId) ? acc : [...acc, curr.poolId], [] as string[]).length || 3}
-            />
-          </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="col-span-12 xl:col-span-9 flex flex-col gap-8">
+        {/* Main Content Area (Right 9 Columns) */}
+        <div className="col-span-12 lg:col-span-9 flex flex-col gap-8 animate-fade-in">
+          
+          {expertStatus === "Shortlisted" ? (
+            <div className="bg-[#121212] border border-[#262626] rounded p-8 space-y-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-white/[0.02] blur-[80px] pointer-events-none" />
+
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#ffffff] mb-2.5 block">
+                  Onboarding Ledger &amp; Node Activation
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-display">
+                  Sovereign Candidate Shortlist
+                </h3>
+                <p className="text-zinc-400 text-sm mt-2 leading-relaxed font-body-md">
+                  Welcome to the Axiom Sovereign Network, <span className="text-white font-bold">{expertProfile?.name || "Candidate Specialist"}</span>. 
+                  Your credentials have been successfully shortlisted from thousands of applicants. To activate your node and unlock mainnet claiming payouts, complete the final vetting activation checkpoint.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-xs font-mono font-bold uppercase text-zinc-500 tracking-wider">
+                  NODE VERIFICATION CHECKLIST
+                </h4>
+
+                <div className="space-y-3.5">
+                  <div className="flex gap-4 p-4 rounded bg-[#141313] border border-[#262626] items-start transition-all duration-300">
+                    <span className="w-5 h-5 rounded-full bg-white/10 text-white border border-white/20 flex items-center justify-center text-[10px] font-mono shrink-0 font-bold mt-0.5">
+                      ✓
+                    </span>
+                    <div className="space-y-1">
+                      <span className="text-xs font-mono font-bold tracking-wide text-zinc-300 uppercase block">
+                        Step 1: Application Ledger Submitted
+                      </span>
+                      <p className="text-zinc-500 text-xs font-body-md">
+                        Onboarding application logged securely. Linked credential details match expert specifications.
+                      </p>
+                    </div>
+                    <span className="text-[9px] font-mono text-[#10B981] ml-auto shrink-0 bg-[#10B981]/15 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                      Complete
+                    </span>
+                  </div>
+
+                  <div className="flex gap-4 p-4 rounded bg-[#141313] border border-[#262626] items-start transition-all duration-300">
+                    <span className="w-5 h-5 rounded-full bg-white/10 text-white border border-white/20 flex items-center justify-center text-[10px] font-mono shrink-0 font-bold mt-0.5">
+                      ✓
+                    </span>
+                    <div className="space-y-1">
+                      <span className="text-xs font-mono font-bold tracking-wide text-zinc-300 uppercase block">
+                        Step 2: Axiom Core Selection &amp; Shortlist
+                      </span>
+                      <p className="text-zinc-500 text-xs font-body-md">
+                        Review of expert portfolio approved. Node successfully shortlisted into specialized domain group: <span className="text-white font-bold">{expertProfile?.expertise || "Biomedical/Technical"} Track</span>.
+                      </p>
+                    </div>
+                    <span className="text-[9px] font-mono text-[#10B981] ml-auto shrink-0 bg-[#10B981]/15 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                      Complete
+                    </span>
+                  </div>
+
+                  <div className="flex gap-4 p-4 rounded bg-[#141313]/50 border border-white/10 items-start transition-all duration-300 hover:border-white/20">
+                    <span className="w-5 h-5 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-mono shrink-0 font-bold mt-0.5 animate-pulse">
+                      3
+                    </span>
+                    <div className="space-y-1">
+                      <span className="text-xs font-mono font-bold tracking-wide text-white uppercase block">
+                        Step 3: Cognitive Domain Vetting V2 (PENDING)
+                      </span>
+                      <p className="text-zinc-400 text-xs font-body-md">
+                        Axiom requires newly registered nodes to complete a simulated instruction evaluation task in the Vetting Arena to grade precision thresholds.
+                      </p>
+                    </div>
+                    <span className="text-[9px] font-mono text-white ml-auto shrink-0 bg-white/10 px-2 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">
+                      Vetting Required
+                    </span>
+                  </div>
+
+                  <div className="flex gap-4 p-4 rounded bg-[#141313] border border-[#262626] items-start transition-all duration-300">
+                    <span className="w-5 h-5 rounded-full bg-white/10 text-white border border-white/20 flex items-center justify-center text-[10px] font-mono shrink-0 font-bold mt-0.5">
+                      ✓
+                    </span>
+                    <div className="space-y-1">
+                      <span className="text-xs font-mono font-bold tracking-wide text-zinc-300 uppercase block">
+                        Step 4: Payout UPI VPA Verification
+                      </span>
+                      <p className="text-zinc-500 text-xs font-body-md">
+                        Expert Razorpay UPI address linked: <span className="text-white font-mono">{expertProfile?.upiId || "upi@vpa"}</span>. Standard transactions connected.
+                      </p>
+                    </div>
+                    <span className="text-[9px] font-mono text-[#10B981] ml-auto shrink-0 bg-[#10B981]/15 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                      Complete
+                    </span>
+                  </div>
+
+                  <div className="flex gap-4 p-4 rounded bg-[#141313]/30 border border-[#262626] items-start transition-all duration-300 opacity-50">
+                    <span className="w-5 h-5 rounded-full bg-[#141313] text-zinc-600 border border-zinc-700 flex items-center justify-center text-[10px] font-mono shrink-0 font-bold mt-0.5">
+                      🔑
+                    </span>
+                    <div className="space-y-1">
+                      <span className="text-xs font-mono font-bold tracking-wide text-zinc-500 uppercase block">
+                        Step 5: Final Node Signature Activation
+                      </span>
+                      <p className="text-zinc-600 text-xs font-body-md">
+                        Mainnet claim logs lock and perpetual token royalty allocations activate upon successful onboarding signoff.
+                      </p>
+                    </div>
+                    <span className="text-[9px] font-mono text-zinc-600 ml-auto shrink-0 bg-transparent px-2 py-0.5 border border-zinc-700 rounded font-bold uppercase tracking-wider">
+                      Locked
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div className="pt-4 border-t border-[#262626] flex flex-col sm:flex-row items-center gap-4">
+                <div className="text-xs text-zinc-400 font-body-md">
+                  Ready to activate? Complete the cognitive task in the vetting arena now.
+                </div>
+                <Link href="/vetting" className="sm:ml-auto w-full sm:w-auto">
+                  <button className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200 font-bold px-8 py-3.5 rounded text-xs font-mono uppercase tracking-wider">
+                    Enter Vetting Arena →
+                  </button>
+                </Link>
+              </div>
+
+            </div>
+          ) : (
+            <>
           
           {/* Expert Submission Workbench */}
-          <section className="glass-panel rounded-2xl p-6 relative overflow-hidden border border-white/[0.01]">
-            <h3 className="text-lg font-display font-black text-white mb-5 flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-[#5E5CE6] animate-pulse" />
+          <section className="bg-[#121212] border border-[#262626] rounded p-6 relative overflow-hidden">
+            <h3 className="text-sm font-display font-bold uppercase text-white mb-5 flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-white" />
               Expert Reasoning Workbench
             </h3>
 
@@ -408,11 +526,11 @@ export default function ExpertDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Select Asset Pool */}
                 <div>
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-1">Target Asset Pool</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-1">Target Asset Pool</label>
                   <select
                     value={selectedPoolId}
                     onChange={(e) => setSelectedPoolId(e.target.value)}
-                    className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#5E5CE6]/40 outline-none transition duration-300"
+                    className="w-full p-2.5 rounded bg-[#141313] border border-[#262626] text-white text-xs font-semibold focus:border-white focus:bg-[#141313] outline-none transition duration-200 cursor-pointer"
                     disabled={submittingTask}
                   >
                     {pools.map(pool => (
@@ -423,11 +541,11 @@ export default function ExpertDashboard() {
 
                 {/* Multiplier Option */}
                 <div>
-                  <label className="text-xs text-[#acaab4] font-semibold block mb-1">Task Complexity Multiplier</label>
+                  <label className="text-xs text-zinc-400 font-semibold block mb-1">Task Complexity Multiplier</label>
                   <select
                     value={difficultyMultiplier}
                     onChange={(e) => setDifficultyMultiplier(Number(e.target.value))}
-                    className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#5E5CE6]/40 outline-none transition duration-300"
+                    className="w-full p-2.5 rounded bg-[#141313] border border-[#262626] text-white text-xs font-semibold focus:border-white focus:bg-[#141313] outline-none transition duration-200 cursor-pointer"
                     disabled={submittingTask}
                   >
                     <option value="1.0">Standard Reasoning (1.0x)</option>
@@ -440,13 +558,13 @@ export default function ExpertDashboard() {
 
               {/* Prompt Input */}
               <div>
-                <label className="text-xs text-[#acaab4] font-semibold block mb-1">Instruction Prompt</label>
+                <label className="text-xs text-zinc-400 font-semibold block mb-1">Instruction Challenge Prompt</label>
                 <textarea
                   placeholder="Specify clear, domain-specific instruction challenge..."
                   value={submissionPrompt}
                   onChange={(e) => setSubmissionPrompt(e.target.value)}
                   rows={2}
-                  className="w-full p-3 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#5E5CE6]/40 outline-none transition duration-300 resize-none font-sans"
+                  className="w-full p-3 rounded bg-[#141313] border border-[#262626] text-white text-xs font-semibold focus:border-white focus:bg-[#141313] outline-none transition duration-200 resize-none font-sans"
                   disabled={submittingTask}
                 />
               </div>
@@ -454,8 +572,8 @@ export default function ExpertDashboard() {
               {/* Response Input */}
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="text-xs text-[#acaab4] font-semibold block">Expert Reasoning Response</label>
-                  <span className="text-[10px] text-[#bf5af2] font-bold uppercase tracking-wider animate-pulse">
+                  <label className="text-xs text-zinc-400 font-semibold block">Expert Reasoning Response</label>
+                  <span className="text-[10px] text-zinc-500 font-mono">
                     Consensus calibration scores best on high-density traces
                   </span>
                 </div>
@@ -464,7 +582,7 @@ export default function ExpertDashboard() {
                   value={submissionResponse}
                   onChange={(e) => setSubmissionResponse(e.target.value)}
                   rows={4}
-                  className="w-full p-3 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-mono focus:border-[#5E5CE6]/40 outline-none transition duration-300 resize-none text-[11px] leading-relaxed"
+                  className="w-full p-3 rounded bg-[#141313] border border-[#262626] text-white text-xs font-mono focus:border-white focus:bg-[#141313] outline-none transition duration-200 resize-none text-[11px] leading-relaxed"
                   disabled={submittingTask}
                 />
               </div>
@@ -473,10 +591,10 @@ export default function ExpertDashboard() {
                 <button
                   type="submit"
                   disabled={submittingTask || !expertProfile}
-                  className={`w-full py-3 text-xs font-bold rounded-xl transition duration-300 flex items-center justify-center gap-2 ${
+                  className={`w-full py-3 text-xs font-bold rounded transition duration-200 flex items-center justify-center gap-2 ${
                     submittingTask 
-                      ? 'bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 cursor-not-allowed animate-pulse'
-                      : 'bg-[#5E5CE6] hover:bg-[#4a48c4] text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_-5px_rgba(94,92,230,0.4)]'
+                      ? 'bg-emerald-950/20 border border-emerald-500/20 text-emerald-400 cursor-not-allowed'
+                      : 'bg-white text-black hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed font-display uppercase tracking-wider font-bold'
                   }`}
                 >
                   {submittingTask ? (
@@ -497,14 +615,14 @@ export default function ExpertDashboard() {
 
           {/* Consensus AI QA Calibration Report */}
           {consensusReport && (
-            <div className="glass-panel rounded-2xl p-6 border border-[#bf5af2]/30 bg-[#bf5af2]/5 relative overflow-hidden animate-fade-in mb-4">
-              <div className="absolute top-0 right-0 p-2.5 bg-[#bf5af2]/10 rounded-bl-xl border-l border-b border-[#bf5af2]/20">
-                <Cpu className="w-4 h-4 text-[#bf5af2]" />
+            <div className="bg-[#121212] border border-[#262626] p-6 rounded relative overflow-hidden animate-fade-in">
+              <div className="absolute top-0 right-0 p-2.5 bg-white/5 rounded-bl-xl border-l border-b border-[#262626]">
+                <Cpu className="w-4 h-4 text-white" />
               </div>
               
               <div className="flex items-center gap-2.5 mb-4">
                 <span className={`w-2.5 h-2.5 rounded-full ${
-                  consensusReport.status === 'APPROVED' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                  consensusReport.status === 'APPROVED' ? 'bg-emerald-400' : 'bg-amber-400'
                 }`} />
                 <h3 className="text-sm font-display font-black text-white uppercase tracking-wider">
                   Consensus AI QA Calibration Report
@@ -517,19 +635,19 @@ export default function ExpertDashboard() {
 
               {/* Groq / Llama evaluation */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                <div className="p-4 rounded-xl bg-[#13131a]/60 border border-white/5 flex flex-col justify-between">
+                <div className="p-4 rounded bg-[#141313] border border-[#262626] flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-bold text-white">Llama 3.3 Score</span>
-                      <span className="text-[9px] text-[#5E5CE6] font-mono">llama-3.3-70b</span>
+                      <span className="text-[9px] text-zinc-500 font-mono">llama-3.3-70b</span>
                     </div>
                     <p className="text-xs text-[#acaab4] italic leading-relaxed">
                       &ldquo;{consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'))?.reasoning || "Evaluation completed successfully by Llama-3.3 parser."}&rdquo;
                     </p>
                   </div>
-                  <div className="mt-3 pt-2 border-t border-white/5 flex justify-between items-center text-xs">
+                  <div className="mt-3 pt-2 border-t border-[#262626] flex justify-between items-center text-xs">
                     <span className="text-[#acaab4]">Adjudication score:</span>
-                    <span className="font-bold text-emerald-400">
+                    <span className="font-bold text-emerald-400 font-mono">
                       {(() => {
                         const score = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('groq'))?.score ?? 0.85;
                         return score > 1 ? (score / 100).toFixed(2) : score.toFixed(2);
@@ -539,19 +657,19 @@ export default function ExpertDashboard() {
                 </div>
 
                 {/* OpenAI evaluation */}
-                <div className="p-4 rounded-xl bg-[#13131a]/60 border border-white/5 flex flex-col justify-between">
+                <div className="p-4 rounded bg-[#141313] border border-[#262626] flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-xs font-bold text-white">GPT-4o Score</span>
-                      <span className="text-[9px] text-[#5E5CE6] font-mono">gpt-4o</span>
+                      <span className="text-[9px] text-zinc-500 font-mono">gpt-4o</span>
                     </div>
                     <p className="text-xs text-[#acaab4] italic leading-relaxed">
                       &ldquo;{consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'))?.reasoning || "Evaluation completed successfully by GPT-4o parser."}&rdquo;
                     </p>
                   </div>
-                  <div className="mt-3 pt-2 border-t border-white/5 flex justify-between items-center text-xs">
+                  <div className="mt-3 pt-2 border-t border-[#262626] flex justify-between items-center text-xs">
                     <span className="text-[#acaab4]">Adjudication score:</span>
-                    <span className="font-bold text-emerald-400">
+                    <span className="font-bold text-emerald-400 font-mono">
                       {(() => {
                         const score = consensusReport.evaluations?.find(e => e.provider.toLowerCase().includes('openai'))?.score ?? 0.90;
                         return score > 1 ? (score / 100).toFixed(2) : score.toFixed(2);
@@ -562,7 +680,7 @@ export default function ExpertDashboard() {
               </div>
 
               {/* Final Adjudication Banner */}
-              <div className="p-4 rounded-xl bg-[#13131a]/80 border border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="p-4 rounded bg-[#141313] border border-[#262626] flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                   <span className="text-[9px] text-[#acaab4] uppercase block">Consensus Status</span>
                   <span className="text-sm font-black text-emerald-400 uppercase tracking-widest block mt-0.5">
@@ -576,8 +694,8 @@ export default function ExpertDashboard() {
                   </span>
                 </div>
                 {consensusReport.pointsEarned && (
-                  <div className="px-3.5 py-2 rounded-lg bg-emerald-950/60 border border-emerald-500/20 text-center font-mono">
-                    <span className="text-[9px] text-gray-400 block uppercase font-sans">Razorpay UPI Transfer</span>
+                  <div className="px-3.5 py-2 rounded bg-[#121212] border border-[#262626] text-center font-mono">
+                    <span className="text-[9px] text-gray-500 block uppercase font-sans">Razorpay UPI Transfer</span>
                     <span className="text-xs font-bold text-emerald-400">₹{(consensusReport.pointsEarned * 120).toLocaleString('en-IN')} paid</span>
                   </div>
                 )}
@@ -586,14 +704,14 @@ export default function ExpertDashboard() {
           )}
 
           {/* Reasoning Contributions Historical Ledger */}
-          <section className="glass-panel rounded-2xl p-6 border border-white/[0.01]">
-            <h3 className="text-sm font-display font-black uppercase text-[#e7e4ee] tracking-wider mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-[#5E5CE6]" />
-              Expert Reasoning Ledger
+          <section className="bg-[#121212] border border-[#262626] rounded p-6">
+            <h3 className="text-xs font-display font-bold uppercase text-[#e7e4ee] tracking-wider mb-4 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-white" />
+              Reasoning Contributions Ledger
             </h3>
 
             {submissions.length === 0 ? (
-              <div className="text-center py-6 bg-[#13131a]/40 rounded-xl border border-white/5">
+              <div className="text-center py-6 bg-[#141313] rounded border border-[#262626]">
                 <FileText className="w-6 h-6 text-zinc-600 mx-auto mb-2" />
                 <p className="text-xs text-[#acaab4]">No tasks submitted under this profile yet.</p>
               </div>
@@ -601,7 +719,7 @@ export default function ExpertDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-white/5 text-[9px] font-bold text-[#acaab4] uppercase tracking-wider">
+                    <tr className="border-b border-[#262626] text-[9px] font-bold text-[#acaab4] uppercase tracking-wider">
                       <th className="pb-3 pr-2">Instruction Prompt</th>
                       <th className="pb-3 px-2">Dataset Fund</th>
                       <th className="pb-3 px-2 text-center">QA Score</th>
@@ -612,11 +730,11 @@ export default function ExpertDashboard() {
                   <tbody className="divide-y divide-white/5 text-xs text-[#acaab4]">
                     {submissions.map((sub) => (
                       <tr key={sub.id} className="hover:bg-white/[0.02] transition duration-300">
-                        <td className="py-3 pr-2 font-medium text-white max-w-[220px] truncate">{sub.prompt}</td>
-                        <td className="py-3 px-2 truncate max-w-[140px]">{sub.poolTitle}</td>
-                        <td className="py-3 px-2 text-center font-mono font-bold text-[#5E5CE6]">{sub.qualityScore || "-"}</td>
-                        <td className="py-3 px-2 text-center font-mono font-semibold text-emerald-400">+{sub.pointsEarned?.toFixed(2)}</td>
-                        <td className="py-3 pl-2 text-right">
+                        <td className="py-3.5 pr-2 font-medium text-white max-w-[220px] truncate">{sub.prompt}</td>
+                        <td className="py-3.5 px-2 truncate max-w-[140px]">{sub.poolTitle}</td>
+                        <td className="py-3.5 px-2 text-center font-mono font-bold text-[#ffffff]">{sub.qualityScore || "-"}</td>
+                        <td className="py-3.5 px-2 text-center font-mono font-semibold text-emerald-400">+{sub.pointsEarned?.toFixed(2)}</td>
+                        <td className="py-3.5 pl-2 text-right">
                           <span className={`px-2 py-0.5 rounded text-[8px] font-bold tracking-wider ${
                             sub.status === 'APPROVED' ? 'bg-emerald-950/80 border border-emerald-500/20 text-emerald-400' :
                             'bg-amber-950/80 border border-amber-500/20 text-amber-400'
@@ -631,137 +749,63 @@ export default function ExpertDashboard() {
               </div>
             )}
           </section>
-
-          {/* Razorpay UPI Payout Ledger */}
-          <section className="glass-panel rounded-2xl p-6 border border-white/[0.01]">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-display font-black uppercase text-[#e7e4ee] tracking-wider flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-[#5E5CE6]" />
-                Razorpay Payout Ledger
-              </h3>
-              {payouts.some(p => p.status === 'PENDING') && (
-                <span className="inline-flex items-center gap-1.5 text-[9px] font-bold text-amber-400 bg-amber-950/40 border border-amber-500/20 px-2 py-0.5 rounded-full animate-pulse">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  Processing
-                </span>
-              )}
-            </div>
-
-            {payouts.length === 0 ? (
-              <div className="text-center py-6 bg-[#13131a]/40 rounded-xl border border-white/5">
-                <Wallet className="w-6 h-6 text-zinc-600 mx-auto mb-2" />
-                <p className="text-xs text-[#acaab4]">No payouts recorded yet.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-white/5 text-[9px] font-bold text-[#acaab4] uppercase tracking-wider">
-                      <th className="pb-3 pr-2">Transaction VPA</th>
-                      <th className="pb-3 px-2">Pool Source</th>
-                      <th className="pb-3 px-2">Royalty Stake</th>
-                      <th className="pb-3 px-2">Gross (₹)</th>
-                      <th className="pb-3 px-2 text-emerald-400">Net Paid</th>
-                      <th className="pb-3 pl-2 text-right">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5 text-xs text-[#acaab4]">
-                    {payouts.map((pay) => {
-                      const isPassive = pay.id.includes('royalty');
-                      const poolObj = pools.find(p => p.id === pay.poolId);
-                      const baseINR = poolObj ? poolObj.basePrice * 83 : 0;
-
-                      return (
-                        <tr key={pay.id} className="hover:bg-white/[0.02] transition duration-300">
-                          <td className="py-3 pr-2 font-mono text-[10px] text-gray-300 truncate max-w-[120px]">{pay.payoutTransactionId}</td>
-                          <td className="py-3 px-2 truncate max-w-[120px]">{pay.poolTitle}</td>
-                          <td className="py-3 px-2">
-                            {isPassive ? (
-                              <span className="text-[10px] font-mono text-[#5E5CE6]">
-                                5% split of ₹{baseINR.toLocaleString()}
-                              </span>
-                            ) : (
-                              <span className="text-[10px] text-[#acaab4]/60">Upfront payment</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-2 font-semibold text-[#acaab4]">₹{pay.grossRoyalty.toLocaleString('en-IN')}</td>
-                          <td className="py-3 px-2 text-emerald-400 font-bold">₹{pay.netRoyalty.toLocaleString('en-IN')}</td>
-                          <td className="py-3 pl-2 text-right">
-                            <span className={`inline-flex items-center gap-1 text-[10px] font-bold ${
-                              pay.status === 'SUCCESS' ? 'text-emerald-400' : 'text-amber-400'
-                            }`}>
-                              {pay.status === 'SUCCESS' ? (
-                                <Check className="w-3.5 h-3.5" />
-                              ) : (
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                              )}
-                              {pay.status === 'SUCCESS' ? "Paid" : "Processing"}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-
+            </>
+          )}
         </div>
       </div>
 
       {/* ================= EXPERT ONBOARDING MODAL ================= */}
       {isSignupOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm transition-all duration-300">
-          <div className="w-full max-w-md p-6 rounded-2xl glass-panel relative overflow-hidden animate-fade-in border border-white/5">
-            <h3 className="text-base font-display font-black text-white mb-2 flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-[#5E5CE6]" />
+          <div className="w-full max-w-md p-6 bg-[#121212] border border-[#262626] rounded relative overflow-hidden animate-fade-in">
+            <h3 className="text-base font-display font-bold text-white mb-2 flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-white" />
               Connect Expert Identity
             </h3>
-            <p className="text-xs text-[#acaab4] mb-5 leading-relaxed">
+            <p className="text-xs text-zinc-400 mb-5 leading-relaxed">
               Register or update credentials linked to Razorpay for compounding royalty dividends and instant UPI distributions.
             </p>
 
             <form onSubmit={handleSignUp} className="space-y-4">
               <div>
-                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Full Legal Name</label>
+                <label className="text-[10px] text-zinc-400 uppercase block mb-1 font-mono">Full Legal Name</label>
                 <input
                   type="text"
                   placeholder="Dr. Ananya Iyer"
                   value={signupName}
                   onChange={(e) => setSignupName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#5E5CE6]/40 outline-none transition"
+                  className="w-full p-2.5 rounded bg-[#141313] border border-[#262626] text-white text-xs font-semibold focus:border-white focus:bg-[#141313] outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Holder Email</label>
+                <label className="text-[10px] text-zinc-400 uppercase block mb-1 font-mono">Holder Email</label>
                 <input
                   type="email"
                   placeholder="ananya.iyer@axiom.ai"
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-mono focus:border-[#5E5CE6]/40 outline-none transition"
+                  className="w-full p-2.5 rounded bg-[#141313] border border-[#262626] text-white text-xs font-mono focus:border-white focus:bg-[#141313] outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Razorpay UPI ID (VPA)</label>
+                <label className="text-[10px] text-zinc-400 uppercase block mb-1 font-mono">Razorpay UPI ID (VPA)</label>
                 <input
                   type="text"
                   placeholder="ananya@okaxis"
                   value={signupUpi}
                   onChange={(e) => setSignupUpi(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-mono focus:border-[#5E5CE6]/40 outline-none transition"
+                  className="w-full p-2.5 rounded bg-[#141313] border border-[#262626] text-white text-xs font-mono focus:border-white focus:bg-[#141313] outline-none transition"
                 />
               </div>
 
               <div>
-                <label className="text-[10px] text-[#acaab4] uppercase block mb-1">Expertise Calibration Tier</label>
+                <label className="text-[10px] text-zinc-400 uppercase block mb-1 font-mono">Expertise Calibration Tier</label>
                 <select
                   value={signupTier}
                   onChange={(e) => setSignupTier(e.target.value as any)}
-                  className="w-full p-2.5 rounded-xl bg-[#13131a] border border-white/10 text-white text-xs font-semibold focus:border-[#5E5CE6]/40 outline-none transition"
+                  className="w-full p-2.5 rounded bg-[#141313] border border-[#262626] text-white text-xs font-semibold focus:border-white focus:bg-[#141313] outline-none transition"
                 >
                   <option value="BRONZE">Bronze Triage (1.0x multiplier)</option>
                   <option value="SILVER">Silver Triage (1.2x multiplier)</option>
@@ -775,13 +819,13 @@ export default function ExpertDashboard() {
                 <button
                   type="button"
                   onClick={() => setIsSignupOpen(false)}
-                  className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded-xl border border-white/5 transition"
+                  className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-white text-xs font-semibold rounded border border-[#262626] transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-[#5E5CE6] text-white hover:bg-[#4a48c4] text-xs font-bold rounded-xl transition"
+                  className="flex-1 py-2.5 bg-white text-black hover:bg-zinc-200 text-xs font-bold rounded transition font-mono uppercase"
                 >
                   Register holder
                 </button>

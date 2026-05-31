@@ -16,13 +16,13 @@ export default function RoyaltyAnalytics({ points, earnings, poolCount }: Royalt
   return (
     <div className="flex flex-col gap-6">
       {/* Earnings Chart Card */}
-      <div className="glass-panel rounded-2xl p-6 ambient-shadow-primary flex flex-col h-64 relative overflow-hidden select-none border border-white/[0.01]">
+      <div className="bg-[#1e293b] border border-[#262626] rounded-xl rounded-2xl p-6  flex flex-col h-64 relative overflow-hidden select-none border border-white/[0.01]">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="font-display font-bold text-base text-[#e7e4ee]">Royalty Analytics</h2>
             <p className="text-xs text-[#acaab4] font-label mt-0.5">Current Epoch Earnings</p>
           </div>
-          <span className="text-[#a5a5ff] font-bold font-display text-lg">1.4k AXM</span>
+          <span className="text-[#ffffff] font-bold font-display text-lg">1.4k AXM</span>
         </div>
         
         {/* Abstract chart bar representation */}
@@ -36,20 +36,20 @@ export default function RoyaltyAnalytics({ points, earnings, poolCount }: Royalt
                 key={i} 
                 className={`w-full rounded-t-md transition-all duration-300 relative group cursor-pointer ${
                   isLast 
-                    ? "bg-[#a5a5ff] shadow-[0_0_15px_rgba(165,165,255,0.45)]" 
+                    ? "bg-[#ffffff] shadow-[0_0_15px_rgba(165,165,255,0.45)]" 
                     : isPeak
-                      ? "bg-[#a5a5ff]/40 hover:bg-[#a5a5ff]/60"
-                      : "bg-[#a5a5ff]/20 hover:bg-[#a5a5ff]/40"
+                      ? "bg-[#ffffff]/40 hover:bg-[#ffffff]/60"
+                      : "bg-[#ffffff]/20 hover:bg-[#ffffff]/40"
                 }`}
                 style={{ height: `${height}%` }}
               >
                 {isPeak && (
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-[#a5a5ff] uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-[#ffffff] uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                     Peak
                   </div>
                 )}
                 {/* Micro tooltip */}
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#1f1f28] border border-white/10 rounded px-1.5 py-0.5 text-[8px] font-mono text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-25">
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#1f1f28] border border-[#262626] rounded px-1.5 py-0.5 text-[8px] font-mono text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-25">
                   {(height * 14).toFixed(0)} AXM
                 </div>
               </div>
@@ -59,18 +59,18 @@ export default function RoyaltyAnalytics({ points, earnings, poolCount }: Royalt
       </div>
 
       {/* Contribution Points Card */}
-      <div className="glass-panel rounded-2xl p-5 border border-white/[0.01] flex items-center justify-between">
+      <div className="bg-[#1e293b] border border-[#262626] rounded-xl rounded-2xl p-5 border border-white/[0.01] flex items-center justify-between">
         <div>
           <p className="text-xs text-[#acaab4] font-label mb-1">Contribution Points</p>
           <p className="font-display font-black text-2xl text-[#e7e4ee] tracking-tight">{points.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</p>
         </div>
-        <div className="w-11 h-11 rounded-full bg-[#bf5af2]/10 flex items-center justify-center text-[#bf5af2] border border-[#bf5af2]/10">
-          <Star className="w-5 h-5 fill-[#bf5af2]/20" />
+        <div className="w-11 h-11 rounded-full bg-[#ffffff]/10 flex items-center justify-center text-[#ffffff] border border-[#ffffff]/10">
+          <Star className="w-5 h-5 fill-[#ffffff]/20" />
         </div>
       </div>
 
       {/* UPI & Sync Status Card */}
-      <div className="glass-panel rounded-2xl p-5 border border-white/[0.01] flex flex-col gap-3">
+      <div className="bg-[#1e293b] border border-[#262626] rounded-xl rounded-2xl p-5 border border-white/[0.01] flex flex-col gap-3">
         <p className="text-xs text-[#acaab4] font-label">UPI Network Sync</p>
         <div className="flex items-center gap-3">
           <div className="relative flex h-3 w-3">
@@ -80,7 +80,7 @@ export default function RoyaltyAnalytics({ points, earnings, poolCount }: Royalt
           <span className="font-display font-bold text-sm text-[#e7e4ee]">Active &amp; Synchronized</span>
         </div>
         
-        <div className="text-[10px] text-[#acaab4] font-mono mt-1 bg-[#13131a]/60 p-2.5 rounded-xl border border-white/[0.02] leading-relaxed">
+        <div className="text-[10px] text-[#acaab4] font-mono mt-1 bg-[#121212]/60 p-2.5 rounded-xl border border-[#1a1a1a] leading-relaxed">
           <div className="flex justify-between">
             <span className="opacity-60">Connected Pools:</span>
             <span className="font-semibold text-[#e7e4ee]">{poolCount} pools</span>
