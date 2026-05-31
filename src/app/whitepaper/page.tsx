@@ -70,6 +70,12 @@ export default function WhitepaperPage() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
             <Link 
+              href="/docs" 
+              className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#262626] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
+            >
+              Docs
+            </Link>
+            <Link 
               href="/expert" 
               className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#262626] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
             >
@@ -112,8 +118,7 @@ export default function WhitepaperPage() {
             </nav>
             <div className="mt-6 pt-5 border-t border-white/5 flex flex-col gap-3">
               <a 
-                href="#" 
-                onClick={(e) => { e.preventDefault(); alert("Whitepaper PDF download initiated (simulation)."); }}
+                href="/api/whitepaper"
                 className="w-full text-center py-2 rounded bg-[#1c1917] hover:bg-[#2e2a28] text-white text-xs font-bold font-display shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <FileText className="w-3.5 h-3.5" /> Download PDF v2.4
@@ -322,6 +327,8 @@ export default function WhitepaperPage() {
 
           <div className="flex flex-wrap gap-x-8 gap-y-2 justify-center text-[10px]">
             <span>© 2026 Axiom Protocol Layer. All rights reserved.</span>
+            <span className="text-zinc-800">|</span>
+            <Link href="/docs" className="hover:text-white transition-colors">Documentation</Link>
             <span className="text-zinc-800">|</span>
             <Link href="/terminals" className="hover:text-white transition-colors">Terminals</Link>
             <span className="text-zinc-800">|</span>

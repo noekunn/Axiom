@@ -394,6 +394,41 @@ export default function Home() {
     }
   };
 
+  const downloadLicensedDataset = () => {
+    if (!purchaseSuccess) return;
+
+    const pool = pools.find((item) => item.title === purchaseSuccess.poolTitle) || licensingPool;
+    const records = [
+      {
+        messages: [
+          { role: "system", content: "You are an expert reasoning assistant trained on Axiom licensed data." },
+          { role: "user", content: pool?.samplePrompt || "Provide a domain-specific expert reasoning response." },
+          { role: "assistant", content: `Licensed Axiom dataset sample for ${purchaseSuccess.poolTitle}. Access token: ${purchaseSuccess.token}` },
+        ],
+      },
+      {
+        metadata: {
+          poolTitle: purchaseSuccess.poolTitle,
+          licenseToken: purchaseSuccess.token,
+          licenseType,
+          exportedAt: new Date().toISOString(),
+        },
+      },
+    ];
+
+    const jsonl = records.map((record) => JSON.stringify(record)).join("\n");
+    const blob = new Blob([jsonl], { type: "application/jsonl" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${purchaseSuccess.poolTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.jsonl`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setAlert({ type: 'success', message: 'Secure JSONL dataset downloaded.' });
+  };
+
   return (
     <DashboardLayout>
       {/* Alert Banner */}
@@ -803,17 +838,14 @@ export default function Home() {
                   <span className="text-emerald-400 font-semibold truncate block select-all">{purchaseSuccess.token}</span>
                 </div>
                 <div className="pt-1">
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setAlert({ type: 'success', message: 'Starting secure JSONL dataset download...' });
-                    }}
+                  <button
+                    type="button"
+                    onClick={downloadLicensedDataset}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:text-white transition duration-300 font-sans font-bold text-xs"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Download JSONL Dataset
-                  </a>
+                  </button>
                 </div>
               </div>
 

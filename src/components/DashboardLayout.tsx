@@ -10,6 +10,8 @@ import {
   Trophy,
   Settings,
   HelpCircle,
+  BookOpen,
+  FileText,
   Search,
   Bell,
   Wallet,
@@ -57,6 +59,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       name: "Operator Control",
       href: "/admin",
       icon: Settings
+    },
+    {
+      name: "Documentation",
+      href: "/docs",
+      icon: BookOpen
     }
   ];
 
@@ -108,6 +115,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Support & Connection Status Footer */}
         <ul className="flex flex-col gap-2 mt-auto pt-6 border-t border-[#262626]">
+          <li>
+            <Link 
+              href="/whitepaper" 
+              className="flex items-center gap-3 px-4 py-2 font-display font-semibold text-xs text-[#acaab4] hover:text-[#e7e4ee] transition-colors rounded-xl"
+            >
+              <FileText className="w-4 h-4" />
+              Whitepaper
+            </Link>
+          </li>
           <li>
             <a 
               href="mailto:support@axiom.ai" 

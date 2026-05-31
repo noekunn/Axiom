@@ -4,6 +4,10 @@ Axiom is a next-generation decentralized reasoning data marketplace engineered t
 
 The platform leverages a cryptographic proof-of-origin framework, a multi-model consensus QA pipeline, automated upfront payments and passive perpetual royalties via Razorpay FinOps, and instant dataset licensing and fine-tuning integrations.
 
+## Documentation
+
+The in-app documentation is available at `/docs`, and the repository copy lives at `docs/axiom-documentation.md`. It covers product flows, route structure, API surfaces, Prisma models, environment variables, and production-readiness notes.
+
 ---
 
 ## 🛠️ Core Features

@@ -83,6 +83,12 @@ export default function PrivacyPage() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
             </Link>
             <Link 
+              href="/docs" 
+              className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#262626] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
+            >
+              Docs
+            </Link>
+            <Link 
               href="/client" 
               className="text-xs font-semibold text-zinc-400 hover:text-white border border-[#262626] hover:bg-white/5 px-4 py-2 rounded transition-all duration-200"
             >
@@ -174,6 +180,8 @@ export default function PrivacyPage() {
 
           <div className="flex flex-wrap gap-x-8 gap-y-2 justify-center text-[10px]">
             <span>© 2026 Axiom Protocol Layer. All rights reserved.</span>
+            <span className="text-zinc-800">|</span>
+            <Link href="/docs" className="hover:text-white transition-colors">Documentation</Link>
             <span className="text-zinc-800">|</span>
             <Link href="/terminals" className="hover:text-white transition-colors">Terminals</Link>
             <span className="text-zinc-800">|</span>
