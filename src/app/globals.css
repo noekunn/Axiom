@@ -1,66 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #f8f7f6; /* Premium soft chalk background */
-  --foreground: #1c1917; /* Off-black ink text */
+  --background: #0e0e15;
+  --foreground: #e7e4ee;
   
-  --primary: #1c1917;
-  --on-primary: #ffffff;
-  --primary-container: #eae7e6;
+  --primary: #a5a5ff;
+  --primary-dim: #6462ec;
+  --primary-container: #9695ff;
+  --on-primary: #1700a1;
   
-  --secondary: #6e6765;
-  --on-secondary: #ffffff;
-  --secondary-container: #eae7e6;
+  --secondary: #5f9eff;
+  --secondary-dim: #0073e0;
+  --secondary-container: #005db8;
+  --on-secondary-container: #f7f7ff;
   
-  --tertiary: #1c1917;
-  --tertiary-container: #eae7e6;
+  --tertiary: #d277ff;
+  --tertiary-dim: #d277ff;
+  --tertiary-container: #bf5af2;
   
-  --surface: #f8f7f6;
-  --surface-container-lowest: #ffffff; /* Pure white container base */
-  --surface-container-low: #f1efed;    /* Soft light base */
-  --surface-container: #eae7e6;        /* Tonal card inner */
-  --surface-container-high: #e2dedc;   /* Soft border line outline */
-  --surface-container-highest: #dad5d3;
+  --surface: #0e0e15;
+  --surface-container-lowest: #000000;
+  --surface-container-low: #13131a;
+  --surface-container: #191921;
+  --surface-container-high: #1f1f28;
+  --surface-container-highest: #25252f;
   
-  --on-surface: #1c1917;
-  --on-surface-variant: #6e6765;
-  --outline: #8e8380;                  /* Soft charcoal boundary */
-  --outline-variant: #dad5d3;          /* Very thin grey boundary */
+  --on-surface: #e7e4ee;
+  --on-surface-variant: #acaab4;
+  --outline: #76747e;
+  --outline-variant: #48474f;
   
-  --error: #ba1a1a;
-  
-  /* Scholaris specific success/status colors */
-  --obsidian-accent: #1c1917;
-  --obsidian-success: #10B981;
-
-  /* Premium Visual Aesthetics: Gradients & Shadows */
-  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); /* Deep Indigo to Violet */
-  --gradient-secondary: linear-gradient(135deg, #10B981 0%, #06b6d4 100%); /* Emerald to Cyan */
-  --gradient-rose: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%); /* Rose to Pink */
-  --gradient-warm: linear-gradient(135deg, #f97316 0%, #e11d48 100%); /* Orange to Rose */
-  --gradient-light-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 247, 246, 0.65) 100%); /* Richer frosted glass */
-  
-  --outline-lavender: rgba(99, 102, 241, 0.08); /* Premium lavender/indigo outline tint */
-  --outline-lavender-high: rgba(99, 102, 241, 0.16); /* Premium hover outline tint */
-
-  --shadow-premium: 0 10px 40px -6px rgba(99, 102, 241, 0.05), 0 1px 3px rgba(28, 25, 23, 0.02);
-  --shadow-hover: 0 20px 50px -10px rgba(99, 102, 241, 0.12), 0 4px 12px -2px rgba(99, 102, 241, 0.03);
-  --shadow-glow-purple: 0 0 35px rgba(99, 102, 241, 0.22);
-  --shadow-glow-emerald: 0 0 35px rgba(16, 185, 129, 0.22);
+  --error: #ff6e84;
+  --error-dim: #d73357;
 }
 
 body {
   color: var(--foreground);
   background-color: var(--background);
-  font-family: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  background-image: radial-gradient(circle at 50% -20%, var(--primary-dim) 0%, transparent 60%);
+  background-attachment: fixed;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
 }
 
-/* Scrollbar styles to match the premium minimal aesthetic */
+/* Scrollbar styles to match the premium dark terminal aesthetic */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -69,7 +56,7 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-container-high);
+  background: var(--surface-container-highest);
   border-radius: 10px;
   transition: all 0.3s ease;
 }
@@ -79,56 +66,77 @@ body {
 
 /* Custom Selection style */
 ::selection {
-  background: rgba(99, 102, 241, 0.2); /* Soft selection */
-  color: inherit;
+  background: rgba(165, 165, 255, 0.3);
+  color: #ffffff;
 }
 
 @layer utilities {
   .font-headline {
-    font-family: 'Noto Serif', serif;
-  }
-  
-  .font-display {
-    font-family: 'Noto Serif', serif;
-  }
-  
-  .font-label {
     font-family: 'Manrope', sans-serif;
   }
   
+  .font-display {
+    font-family: 'Manrope', sans-serif;
+  }
+  
+  .font-label {
+    font-family: 'Inter', sans-serif;
+  }
+  
   .glass-panel {
-    background: var(--gradient-light-glass);
+    background: rgba(25, 25, 33, 0.4); /* surface-container based */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: var(--shadow-premium);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .glass-panel:hover {
-    box-shadow: var(--shadow-hover);
-    border-color: rgba(99, 102, 241, 0.16);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    border: none; /* The strict no-line boundary rule */
   }
 
   .ambient-shadow-primary {
-    box-shadow: var(--shadow-glow-purple);
+    box-shadow: 0 0 40px -10px rgba(165, 165, 255, 0.15);
   }
 
   .ambient-shadow-tertiary {
-    box-shadow: var(--shadow-glow-emerald);
+    box-shadow: 0 0 40px -10px rgba(210, 119, 255, 0.15);
   }
 
   .glow-text-emerald {
-    color: var(--obsidian-success);
-    text-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
   }
   
   .bg-grid-cyber {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(99, 102, 241, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(165, 165, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(165, 165, 255, 0.5);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
 }
 
 @keyframes fade-in {
@@ -145,182 +153,3 @@ body {
 .animate-fade-in {
   animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-
-/* ==========================================================================
-   PREMIUM LIGHT MODE TAILWIND CLASS OVERRIDES (STITCH FIDELITY SPECS)
-   ========================================================================= */
-
-/* 1. Core Surfaces & Page Backgrounds (Excludes interactive triggers) */
-.bg-\[\#141313\]:not(button):not(a), .bg-\[\#0e0e15\]:not(button):not(a), .bg-\[\#0b1326\]:not(button):not(a), .bg-\[\#0d0d14\]:not(button):not(a), .bg-\[\#09090b\]:not(button):not(a), .bg-background:not(button):not(a), .bg-zinc-950:not(button):not(a), .bg-slate-950:not(button):not(a), .bg-neutral-950:not(button):not(a), .bg-black:not(.terminal-box):not(.terminal-console):not(.terminal-screen):not(button):not(a) {
-  background-color: var(--background) !important;
-  color: var(--foreground) !important;
-}
-.bg-\[\#141313\]\/95 {
-  background-color: rgba(248, 247, 246, 0.95) !important;
-  color: var(--foreground) !important;
-}
-
-/* 2. Container & Card Surface Elements (Rich frosted glass overlays) */
-.bg-\[\#121212\]:not(button):not(a), .bg-\#121212:not(button):not(a), .bg-\[\#0e0e0e\]:not(button):not(a), .bg-\[\#101010\]:not(button):not(a), .bg-\[\#191921\]:not(button):not(a), .bg-\[\#171f33\]:not(button):not(a), .bg-\[\#1e293b\]:not(button):not(a), .bg-\[\#1a1818\]:not(button):not(a), .bg-zinc-900:not(button):not(a), .bg-slate-900:not(button):not(a), .bg-neutral-900:not(button):not(a),
-.bg-zinc-900\/50:not(button):not(a), .bg-zinc-900\/40:not(button):not(a), .bg-zinc-900\/20:not(button):not(a), .bg-zinc-900\/60:not(button):not(a), .bg-zinc-900\/10:not(button):not(a), .bg-zinc-950\/40:not(button):not(a), .bg-zinc-950\/50:not(button):not(a), .bg-zinc-800\/50:not(button):not(a), .bg-\[\#141313\]\/40:not(button):not(a), .bg-\[\#121212\]\/40:not(button):not(a), .bg-\[\#1f1f28\]\/40:not(button):not(a) {
-  background: var(--gradient-light-glass) !important; /* Pure white glass base */
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: var(--shadow-premium) !important;
-  color: var(--foreground) !important;
-}
-
-/* 3. Tonal Lower Surfaces & Borders */
-.bg-\[\#13131a\]:not(button):not(a), .bg-\[\#131b2e\]:not(button):not(a), .bg-\[\#060e20\]:not(button):not(a), .bg-\[\#25252f\]:not(button):not(a), .bg-\[\#2b2b36\]:not(button):not(a), .bg-\[\#222a3d\]:not(button):not(a), .bg-\[\#2d3449\]:not(button):not(a), .bg-\[\#1e1c1c\]:not(button):not(a), .bg-zinc-800:not(button):not(a), .bg-slate-800:not(button):not(a), .bg-neutral-800:not(button):not(a) {
-  background-color: var(--surface-container-low) !important; /* Soft grey base */
-  color: var(--foreground) !important;
-}
-
-aside.bg-\[\#121212\], aside.bg-\[\#0b1326\], aside.bg-zinc-950, aside.bg-slate-950, aside.bg-\[\#141313\], .bg-\[\#0b1326\] aside, .bg-\[\#121212\] aside {
-  background-color: var(--surface-container-low) !important; /* Soft grey sidebar base */
-  border-right-color: var(--outline-variant) !important;
-}
-
-header.bg-\[\#141313\]\/80, header.bg-\[\#0e0e15\]\/80, header.bg-\[\#0b1326\]\/80, header.bg-zinc-950\/80, header.bg-slate-950\/80, header.bg-black\/80 {
-  background-color: rgba(248, 247, 246, 0.8) !important; /* Light blurred header */
-  border-bottom-color: var(--outline-variant) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-}
-
-/* 4. Interactive Borders (Lavender/Indigo soft-glass boundaries instead of raw grey) */
-.border-\[\#262626\], .border-\[\#1e293b\], .border-\[\#25252f\], .border-\[\#191921\], .border-\[\#1e1c1c\], .border-white\/10, .border-white\/5, .border-zinc-800\/80, .border-zinc-800, .border-zinc-900, .border-slate-800\/80, .border-slate-800, .border-slate-900,
-.border-\[\#1a1a1a\], .border-zinc-800\/60, .border-zinc-850, .border-zinc-800\/85, .border-zinc-700\/60,
-.border-\[\#ffffff\]\/20, .border-\[\#ffffff\]\/10, .border-\[\#ffffff\]\/25, .border-\[\#ffffff\]\/40, .focus\:border-\[\#ffffff\]\/40, .focus\:border-\[\#ffffff\] {
-  border-color: var(--outline-lavender) !important;
-}
-.border-white\/20, .border-white\/30, .border-zinc-700, .border-zinc-600, .border-slate-700, .border-slate-600,
-.border-\[\#ffffff\]\/50, .border-\[\#ffffff\] {
-  border-color: var(--outline-lavender-high) !important;
-}
-
-/* 5. Global Text Contrast Overrides */
-.text-white, .text-\[\#e7e4ee\], .text-\[\#dae2fd\], .text-zinc-50, .text-zinc-100, .text-zinc-200, .text-zinc-300, .text-slate-50, .text-slate-100, .text-slate-200, .text-slate-300,
-.text-\[\#ffffff\], .text-\[\#ffffff\]\/90, .text-\[\#ffffff\]\/80, .text-\[\#ffffff\]\/70 {
-  color: var(--foreground) !important;
-}
-
-.text-zinc-400, .text-zinc-500, .text-slate-400, .text-slate-500, .text-\[\#acaab4\], .text-\[\#c4c7c8\] {
-  color: var(--on-surface-variant) !important;
-}
-
-/* 6. Controls & Input Enclosures */
-input.bg-\[\#141313\], textarea.bg-\[\#141313\], select.bg-\[\#121212\], select.bg-\[\#141313\], 
-input.bg-zinc-900, textarea.bg-zinc-900, select.bg-zinc-900, 
-input.bg-slate-900, textarea.bg-slate-900, select.bg-slate-900, 
-.bg-\[\#141313\] input, .bg-\[\#141313\] textarea, .bg-zinc-950 input, .bg-zinc-950 textarea {
-  background-color: var(--surface-container-lowest) !important;
-  color: var(--foreground) !important;
-  border-color: var(--outline-variant) !important;
-}
-input.bg-\[\#141313\]:focus, textarea.bg-\[\#141313\]:focus, select.bg-\[\#121212\]:focus {
-  border-color: var(--foreground) !important;
-  box-shadow: none !important;
-}
-
-/* 7. Solid Active Triggers (Vibrant custom gradients with deep shadows in Light Mode) */
-button.bg-white, a.bg-white, .bg-white:not(aside):not(header):not(main) {
-  background: var(--gradient-primary) !important; /* Vibrant Indigo to Purple gradient */
-  color: #ffffff !important;                     /* High contrast white text */
-  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3) !important; /* Soft purple shadow */
-  border: none !important;
-}
-button.bg-white:hover, a.bg-white:hover {
-  background: var(--gradient-primary) !important;
-  opacity: 0.9 !important;
-  box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.4) !important;
-  transform: translateY(-1px);
-}
-
-/* 8. Premium Solid Off-Black Buttons (Guaranteed Contrast Safety) */
-button.bg-zinc-950, button.bg-slate-950, button.bg-black,
-a.bg-zinc-950, a.bg-slate-950, a.bg-black {
-  background-color: #1c1917 !important; /* Elegant solid off-black background */
-  background: #1c1917 !important;
-  color: #ffffff !important;            /* High contrast white text */
-  border: 1px solid rgba(28, 25, 23, 0.1) !important;
-  box-shadow: 0 4px 12px rgba(28, 25, 23, 0.15) !important;
-  transition: all 0.2s ease-in-out !important;
-}
-button.bg-zinc-950:hover, button.bg-slate-950:hover, button.bg-black:hover,
-a.bg-zinc-950:hover, a.bg-slate-950:hover, a.bg-black:hover {
-  background-color: #2e2a28 !important; /* Elegant dark charcoal hover */
-  background: #2e2a28 !important;
-  box-shadow: 0 6px 16px rgba(28, 25, 23, 0.2) !important;
-  transform: translateY(-1px) !important;
-}
-button.bg-zinc-950 *, button.bg-slate-950 *, button.bg-black *,
-a.bg-zinc-950 *, a.bg-slate-950 *, a.bg-black * {
-  color: #ffffff !important;
-}
-button.bg-zinc-950 svg, button.bg-slate-950 svg, button.bg-black svg,
-a.bg-zinc-950 svg, a.bg-slate-950 svg, a.bg-black svg {
-  color: #ffffff !important;
-}
-
-/* 9. Color-coded / Gradient Buttons */
-button.bg-indigo-600, button.bg-violet-600, button.bg-emerald-600, button.bg-rose-600,
-button.bg-emerald-500, button.bg-indigo-500, button.bg-violet-500,
-a.bg-indigo-600, a.bg-violet-600, a.bg-emerald-600, a.bg-rose-600,
-.bg-gradient-to-r, .bg-gradient-to-br {
-  color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
-  transition: all 0.2s ease-in-out !important;
-}
-button.bg-indigo-600 *, button.bg-violet-600 *, button.bg-emerald-600 *, button.bg-rose-600 *,
-button.bg-emerald-500 *, button.bg-indigo-500 *, button.bg-violet-500 *,
-a.bg-indigo-600 *, a.bg-violet-600 *, a.bg-emerald-600 *, a.bg-rose-600 *,
-.bg-gradient-to-r *, .bg-gradient-to-br * {
-  color: #ffffff !important;
-}
-button.bg-indigo-600 svg, button.bg-violet-600 svg, button.bg-emerald-600 svg, button.bg-rose-600 svg,
-a.bg-indigo-600 svg, a.bg-violet-600 svg, a.bg-emerald-600 svg, a.bg-rose-600 svg,
-.bg-gradient-to-r svg, .bg-gradient-to-br svg {
-  color: #ffffff !important;
-}
-
-/* 10. Active Badges & Micro-indicator Surfaces */
-.bg-white\/5, .bg-white\/10, .bg-\[\#ffffff\]\/10, .bg-white\/20, .bg-\[\#ffffff\]\/20, .bg-\[\#ffffff\]\/5 {
-  background-color: rgba(99, 102, 241, 0.05) !important; /* Subtle purple badge fill */
-  color: #4f46e5 !important;                              /* Indigo text color for accents */
-  border: 1px solid rgba(99, 102, 241, 0.12) !important;
-}
-
-/* 11. Success & Alert Notifications status bands */
-.bg-emerald-950\/20, .bg-emerald-950\/80 {
-  background-color: #d1fae5 !important;
-  border-color: rgba(16, 185, 129, 0.2) !important;
-  color: #065f46 !important;
-}
-.bg-rose-950\/20, .bg-rose-950\/80 {
-  background-color: #ffe4e6 !important;
-  border-color: rgba(244, 63, 94, 0.2) !important;
-  color: #9f1239 !important;
-}
-
-/* 12. SVG Icon elements */
-header button svg, header a svg, aside svg {
-  color: var(--foreground) !important;
-}
-
-/* 13. Descendant Contrast Safety Overrides for dark/gradient elements */
-button.bg-white, a.bg-white, .bg-white:not(aside):not(header):not(main),
-button.bg-violet-600, button.bg-indigo-600,
-.bg-gradient-to-br, .bg-gradient-to-r, .bg-violet-600, .bg-indigo-600, .bg-emerald-600, .bg-rose-600,
-button.bg-white svg, a.bg-white svg, .bg-white:not(aside):not(header):not(main) svg,
-button.bg-violet-600 svg, button.bg-indigo-600 svg,
-.bg-gradient-to-br svg, .bg-gradient-to-r svg {
-  color: #ffffff !important;
-}
-button.bg-white *, a.bg-white *, .bg-white:not(aside):not(header):not(main) *,
-button.bg-violet-600 *, button.bg-indigo-600 *,
-.bg-gradient-to-br *, .bg-gradient-to-r *, .bg-violet-600 *, .bg-indigo-600 *, .bg-emerald-600 *, .bg-rose-600 * {
-  color: #ffffff !important;
-}
-
