@@ -36,6 +36,18 @@
   /* Scholaris specific success/status colors */
   --obsidian-accent: #1c1917;
   --obsidian-success: #10B981;
+
+  /* Premium Visual Aesthetics: Gradients & Shadows */
+  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); /* Deep Indigo to Violet */
+  --gradient-secondary: linear-gradient(135deg, #10B981 0%, #06b6d4 100%); /* Emerald to Cyan */
+  --gradient-rose: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%); /* Rose to Pink */
+  --gradient-warm: linear-gradient(135deg, #f97316 0%, #e11d48 100%); /* Orange to Rose */
+  --gradient-light-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.4) 100%);
+  
+  --shadow-premium: 0 10px 30px -5px rgba(28, 25, 23, 0.05), 0 1px 3px rgba(28, 25, 23, 0.02);
+  --shadow-hover: 0 20px 40px -10px rgba(28, 25, 23, 0.08), 0 4px 6px -1px rgba(28, 25, 23, 0.03);
+  --shadow-glow-purple: 0 0 30px rgba(99, 102, 241, 0.18);
+  --shadow-glow-emerald: 0 0 30px rgba(16, 185, 129, 0.18);
 }
 
 body {
@@ -82,31 +94,36 @@ body {
   }
   
   .glass-panel {
-    background: var(--surface-container-lowest);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: none; /* No drop shadows rule */
+    background: var(--gradient-light-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow-premium);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-panel:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(255, 255, 255, 0.9);
   }
 
   .ambient-shadow-primary {
-    box-shadow: none; /* Replaced by tonal borders */
+    box-shadow: var(--shadow-glow-purple);
   }
 
   .ambient-shadow-tertiary {
-    box-shadow: none; /* Replaced by tonal borders */
+    box-shadow: var(--shadow-glow-emerald);
   }
 
   .glow-text-emerald {
-    text-shadow: none; /* Corporate minimalism */
     color: var(--obsidian-success);
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
   }
   
   .bg-grid-cyber {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
+      linear-gradient(to right, rgba(99, 102, 241, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(99, 102, 241, 0.02) 1px, transparent 1px);
   }
 }
 
@@ -142,7 +159,11 @@ body {
 /* 2. Container & Card Surface Elements */
 .bg-\[\#121212\], .bg-\#121212, .bg-\[\#0e0e0e\], .bg-\[\#101010\], .bg-\[\#191921\], .bg-\[\#171f33\], .bg-\[\#1e293b\], .bg-\[\#1a1818\], .bg-zinc-900, .bg-slate-900, .bg-neutral-900,
 .bg-zinc-900\/50, .bg-zinc-900\/40, .bg-zinc-900\/20, .bg-zinc-900\/60, .bg-zinc-900\/10, .bg-zinc-950\/40, .bg-zinc-950\/50, .bg-zinc-800\/50, .bg-\[\#141313\]\/40, .bg-\[\#121212\]\/40, .bg-\[\#1f1f28\]\/40 {
-  background-color: var(--surface-container-lowest) !important; /* Pure white card base */
+  background: var(--gradient-light-glass) !important; /* Pure white card base */
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: var(--shadow-premium) !important;
   color: var(--foreground) !important;
 }
 
@@ -168,11 +189,11 @@ header.bg-\[\#141313\]\/80, header.bg-\[\#0e0e15\]\/80, header.bg-\[\#0b1326\]\/
 .border-\[\#262626\], .border-\[\#1e293b\], .border-\[\#25252f\], .border-\[\#191921\], .border-\[\#1e1c1c\], .border-white\/10, .border-white\/5, .border-zinc-800\/80, .border-zinc-800, .border-zinc-900, .border-slate-800\/80, .border-slate-800, .border-slate-900,
 .border-\[\#1a1a1a\], .border-zinc-800\/60, .border-zinc-850, .border-zinc-800\/85, .border-zinc-700\/60,
 .border-\[\#ffffff\]\/20, .border-\[\#ffffff\]\/10, .border-\[\#ffffff\]\/25, .border-\[\#ffffff\]\/40, .focus\:border-\[\#ffffff\]\/40, .focus\:border-\[\#ffffff\] {
-  border-color: var(--outline-variant) !important;
+  border-color: rgba(28, 25, 23, 0.08) !important; /* Soft Gray border outline */
 }
 .border-white\/20, .border-white\/30, .border-zinc-700, .border-zinc-600, .border-slate-700, .border-slate-600,
 .border-\[\#ffffff\]\/50, .border-\[\#ffffff\] {
-  border-color: var(--outline) !important;
+  border-color: rgba(28, 25, 23, 0.18) !important; /* Premium outline highlight */
 }
 
 /* 5. Global Text Contrast Overrides */
@@ -199,20 +220,56 @@ input.bg-\[\#141313\]:focus, textarea.bg-\[\#141313\]:focus, select.bg-\[\#12121
   box-shadow: none !important;
 }
 
-/* 7. Solid Active Triggers (Ink buttons in Light Mode) */
+/* 7. Solid Active Triggers (Vibrant custom gradients in Light Mode) */
 button.bg-white, a.bg-white, .bg-white:not(aside):not(header):not(main) {
-  background-color: var(--foreground) !important; /* Ink black button */
-  color: var(--background) !important;          /* White text */
+  background: var(--gradient-primary) !important; /* Vibrant Indigo to Purple gradient */
+  color: #ffffff !important;                     /* High contrast white text */
+  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3) !important; /* Soft purple shadow */
+  border: none !important;
 }
 button.bg-white:hover, a.bg-white:hover {
-  background-color: var(--secondary) !important;
+  background: var(--gradient-primary) !important;
+  opacity: 0.9 !important;
+  box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.4) !important;
 }
 
 /* 8. Active Badges & Micro-indicator Surfaces */
 .bg-white\/5, .bg-white\/10, .bg-\[\#ffffff\]\/10, .bg-white\/20, .bg-\[\#ffffff\]\/20, .bg-\[\#ffffff\]\/5 {
-  background-color: var(--primary-container) !important;
+  background-color: rgba(99, 102, 241, 0.05) !important; /* Subtle purple badge fill */
+  color: #4f46e5 !important;                              /* Indigo text color for accents */
+  border: 1px solid rgba(99, 102, 241, 0.12) !important;
+}
+
+/* 9. Success & Alert Notifications status bands */
+.bg-emerald-950\/20, .bg-emerald-950\/80 {
+  background-color: #d1fae5 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #065f46 !important;
+}
+.bg-rose-950\/20, .bg-rose-950\/80 {
+  background-color: #ffe4e6 !important;
+  border-color: rgba(244, 63, 94, 0.2) !important;
+  color: #9f1239 !important;
+}
+
+/* 10. SVG Icon elements */
+header button svg, header a svg, aside svg {
   color: var(--foreground) !important;
-  border-color: var(--outline-variant) !important;
+}
+
+/* 11. Descendant Contrast Safety Overrides for dark/gradient elements */
+button.bg-white, a.bg-white, .bg-white:not(aside):not(header):not(main),
+button.bg-violet-600, button.bg-indigo-600, button.bg-zinc-950, button.bg-slate-950, button.bg-black,
+.bg-gradient-to-br, .bg-gradient-to-r, .bg-violet-600, .bg-indigo-600, .bg-emerald-600, .bg-rose-600,
+button.bg-white svg, a.bg-white svg, .bg-white:not(aside):not(header):not(main) svg,
+button.bg-violet-600 svg, button.bg-indigo-600 svg, button.bg-zinc-950 svg, button.bg-slate-950 svg, button.bg-black svg,
+.bg-gradient-to-br svg, .bg-gradient-to-r svg {
+  color: #ffffff !important;
+}
+button.bg-white *, a.bg-white *, .bg-white:not(aside):not(header):not(main) *,
+button.bg-violet-600 *, button.bg-indigo-600 *, button.bg-zinc-950 *, button.bg-slate-950 *, button.bg-black *,
+.bg-gradient-to-br *, .bg-gradient-to-r *, .bg-violet-600 *, .bg-indigo-600 *, .bg-emerald-600 *, .bg-rose-600 * {
+  color: #ffffff !important;
 }
 
 /* 9. Success & Alert Notifications status bands */
